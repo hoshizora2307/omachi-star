@@ -270,13 +270,22 @@
             background: rgba(6, 10, 23, 0.95);
             border-top: 1px solid rgba(255, 255, 255, 0.05);
             margin-top: 100px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        }
+
+        .footer-info {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .footer-info span {
+            display: inline-block;
+            margin: 0 12px;
         }
 
         .footer-credit {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: #718096;
             letter-spacing: 1px;
             white-space: nowrap;
@@ -303,6 +312,8 @@
             .partner-card { padding: 15px 10px; min-height: 75px; font-size: 0.9rem; }
             
             .to-top { bottom: 20px; right: 20px; width: 40px; height: 40px; font-size: 1.1rem; }
+            .footer-info { font-size: 0.8rem; margin-bottom: 12px; }
+            .footer-info span { display: block; margin: 4px 0; }
             .footer-credit { font-size: 0.75rem; letter-spacing: 0.5px; }
         }
 
@@ -310,6 +321,7 @@
             .partner-grid { grid-template-columns: 1fr; }
             nav ul { gap: 10px; }
             nav a { font-size: 0.8rem; }
+            .footer-info { font-size: 0.75rem; }
             .footer-credit { font-size: 0.65rem; }
         }
     </style>
@@ -357,6 +369,11 @@
         </div>
 
         <footer>
+            <div class="footer-info">
+                <span>株式会社MONDOCOLO</span>
+                <span>〒398-0002 長野県大町市大町俵町１９０３−１</span>
+                <span>TEL: 0261-85-0131</span>
+            </div>
             <div class="footer-credit">&copy; 株式会社MONDOCOLO. All rights reserved.</div>
         </footer>
     </div>
