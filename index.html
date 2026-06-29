@@ -193,20 +193,6 @@
             border-radius: 4px;
         }
 
-        .scroll-down {
-            position: absolute;
-            bottom: 40px;
-            color: #fff;
-            text-decoration: none;
-            font-size: 0.9rem;
-            letter-spacing: 2px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            animation: bounce 2s infinite;
-        }
-
         .sec-title {
             text-align: center;
             font-size: 2.2rem;
@@ -244,20 +230,60 @@
             border-color: var(--accent-gold);
         }
 
+        .to-top {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 45px;
+            height: 45px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--accent-gold);
+            border-radius: 50%;
+            color: var(--accent-gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 1.3rem;
+            z-index: 999;
+            box-shadow: 0 0 15px var(--accent-glow);
+            transition: all 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .to-top.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .to-top:hover {
+            background: var(--accent-gold);
+            color: #060a17;
+            box-shadow: 0 0 20px var(--accent-gold);
+            transform: translateY(-3px);
+        }
+
         footer {
             text-align: center;
-            padding: 40px;
+            padding: 40px 20px;
             background: rgba(6, 10, 23, 0.95);
             border-top: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .footer-credit {
             font-size: 0.9rem;
             color: #718096;
             letter-spacing: 1px;
-            margin-top: 100px;
+            white-space: nowrap;
         }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; text-shadow: 0 0 15px var(--accent-gold); } }
-        @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-10px); } 60% { transform: translateY(-5px); } }
 
         @media (max-width: 768px) {
             header { padding: 0 20px; height: 65px; }
@@ -275,12 +301,16 @@
             
             .partner-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
             .partner-card { padding: 15px 10px; min-height: 75px; font-size: 0.9rem; }
+            
+            .to-top { bottom: 20px; right: 20px; width: 40px; height: 40px; font-size: 1.1rem; }
+            .footer-credit { font-size: 0.75rem; letter-spacing: 0.5px; }
         }
 
         @media (max-width: 480px) {
             .partner-grid { grid-template-columns: 1fr; }
             nav ul { gap: 10px; }
             nav a { font-size: 0.8rem; }
+            .footer-credit { font-size: 0.65rem; }
         }
     </style>
 </head>
@@ -312,10 +342,6 @@
             <p>星空案内ツアーガイド最高峰の体験</p>
             <h1>銀河の旅人</h1>
             <div class="launch-text">2026年8月始動</div>
-            <a href="#partners" class="scroll-down">
-                <span>Partners</span>
-                <span>↓</span>
-            </a>
         </div>
 
         <div class="container">
@@ -331,17 +357,27 @@
         </div>
 
         <footer>
-            &copy; 株式会社MONDOCOLO. All rights reserved.
+            <div class="footer-credit">&copy; 株式会社MONDOCOLO. All rights reserved.</div>
         </footer>
     </div>
 
+    <a href="#" id="to-top" class="to-top">✦</a>
+
     <script>
         const header = document.getElementById('main-header');
+        const toTopBtn = document.getElementById('to-top');
+
         window.addEventListener('scroll', () => {
             if (window.scrollY > 50) {
                 header.classList.add('scrolled');
             } else {
                 header.classList.remove('scrolled');
+            }
+
+            if (window.scrollY > 300) {
+                toTopBtn.classList.add('visible');
+            } else {
+                toTopBtn.classList.remove('visible');
             }
         });
 
