@@ -481,7 +481,7 @@
             padding: 12px 28px;
             color: var(--accent-gold);
             border-radius: 30px;
-            text-decoration: none;
+            cursor: pointer;
             font-size: 0.95rem;
             letter-spacing: 2px;
             display: flex;
@@ -646,13 +646,9 @@
         <div class="cinema-container">
             <div class="cinema-text-box" id="cinema-text-container"></div>
         </div>
-        <a href="#" id="cinema-to-top" class="to-top" style="z-index: 2005; pointer-events: none; opacity: 0; bottom: 20px; right: 20px;">
-            <span class="star-icon">✦</span>
-            <span class="to-top-text" id="txt-cinema-top">ホームへ戻る</span>
-        </a>
-        <a href="#" id="btn-cinema-close" class="btn-home-back">
+        <div id="btn-cinema-close" class="btn-home-back">
             <span>✦</span> <span id="txt-cinema-back">ホームへ戻る</span>
-        </a>
+        </div>
     </div>
 
     <script>
@@ -673,7 +669,6 @@
                 address: "〒398-0002 長野県大町市大町俵町１９０３−１",
                 credit: "© 株式会社MONDOCOLO. All rights reserved.",
                 cinemaBack: "ホームへ戻る",
-                cinemaTop: "ホームへ戻る",
                 cinemaText: `
                     <p>長野県は星空の観察に適しています。</p>
                     <p style="margin-top: 30px;">阿智村・野辺山、そして大町市が</p>
@@ -697,7 +692,6 @@
                 address: "1903-1 Omachitawara-machi, Omachi City, Nagano 398-0002",
                 credit: "© MONDOCOLO Inc. All rights reserved.",
                 cinemaBack: "Back to Home",
-                cinemaTop: "Back to Home",
                 cinemaText: `
                     <p>Nagano Prefecture is the perfect place for stargazing.</p>
                     <p style="margin-top: 30px;">Achi Village, Nobeyama, and Omachi City</p>
@@ -721,7 +715,6 @@
                 address: "1903-1 Omachitawara-machi, Ciudad de Omachi, Nagano 398-0002",
                 credit: "© MONDOCOLO Inc. All rights reserved.",
                 cinemaBack: "Volver al Inicio",
-                cinemaTop: "Volver al Inicio",
                 cinemaText: `
                     <p>La prefectura de Nagano es el lugar perfecto para observar las estrellas.</p>
                     <p style="margin-top: 30px;">La villa de Achi, Nobeyama y la ciudad de Omachi</p>
@@ -745,7 +738,6 @@
                 address: "〒398-0002 长野县大町市大町俵町1903-1",
                 credit: "© MONDOCOLO Inc. All rights reserved.",
                 cinemaBack: "返回首页",
-                cinemaTop: "返回首页",
                 cinemaText: `
                     <p>长野县是绝佳的观星圣地。</p>
                     <p style="margin-top: 30px;">阿智村、野边山以及大町市</p>
@@ -769,7 +761,6 @@
                 address: "우편번호 398-0002 나가노현 오마치시 오마치타와라마치 1903-1",
                 credit: "© MONDOCOLO Inc. All rights reserved.",
                 cinemaBack: "홈으로 돌아가기",
-                cinemaTop: "홈으로 돌아가기",
                 cinemaText: `
                     <p>나가노현은 별을 관찰하기에 가장 좋은 곳입니다.</p>
                     <p style="margin-top: 30px;">아치 무라, 노베야마, 그리고 오마치 시가</p>
@@ -799,7 +790,6 @@
             document.getElementById('txt-address').innerText = translations[lang].address;
             document.getElementById('txt-credit').innerText = translations[lang].credit;
             document.getElementById('txt-cinema-back').innerText = translations[lang].cinemaBack;
-            document.getElementById('txt-cinema-top').innerText = translations[lang].cinemaTop;
             
             document.getElementById('cinema-text-container').innerHTML = translations[lang].cinemaText;
 
@@ -819,7 +809,6 @@
 
         const header = document.getElementById('main-header');
         const toTopBtn = document.getElementById('to-top');
-        const cinemaToTopBtn = document.getElementById('cinema-to-top');
         
         const btnLaunch = document.getElementById('btn-launch');
         const cinemaLayer = document.getElementById('cinema-layer');
@@ -877,19 +866,12 @@
             cinemaVideo.play().catch(error => {
                 console.log("Video playback failed:", error);
             });
-            cinemaToTopBtn.classList.add('visible');
-            cinemaToTopBtn.style.animation = 'fadeInTopButton 1s ease forwards 1s';
-            cinemaToTopBtn.style.pointerEvents = 'auto';
         });
 
-        btnCinemaClose.addEventListener('click', (e) => {
-            e.preventDefault();
+        btnCinemaClose.addEventListener('click', () => {
             cinemaLayer.classList.remove('active');
             document.body.classList.remove('no-scroll');
             cinemaVideo.pause();
-            cinemaToTopBtn.classList.remove('visible');
-            cinemaToTopBtn.style.animation = 'none';
-            cinemaToTopBtn.style.pointerEvents = 'none';
             
             const textBox = cinemaLayer.querySelector('.cinema-text-box');
             const newTextBox = textBox.cloneNode(true);
