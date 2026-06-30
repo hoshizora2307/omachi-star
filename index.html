@@ -296,6 +296,8 @@
             border-radius: 4px;
             cursor: pointer;
             transition: all 0.3s ease;
+            position: relative;
+            z-index: 10;
         }
 
         .launch-text:hover {
@@ -852,7 +854,13 @@
             document.getElementById('cinema-text-container').innerHTML = translations[lang].cinemaText;
 
             document.getElementById('lang-switcher').classList.remove('open');
-            localStorage.setItem('selectedLang', lang);
+            
+            // エラー回避：プレビュー環境等でlocalStorageがブロックされても処理を止めない
+            try {
+                localStorage.setItem('selectedLang', lang);
+            } catch (e) {
+                console.warn("言語の保存がブロックされましたが、動作は続行します。");
+            }
         }
 
         const langSwitcher = document.getElementById('lang-switcher');
@@ -862,7 +870,13 @@
         });
         document.addEventListener('click', () => langSwitcher.classList.remove('open'));
 
-        const savedLang = localStorage.getItem('selectedLang') || 'ja';
+        // エラー回避：プレビュー環境等でlocalStorageがブロックされても処理を止めない
+        let savedLang = 'ja';
+        try {
+            savedLang = localStorage.getItem('selectedLang') || 'ja';
+        } catch (e) {
+            console.warn("保存された言語の読み込みがブロックされました。");
+        }
         changeLanguage(savedLang);
 
         const header = document.getElementById('main-header');
@@ -904,7 +918,7 @@
             let current = '';
             sections.forEach(section => {
                 const sectionTop = section.offsetTop;
-                if (pageYOffset >= sectionTop - 100) {
+                if (window.pageYOffset >= sectionTop - 100) {
                     current = section.getAttribute('id');
                 }
             });
@@ -924,3 +938,17 @@
             cinemaVideo.play().catch(error => {
                 console.log("Video playback failed:", error);
             });
+        });
+
+        btnCinemaClose.addEventListener('click', () => {
+            cinemaLayer.classList.remove('active');
+            document.body.classList.remove('no-scroll');
+            cinemaVideo.pause();
+            
+            const textBox = cinemaLayer.querySelector('.cinema-text-box');
+            const newTextBox = textBox.cloneNode(true);
+            textBox.parentNode.replaceChild(newTextBox, textBox);
+        });
+    </script>
+</body>
+</html>
