@@ -595,6 +595,7 @@
                 <ul class="lang-dropdown">
                     <li onclick="changeLanguage('ja')">日本語</li>
                     <li onclick="changeLanguage('en')">English</li>
+                    <li onclick="changeLanguage('es')">Español</li>
                     <li onclick="changeLanguage('zh')">简体中文</li>
                     <li onclick="changeLanguage('ko')">한국어</li>
                 </ul>
@@ -703,6 +704,30 @@
                     <p>with all our <span class="love-highlight">Love</span>.</p>
                 `
             },
+            es: {
+                subLogo: "Omachi Onsen-kyo",
+                mainLogo: "Observación de Estrellas",
+                navHome: "Inicio",
+                navPartners: "Socios",
+                heroSub: "La Máxima Experiencia Guiada de Cielos Estrellados",
+                heroTitle: "Viajero Galáctico",
+                btnLaunch: "Inicio en Agosto de 2026",
+                partnerTitle: "PARTNERS",
+                p1: "Ryosuiten Keisui",
+                p2: "Yakushi-no-yu",
+                p4: "Asociación Turística de Omachi Onsen",
+                company: "MONDOCOLO Inc.",
+                address: "1903-1 Omachitawara-machi, Ciudad de Omachi, Nagano 398-0002",
+                credit: "© MONDOCOLO Inc. All rights reserved.",
+                cinemaBack: "Volver al Inicio",
+                cinemaTop: "Volver al Inicio",
+                cinemaText: `
+                    <p>La prefectura de Nagano es el lugar perfecto para observar las estrellas.</p>
+                    <p style="margin-top: 30px;">La villa de Achi, Nobeyama y la ciudad de Omachi</p>
+                    <p>te llevarán a un maravilloso viaje por el universo</p>
+                    <p>con todo nuestro <span class="love-highlight">Amor</span>.</p>
+                `
+            },
             zh: {
                 subLogo: "大町温泉乡",
                 mainLogo: "星空观赏会",
@@ -754,7 +779,9 @@
         };
 
         function changeLanguage(lang) {
-            document.getElementById('current-lang').innerText = lang.toUpperCase();
+            let displayLang = lang.toUpperCase();
+            if(lang === 'es') displayLang = 'ES';
+            document.getElementById('current-lang').innerText = displayLang;
             
             document.getElementById('txt-sub-logo').innerText = translations[lang].subLogo;
             document.getElementById('txt-main-logo').innerText = translations[lang].mainLogo;
