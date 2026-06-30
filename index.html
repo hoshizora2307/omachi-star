@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>大町温泉郷 星空観賞会 ～銀河の旅人～</title>
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-overlay: rgba(6, 10, 23, 0.75);
@@ -11,6 +12,7 @@
             --accent-gold: #e6c27a;
             --accent-glow: rgba(230, 194, 122, 0.4);
             --card-bg: rgba(15, 23, 42, 0.6);
+            --accent-pink: #ff7495;
         }
 
         * {
@@ -242,27 +244,38 @@
             border-color: var(--accent-gold);
         }
 
-        /* 右下のTOPへ戻るボタン */
         .to-top {
             position: fixed;
             bottom: 25px;
             right: 25px;
-            width: 45px;
-            height: 45px;
-            background: rgba(15, 23, 42, 0.8);
+            width: 54px;
+            height: 54px;
+            background: rgba(15, 23, 42, 0.85);
             border: 1px solid var(--accent-gold);
             border-radius: 50%;
             color: var(--accent-gold);
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             text-decoration: none;
-            font-size: 1.3rem;
             z-index: 999;
             box-shadow: 0 0 15px var(--accent-glow);
             transition: all 0.3s ease;
             opacity: 0;
             pointer-events: none;
+        }
+
+        .to-top .star-icon {
+            font-size: 1.2rem;
+            line-height: 1;
+            margin-bottom: -2px;
+        }
+
+        .to-top .to-top-text {
+            font-size: 0.65rem;
+            font-weight: bold;
+            letter-spacing: 0.5px;
         }
 
         .to-top.visible {
@@ -274,12 +287,12 @@
             background: var(--accent-gold);
             color: #060a17;
             box-shadow: 0 0 20px var(--accent-gold);
-            transform: translateY(-3px);
+            transform: translateY(-4px);
         }
 
         footer {
             text-align: center;
-            padding: 40px 20px;
+            padding: 60px 20px;
             background: rgba(6, 10, 23, 0.95);
             border-top: 1px solid rgba(255, 255, 255, 0.05);
             margin-top: 100px;
@@ -288,7 +301,7 @@
         .footer-info {
             font-size: 0.9rem;
             color: #cbd5e1;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             letter-spacing: 1px;
         }
 
@@ -301,10 +314,12 @@
             font-size: 0.85rem;
             color: #718096;
             letter-spacing: 1px;
-            white-space: nowrap;
+            white-space: normal;
+            line-height: 1.8;
+            max-width: 600px;
+            margin: 0 auto;
         }
 
-        /* シネマティック別ページ（映画風演出） */
         .cinema-page {
             position: fixed;
             top: 0;
@@ -356,13 +371,12 @@
             align-items: center;
         }
 
-        /* 映画風の縦スクロールテキスト定義 */
         .cinema-text-box {
             position: absolute;
             width: 90%;
             max-width: 680px;
             text-align: center;
-            top: 100%; /* 画面外の下からスタート */
+            top: 100%;
             transform: translateY(0);
         }
 
@@ -371,17 +385,23 @@
         }
 
         .cinema-text-box p {
-            font-size: 1.8rem;
-            line-height: 2.2;
+            font-family: 'Zen Maru Gothic', sans-serif;
+            font-size: 1.9rem;
+            line-height: 2.4;
             color: #fff;
-            letter-spacing: 3px;
-            text-shadow: 0 0 10px rgba(255,255,255,0.5), 0 0 20px rgba(230,194,122,0.3);
-            font-weight: 300;
+            letter-spacing: 4px;
+            text-shadow: 0 0 10px rgba(255,255,255,0.4), 0 0 20px rgba(230,194,122,0.2);
+            font-weight: 500;
             word-break: keep-all;
             overflow-wrap: anywhere;
         }
 
-        /* ホームへ戻るボタン */
+        .love-highlight {
+            color: var(--accent-pink);
+            font-weight: 700;
+            text-shadow: 0 0 12px rgba(255, 116, 149, 0.6);
+        }
+
         .btn-home-back {
             position: absolute;
             bottom: 40px;
@@ -407,7 +427,7 @@
 
         .cinema-page.active .btn-home-back {
             animation: fadeInButton 3s ease forwards;
-            animation-delay: 3s; /* テキストが流れ始めてから少しして表示 */
+            animation-delay: 2s;
         }
 
         .btn-home-back:hover {
@@ -418,7 +438,7 @@
 
         @keyframes movieScroll {
             0% { top: 100%; transform: translateY(0); }
-            100% { top: -40%; transform: translateY(0); }
+            100% { top: -50%; transform: translateY(0); }
         }
 
         @keyframes fadeInButton {
@@ -428,6 +448,8 @@
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; text-shadow: 0 0 15px var(--accent-gold); } }
+
+        @keyframes fadeInTopButton { from { opacity: 0; } to { opacity: 1; } }
 
         @media (max-width: 768px) {
             header { padding: 0 20px; height: 65px; }
@@ -446,21 +468,22 @@
             .partner-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
             .partner-card { padding: 15px 10px; min-height: 75px; font-size: 0.9rem; }
             
-            .to-top { bottom: 20px; right: 20px; width: 40px; height: 40px; font-size: 1.1rem; }
-            .footer-info { font-size: 0.8rem; margin-bottom: 12px; }
-            .footer-info span { display: block; margin: 4px 0; }
-            .footer-credit { font-size: 0.75rem; letter-spacing: 0.5px; }
+            .to-top { bottom: 20px; right: 20px; width: 46px; height: 46px; }
+            .to-top .star-icon { font-size: 1rem; }
+            .to-top .to-top-text { font-size: 0.55rem; }
 
-            /* 映画風テキストのスマホ最適化 */
+            .footer-info span { display: block; margin: 6px 0; }
+            .footer-credit { font-size: 0.75rem; letter-spacing: 0.5px; padding: 0 10px; }
+
             .cinema-text-box p {
-                font-size: 1.25rem;
-                line-height: 2.4;
-                letter-spacing: 2px;
+                font-size: 1.35rem;
+                line-height: 2.5;
+                letter-spacing: 3px;
                 padding: 0 10px;
             }
             @keyframes movieScroll {
                 0% { top: 100%; }
-                100% { top: -60%; }
+                100% { top: -65%; }
             }
             .btn-home-back { padding: 10px 22px; font-size: 0.85rem; bottom: 30px; }
         }
@@ -526,7 +549,10 @@
         </footer>
     </div>
 
-    <a href="#" id="to-top" class="to-top">✦</a>
+    <a href="#" id="to-top" class="to-top">
+        <span class="star-icon">✦</span>
+        <span class="to-top-text">TOP</span>
+    </a>
 
 
     <div id="cinema-layer" class="cinema-page">
@@ -537,11 +563,15 @@
         <div class="cinema-container">
             <div class="cinema-text-box">
                 <p>長野県は星空の観察に適しています。</p>
-                <p style="margin-top: 25px;">阿智村・野辺山、そして大町市が</p>
-                <p>愛を込めてあなたを</p>
-                <p>銀河の旅へお連れします。</p>
+                <p style="margin-top: 30px;">阿智村・野辺山、そして大町市が</p>
+                <p><span class="love-highlight">愛</span>を込めてあなたを</p>
+                <p>宇宙の旅へお連れします。</p>
             </div>
         </div>
+        <a href="#" id="cinema-to-top" class="to-top" style="z-index: 2005; pointer-events: none; opacity: 0; bottom: 20px; right: 20px;">
+            <span class="star-icon">✦</span>
+            <span class="to-top-text">TOP</span>
+        </a>
         <a href="#" id="btn-cinema-close" class="btn-home-back">
             <span>✦</span> ホームへ戻る
         </a>
@@ -551,14 +581,13 @@
     <script>
         const header = document.getElementById('main-header');
         const toTopBtn = document.getElementById('to-top');
+        const cinemaToTopBtn = document.getElementById('cinema-to-top');
         
-        // シネマティックページ関連の要素
         const btnLaunch = document.getElementById('btn-launch');
         const cinemaLayer = document.getElementById('cinema-layer');
         const btnCinemaClose = document.getElementById('btn-cinema-close');
         const cinemaVideo = document.getElementById('cinema-video-element');
 
-        // 通常ページのスクロールイベント
         window.addEventListener('scroll', () => {
             if (window.scrollY > 50) {
                 header.classList.add('scrolled');
@@ -566,14 +595,13 @@
                 header.classList.remove('scrolled');
             }
 
-            if (window.scrollY > 300) {
+            if (!cinemaLayer.classList.contains('active') && window.scrollY > 300) {
                 toTopBtn.classList.add('visible');
             } else {
                 toTopBtn.classList.remove('visible');
             }
         });
 
-        // フェードインアニメーションの監視
         const observerOptions = { root: null, rootMargin: '0px', threshold: 0.15 };
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -585,7 +613,6 @@
 
         document.querySelectorAll('.fade-in-up').forEach(el => observer.observe(el));
 
-        // ナビゲーション連動
         const sections = document.querySelectorAll('div[id], section[id]');
         const navLinks = document.querySelectorAll('.nav-link');
         window.addEventListener('scroll', () => {
@@ -604,25 +631,28 @@
             });
         });
 
-        // 「8月始動」をタップした時のシネマティックページ起動
         btnLaunch.addEventListener('click', (e) => {
             e.preventDefault();
-            document.body.classList.add('no-scroll'); // 背景スクロール禁止
+            document.body.classList.add('no-scroll');
             cinemaLayer.classList.add('active');
             cinemaVideo.currentTime = 0;
             cinemaVideo.play().catch(error => {
-                console.log("Video play interrupted or failed:", error);
+                console.log("Video playback failed:", error);
             });
+            cinemaToTopBtn.classList.add('visible');
+            cinemaToTopBtn.style.animation = 'fadeInTopButton 1s ease forwards 1s';
+            cinemaToTopBtn.style.pointerEvents = 'auto';
         });
 
-        // シネマティックページから「ホームへ戻る」時の処理
         btnCinemaClose.addEventListener('click', (e) => {
             e.preventDefault();
             cinemaLayer.classList.remove('active');
             document.body.classList.remove('no-scroll');
             cinemaVideo.pause();
+            cinemaToTopBtn.classList.remove('visible');
+            cinemaToTopBtn.style.animation = 'none';
+            cinemaToTopBtn.style.pointerEvents = 'none';
             
-            // アニメーションをリセットするために一度クラスを外して再計算させる（必要に応じて）
             const textBox = cinemaLayer.querySelector('.cinema-text-box');
             const newTextBox = textBox.cloneNode(true);
             textBox.parentNode.replaceChild(newTextBox, textBox);
