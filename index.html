@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>大町温泉郷 星空観賞会 ～銀河の旅人～</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✦</text></svg>">
-    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@500&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-overlay: rgba(6, 10, 23, 0.75);
@@ -14,6 +14,7 @@
             --accent-glow: rgba(230, 194, 122, 0.4);
             --card-bg: rgba(15, 23, 42, 0.6);
             --accent-pink: #ff7495;
+            --kids-cyan: #7bf2ff;
         }
 
         * {
@@ -237,6 +238,29 @@
             padding: 0 20px;
         }
 
+        /* 子ども向けプロジェクト用のめちゃくちゃかわいいフォント・デザイン設定 */
+        .project-tag {
+            font-family: 'Kiwi Maru', serif;
+            font-size: 1.4rem;
+            color: var(--kids-cyan);
+            background: rgba(123, 242, 255, 0.12);
+            border: 1px dashed var(--kids-cyan);
+            padding: 6px 20px;
+            border-radius: 30px;
+            margin-bottom: 25px;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(123, 242, 255, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: bounce 4s infinite ease-in-out;
+        }
+
+        .project-tag span {
+            font-size: 1.1rem;
+            animation: spin 6s infinite linear;
+        }
+
         .hero p {
             font-size: 1.2rem;
             letter-spacing: 4px;
@@ -246,7 +270,7 @@
 
         .hero h1 {
             font-size: 4rem;
-            margin: 20px 0 30px 0;
+            margin: 15px 0 30px 0;
             letter-spacing: 8px;
             color: #fff;
             text-shadow: 0 0 20px var(--accent-glow), 0 0 40px rgba(255,255,255,0.2);
@@ -516,8 +540,17 @@
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; text-shadow: 0 0 15px var(--accent-gold); } }
-
-        @keyframes fadeInTopButton { from { opacity: 0; } to { opacity: 1; } }
+        
+        /* ふわふわ揺れるアニメーション */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        /* 星がくるくる回るアニメーション */
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
 
         @media (max-width: 768px) {
             header { padding: 0 20px; height: 65px; }
@@ -530,6 +563,7 @@
             .lang-btn { padding: 4px 10px; font-size: 0.75rem; }
             
             .container { padding: 60px 15px; }
+            .project-tag { font-size: 1.1rem; padding: 4px 14px; margin-bottom: 15px; }
             .hero h1 { font-size: 2.5rem; letter-spacing: 4px; word-break: keep-all; overflow-wrap: anywhere; margin: 15px 0 25px 0; }
             .hero p { font-size: 1rem; letter-spacing: 2px; padding: 0 10px; }
             .launch-text { font-size: 1.3rem; letter-spacing: 4px; padding: 8px 20px; }
@@ -606,6 +640,9 @@
 
     <div class="content">
         <div id="home" class="hero">
+            <div class="project-tag">
+                <span>⭐</span><div id="txt-project-tag">星と君ぷろじぇくと</div><span>⭐</span>
+            </div>
             <p id="txt-hero-sub">星空案内ツアーガイド最高峰の体験</p>
             <h1 id="txt-hero-title">銀河の旅人</h1>
             <div class="launch-text" id="btn-launch">2026年8月始動</div>
@@ -654,6 +691,7 @@
     <script>
         const translations = {
             ja: {
+                projectTag: "星と君ぷろじぇくと",
                 subLogo: "大町温泉郷",
                 mainLogo: "星空観賞会",
                 navHome: "Home",
@@ -677,6 +715,7 @@
                 `
             },
             en: {
+                projectTag: "Hoshi to Kimi Project",
                 subLogo: "Omachi Onsen-kyo",
                 mainLogo: "Starry Sky Tour",
                 navHome: "Home",
@@ -700,6 +739,7 @@
                 `
             },
             es: {
+                projectTag: "Proyecto Hoshi to Kimi",
                 subLogo: "Omachi Onsen-kyo",
                 mainLogo: "Observación de Estrellas",
                 navHome: "Inicio",
@@ -723,6 +763,7 @@
                 `
             },
             zh: {
+                projectTag: "星星与你企划",
                 subLogo: "大町温泉乡",
                 mainLogo: "星空观赏会",
                 navHome: "首页",
@@ -746,6 +787,7 @@
                 `
             },
             ko: {
+                projectTag: "별과 당신 프로젝트",
                 subLogo: "오마치 온천향",
                 mainLogo: "별자리 감상회",
                 navHome: "홈",
@@ -775,6 +817,7 @@
             if(lang === 'es') displayLang = 'ES';
             document.getElementById('current-lang').innerText = displayLang;
             
+            document.getElementById('txt-project-tag').innerText = translations[lang].projectTag;
             document.getElementById('txt-sub-logo').innerText = translations[lang].subLogo;
             document.getElementById('txt-main-logo').innerText = translations[lang].mainLogo;
             document.getElementById('nav-home').innerText = translations[lang].navHome;
