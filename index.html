@@ -103,6 +103,12 @@
             letter-spacing: 2px;
         }
 
+        .nav-container {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+
         nav ul {
             list-style: none;
             display: flex;
@@ -135,6 +141,67 @@
         }
         nav a:hover::after, nav a.active::after {
             width: 100%;
+        }
+
+        .lang-switcher {
+            position: relative;
+            display: inline-block;
+        }
+
+        .lang-btn {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(230, 194, 122, 0.4);
+            color: var(--text-main);
+            padding: 6px 14px;
+            font-size: 0.85rem;
+            border-radius: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .lang-btn:hover {
+            background: rgba(230, 194, 122, 0.15);
+            border-color: var(--accent-gold);
+        }
+
+        .lang-dropdown {
+            position: absolute;
+            top: 120%;
+            right: 0;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(230, 194, 122, 0.3);
+            border-radius: 8px;
+            list-style: none;
+            padding: 6px 0;
+            min-width: 110px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            transform: translateY(-10px);
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .lang-switcher.open .lang-dropdown {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .lang-dropdown li {
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .lang-dropdown li:hover {
+            background: rgba(230, 194, 122, 0.2);
+            color: var(--accent-gold);
         }
 
         .content {
@@ -374,7 +441,7 @@
         .cinema-text-box {
             position: absolute;
             width: 90%;
-            max-width: 680px;
+            max-width: 720px;
             text-align: center;
             top: 100%;
             transform: translateY(0);
@@ -456,8 +523,10 @@
             .logo { font-size: 1.1rem; gap: 8px; }
             .logo-icon { font-size: 1.4rem; }
             .logo-text span { font-size: 0.75rem; letter-spacing: 1px; }
+            .nav-container { gap: 15px; }
             nav ul { gap: 15px; }
             nav a { font-size: 0.85rem; }
+            .lang-btn { padding: 4px 10px; font-size: 0.75rem; }
             
             .container { padding: 60px 15px; }
             .hero h1 { font-size: 2.5rem; letter-spacing: 4px; word-break: keep-all; overflow-wrap: anywhere; margin: 15px 0 25px 0; }
@@ -494,6 +563,8 @@
             nav a { font-size: 0.8rem; }
             .footer-info { font-size: 0.75rem; }
             .footer-credit { font-size: 0.65rem; }
+            header { padding: 0 10px; }
+            .nav-container { gap: 8px; }
         }
     </style>
 </head>
@@ -508,44 +579,55 @@
         <a href="#" class="logo">
             <div class="logo-icon">✦</div>
             <div class="logo-text">
-                <span>大町温泉郷</span>
-                星空観賞会
+                <span id="txt-sub-logo">大町温泉郷</span>
+                <span id="txt-main-logo" style="font-size:1.4rem; color:#fff; font-weight:bold; letter-spacing:0;">星空観賞会</span>
             </div>
         </a>
-        <nav>
-            <ul>
-                <li><a href="#home" class="nav-link active">Home</a></li>
-                <li><a href="#partners" class="nav-link">Partners</a></li>
-            </ul>
-        </nav>
+        <div class="nav-container">
+            <nav>
+                <ul>
+                    <li><a href="#home" class="nav-link active" id="nav-home">Home</a></li>
+                    <li><a href="#partners" class="nav-link" id="nav-partners">Partners</a></li>
+                </ul>
+            </nav>
+            <div class="lang-switcher" id="lang-switcher">
+                <button class="lang-btn">🌐 <span id="current-lang">JA</span> ▼</button>
+                <ul class="lang-dropdown">
+                    <li onclick="changeLanguage('ja')">日本語</li>
+                    <li onclick="changeLanguage('en')">English</li>
+                    <li onclick="changeLanguage('zh')">简体中文</li>
+                    <li onclick="changeLanguage('ko')">한국어</li>
+                </ul>
+            </div>
+        </div>
     </header>
 
     <div class="content">
         <div id="home" class="hero">
-            <p>星空案内ツアーガイド最高峰の体験</p>
-            <h1>銀河の旅人</h1>
+            <p id="txt-hero-sub">星空案内ツアーガイド最高峰の体験</p>
+            <h1 id="txt-hero-title">銀河の旅人</h1>
             <div class="launch-text" id="btn-launch">2026年8月始動</div>
         </div>
 
         <div class="container">
             <section id="partners" class="fade-in-up">
-                <h2 class="sec-title">PARTNERS</h2>
+                <h2 class="sec-title" id="txt-partner-title">PARTNERS</h2>
                 <div class="partner-grid">
-                    <div class="partner-card">緑翠亭 景水</div>
-                    <div class="partner-card">薬師の湯</div>
+                    <div class="partner-card" id="p1">緑翠亭 景水</div>
+                    <div class="partner-card" id="p2">薬師の湯</div>
                     <div class="partner-card">ねるだけ</div>
-                    <div class="partner-card">大町温泉郷観光協会</div>
+                    <div class="partner-card" id="p4">大町温泉郷観光協会</div>
                 </div>
             </section>
         </div>
 
         <footer>
             <div class="footer-info">
-                <span>株式会社MONDOCOLO</span>
-                <span>〒398-0002 長野県大町市大町俵町１９０３−１</span>
+                <span id="txt-company">株式会社MONDOCOLO</span>
+                <span id="txt-address">〒398-0002 長野県大町市大町俵町１９０３−１</span>
                 <span>TEL: 0261-85-0131</span>
             </div>
-            <div class="footer-credit">&copy; 株式会社MONDOCOLO. All rights reserved.</div>
+            <div class="footer-credit" id="txt-credit">&copy; 株式会社MONDOCOLO. All rights reserved.</div>
         </footer>
     </div>
 
@@ -554,31 +636,159 @@
         <span class="to-top-text">TOP</span>
     </a>
 
-
     <div id="cinema-layer" class="cinema-page">
         <video class="cinema-video" loop muted playsinline id="cinema-video-element">
             <source src="4989.mp4" type="video/mp4">
         </video>
         <div class="cinema-overlay"></div>
         <div class="cinema-container">
-            <div class="cinema-text-box">
-                <p>長野県は星空の観察に適しています。</p>
-                <p style="margin-top: 30px;">阿智村・野辺山、そして大町市が</p>
-                <p><span class="love-highlight">愛</span>を込めてあなたを</p>
-                <p>宇宙の旅へお連れします。</p>
-            </div>
+            <div class="cinema-text-box" id="cinema-text-container"></div>
         </div>
         <a href="#" id="cinema-to-top" class="to-top" style="z-index: 2005; pointer-events: none; opacity: 0; bottom: 20px; right: 20px;">
             <span class="star-icon">✦</span>
-            <span class="to-top-text">ホームへ戻る</span>
+            <span class="to-top-text" id="txt-cinema-top">ホームへ戻る</span>
         </a>
         <a href="#" id="btn-cinema-close" class="btn-home-back">
-            <span>✦</span> ホームへ戻る
+            <span>✦</span> <span id="txt-cinema-back">ホームへ戻る</span>
         </a>
     </div>
 
-
     <script>
+        const translations = {
+            ja: {
+                subLogo: "大町温泉郷",
+                mainLogo: "星空観賞会",
+                navHome: "Home",
+                navPartners: "Partners",
+                heroSub: "星空案内ツアーガイド最高峰の体験",
+                heroTitle: "銀河の旅人",
+                btnLaunch: "2026年8月始動",
+                partnerTitle: "PARTNERS",
+                p1: "緑翠亭 景水",
+                p2: "薬師の湯",
+                p4: "大町温泉郷観光協会",
+                company: "株式会社MONDOCOLO",
+                address: "〒398-0002 長野県大町市大町俵町１９０３−１",
+                credit: "© 株式会社MONDOCOLO. All rights reserved.",
+                cinemaBack: "ホームへ戻る",
+                cinemaTop: "ホームへ戻る",
+                cinemaText: `
+                    <p>長野県は星空の観察に適しています。</p>
+                    <p style="margin-top: 30px;">阿智村・野辺山、そして大町市が</p>
+                    <p><span class="love-highlight">愛</span>を込めてあなたを</p>
+                    <p>宇宙の旅へお連れします。</p>
+                `
+            },
+            en: {
+                subLogo: "Omachi Onsen-kyo",
+                mainLogo: "Starry Sky Tour",
+                navHome: "Home",
+                navPartners: "Partners",
+                heroSub: "The Ultimate Starry Sky Guided Experience",
+                heroTitle: "Galactic Traveler",
+                btnLaunch: "Launching August 2026",
+                partnerTitle: "PARTNERS",
+                p1: "Ryosuiten Keisui",
+                p2: "Yakushi-no-yu",
+                p4: "Omachi Onsen Tourist Association",
+                company: "MONDOCOLO Inc.",
+                address: "1903-1 Omachitawara-machi, Omachi City, Nagano 398-0002",
+                credit: "© MONDOCOLO Inc. All rights reserved.",
+                cinemaBack: "Back to Home",
+                cinemaTop: "Back to Home",
+                cinemaText: `
+                    <p>Nagano Prefecture is the perfect place for stargazing.</p>
+                    <p style="margin-top: 30px;">Achi Village, Nobeyama, and Omachi City</p>
+                    <p>bring you into a journey through the universe</p>
+                    <p>with all our <span class="love-highlight">Love</span>.</p>
+                `
+            },
+            zh: {
+                subLogo: "大町温泉乡",
+                mainLogo: "星空观赏会",
+                navHome: "首页",
+                navPartners: "合作伙伴",
+                heroSub: "星空导游带来的顶级观星体验",
+                heroTitle: "银河旅行者",
+                btnLaunch: "2026年8月隆重登场",
+                partnerTitle: "PARTNERS",
+                p1: "绿翠亭 景水",
+                p2: "药师之汤",
+                p4: "大町温泉乡旅游协会",
+                company: "MONDOCOLO 株式会社",
+                address: "〒398-0002 长野县大町市大町俵町1903-1",
+                credit: "© MONDOCOLO Inc. All rights reserved.",
+                cinemaBack: "返回首页",
+                cinemaTop: "返回首页",
+                cinemaText: `
+                    <p>长野县是绝佳的观星圣地。</p>
+                    <p style="margin-top: 30px;">阿智村、野边山以及大町市</p>
+                    <p>将满怀<span class="love-highlight">爱</span>意，带您开启</p>
+                    <p>一场浪漫的宇宙之旅。</p>
+                `
+            },
+            ko: {
+                subLogo: "오마치 온천향",
+                mainLogo: "별자리 감상회",
+                navHome: "홈",
+                navPartners: "파트너",
+                heroSub: "최고의 별자리 가이드 투어 체험",
+                heroTitle: "은하수의 여행자",
+                btnLaunch: "2026년 8월 시동",
+                partnerTitle: "PARTNERS",
+                p1: "료스이텐 케이스이",
+                p2: "야쿠시노유",
+                p4: "오마치 온천향 관광협회",
+                company: "주식회사 MONDOCOLO",
+                address: "우편번호 398-0002 나가노현 오마치시 오마치타와라마치 1903-1",
+                credit: "© MONDOCOLO Inc. All rights reserved.",
+                cinemaBack: "홈으로 돌아가기",
+                cinemaTop: "홈으로 돌아가기",
+                cinemaText: `
+                    <p>나가노현은 별을 관찰하기에 가장 좋은 곳입니다.</p>
+                    <p style="margin-top: 30px;">아치 무라, 노베야마, 그리고 오마치 시가</p>
+                    <p>당신을 <span class="love-highlight">사랑</span>을 담아</p>
+                    <p>우주 여행으로 안내합니다.</p>
+                `
+            }
+        };
+
+        function changeLanguage(lang) {
+            document.getElementById('current-lang').innerText = lang.toUpperCase();
+            
+            document.getElementById('txt-sub-logo').innerText = translations[lang].subLogo;
+            document.getElementById('txt-main-logo').innerText = translations[lang].mainLogo;
+            document.getElementById('nav-home').innerText = translations[lang].navHome;
+            document.getElementById('nav-partners').innerText = translations[lang].navPartners;
+            document.getElementById('txt-hero-sub').innerText = translations[lang].heroSub;
+            document.getElementById('txt-hero-title').innerText = translations[lang].heroTitle;
+            document.getElementById('btn-launch').innerText = translations[lang].btnLaunch;
+            document.getElementById('txt-partner-title').innerText = translations[lang].partnerTitle;
+            document.getElementById('p1').innerText = translations[lang].p1;
+            document.getElementById('p2').innerText = translations[lang].p2;
+            document.getElementById('p4').innerText = translations[lang].p4;
+            document.getElementById('txt-company').innerText = translations[lang].company;
+            document.getElementById('txt-address').innerText = translations[lang].address;
+            document.getElementById('txt-credit').innerText = translations[lang].credit;
+            document.getElementById('txt-cinema-back').innerText = translations[lang].cinemaBack;
+            document.getElementById('txt-cinema-top').innerText = translations[lang].cinemaTop;
+            
+            document.getElementById('cinema-text-container').innerHTML = translations[lang].cinemaText;
+
+            document.getElementById('lang-switcher').classList.remove('open');
+            localStorage.setItem('selectedLang', lang);
+        }
+
+        const langSwitcher = document.getElementById('lang-switcher');
+        langSwitcher.querySelector('.lang-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            langSwitcher.classList.toggle('open');
+        });
+        document.addEventListener('click', () => langSwitcher.classList.remove('open'));
+
+        const savedLang = localStorage.getItem('selectedLang') || 'ja';
+        changeLanguage(savedLang);
+
         const header = document.getElementById('main-header');
         const toTopBtn = document.getElementById('to-top');
         const cinemaToTopBtn = document.getElementById('cinema-to-top');
