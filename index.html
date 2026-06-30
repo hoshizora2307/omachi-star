@@ -59,7 +59,6 @@
             z-index: -1;
         }
 
-        /* ヘッダー全体の高さを少し広げて右側に要素を縦並びできるように調整 */
         header {
             position: fixed;
             top: 0;
@@ -106,7 +105,6 @@
             letter-spacing: 2px;
         }
 
-        /* 言語選択とプロジェクト名を右側に縦並びにするコンテナ */
         .right-nav-box {
             display: flex;
             flex-direction: column;
@@ -215,10 +213,9 @@
             color: var(--accent-gold);
         }
 
-        /* 👑 「星と君ぷろじぇくと」右上に小さくかわいく配置するスタイル設定 */
         .project-tag {
             font-family: 'Kiwi Maru', serif;
-            font-size: 0.75rem; /* 小さく控えめに */
+            font-size: 0.75rem;
             color: var(--kids-cyan);
             background: rgba(123, 242, 255, 0.08);
             border: 1px dashed rgba(123, 242, 255, 0.5);
@@ -727,7 +724,7 @@
                 cinemaBack: "ホームへ戻る",
                 cinemaText: `
                     <p>長野県は星空の観察に適しています。</p>
-                    <p style="margin-top: 30px;">阿智村・野辺山、精度大町市が</p>
+                    <p style="margin-top: 30px;">阿智村・野辺山、そして大町市で、</p>
                     <p><span class="love-highlight">愛</span>を込めてあなたを</p>
                     <p>宇宙の旅へお連れします。</p>
                 `
@@ -801,7 +798,7 @@
                     <p>长野县是绝佳的观星圣地。</p>
                     <p style="margin-top: 30px;">阿智村、野边山以及大町市</p>
                     <p>将满怀<span class="love-highlight">爱</span>意，带您开启</p>
-                    <p>一场浪漫的宇宙之旅。</p>
+                    <p>一场浪漫の宇宙之旅。</p>
                 `
             },
             ko: {
@@ -823,7 +820,7 @@
                 cinemaBack: "홈으로 돌아가기",
                 cinemaText: `
                     <p>나가노현은 별을 관찰하기에 가장 좋은 곳입니다.</p>
-                    <p style="margin-top: 30px;">아치 무라, 노베야마, 그리고 오마치 시가</p>
+                    <p style="margin-top: 30px;">아치 무라, 노베야마, 그리고 오마치 시에서,</p>
                     <p>당신을 <span class="love-highlight">사랑</span>을 담아</p>
                     <p>우주 여행으로 안내합니다.</p>
                 `
@@ -927,17 +924,3 @@
             cinemaVideo.play().catch(error => {
                 console.log("Video playback failed:", error);
             });
-        });
-
-        btnCinemaClose.addEventListener('click', () => {
-            cinemaLayer.classList.remove('active');
-            document.body.classList.remove('no-scroll');
-            cinemaVideo.pause();
-            
-            const textBox = cinemaLayer.querySelector('.cinema-text-box');
-            const newTextBox = textBox.cloneNode(true);
-            textBox.parentNode.replaceChild(newTextBox, textBox);
-        });
-    </script>
-</body>
-</html>
