@@ -59,12 +59,13 @@
             z-index: -1;
         }
 
+        /* ヘッダー全体の高さを少し広げて右側に要素を縦並びできるように調整 */
         header {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            height: 80px;
+            height: 90px;
             background: transparent;
             display: flex;
             justify-content: space-between;
@@ -75,7 +76,7 @@
         }
 
         header.scrolled {
-            height: 65px;
+            height: 80px;
             background: rgba(6, 10, 23, 0.9);
             backdrop-filter: blur(15px);
             border-bottom: 1px solid rgba(230, 194, 122, 0.2);
@@ -103,6 +104,14 @@
             font-size: 0.85rem;
             display: block;
             letter-spacing: 2px;
+        }
+
+        /* 言語選択とプロジェクト名を右側に縦並びにするコンテナ */
+        .right-nav-box {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 6px;
         }
 
         .nav-container {
@@ -154,8 +163,8 @@
             background: rgba(255, 255, 255, 0.07);
             border: 1px solid rgba(230, 194, 122, 0.4);
             color: var(--text-main);
-            padding: 6px 14px;
-            font-size: 0.85rem;
+            padding: 5px 12px;
+            font-size: 0.8rem;
             border-radius: 20px;
             cursor: pointer;
             display: flex;
@@ -206,6 +215,28 @@
             color: var(--accent-gold);
         }
 
+        /* 👑 「星と君ぷろじぇくと」右上に小さくかわいく配置するスタイル設定 */
+        .project-tag {
+            font-family: 'Kiwi Maru', serif;
+            font-size: 0.75rem; /* 小さく控えめに */
+            color: var(--kids-cyan);
+            background: rgba(123, 242, 255, 0.08);
+            border: 1px dashed rgba(123, 242, 255, 0.5);
+            padding: 3px 10px;
+            border-radius: 20px;
+            letter-spacing: 1px;
+            text-shadow: 0 0 6px rgba(123, 242, 255, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            animation: bounce 4s infinite ease-in-out;
+        }
+
+        .project-tag span {
+            font-size: 0.7rem;
+            animation: spin 6s infinite linear;
+        }
+
         .content {
             position: relative;
             z-index: 1;
@@ -238,29 +269,6 @@
             padding: 0 20px;
         }
 
-        /* 子ども向けプロジェクト用のめちゃくちゃかわいいフォント・デザイン設定 */
-        .project-tag {
-            font-family: 'Kiwi Maru', serif;
-            font-size: 1.4rem;
-            color: var(--kids-cyan);
-            background: rgba(123, 242, 255, 0.12);
-            border: 1px dashed var(--kids-cyan);
-            padding: 6px 20px;
-            border-radius: 30px;
-            margin-bottom: 25px;
-            letter-spacing: 2px;
-            text-shadow: 0 0 10px rgba(123, 242, 255, 0.5);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            animation: bounce 4s infinite ease-in-out;
-        }
-
-        .project-tag span {
-            font-size: 1.1rem;
-            animation: spin 6s infinite linear;
-        }
-
         .hero p {
             font-size: 1.2rem;
             letter-spacing: 4px;
@@ -270,7 +278,7 @@
 
         .hero h1 {
             font-size: 4rem;
-            margin: 15px 0 30px 0;
+            margin: 20px 0 30px 0;
             letter-spacing: 8px;
             color: #fff;
             text-shadow: 0 0 20px var(--accent-glow), 0 0 40px rgba(255,255,255,0.2);
@@ -496,30 +504,30 @@
 
         .btn-home-back {
             position: absolute;
-            bottom: 40px;
+            bottom: 5%;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 2004;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(230, 194, 122, 0.6);
-            padding: 12px 28px;
+            z-index: 2010;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(230, 194, 122, 0.8);
+            padding: 14px 32px;
             color: var(--accent-gold);
             border-radius: 30px;
             cursor: pointer;
-            font-size: 0.95rem;
+            font-size: 1rem;
             letter-spacing: 2px;
             display: flex;
             align-items: center;
             gap: 8px;
             backdrop-filter: blur(10px);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            box-shadow: 0 4px 25px rgba(0,0,0,0.6);
             opacity: 0;
             transition: all 0.4s ease;
         }
 
         .cinema-page.active .btn-home-back {
             animation: fadeInButton 3s ease forwards;
-            animation-delay: 2s;
+            animation-delay: 1.5s;
         }
 
         .btn-home-back:hover {
@@ -541,19 +549,18 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; text-shadow: 0 0 15px var(--accent-gold); } }
         
-        /* ふわふわ揺れるアニメーション */
         @keyframes bounce {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
+            50% { transform: translateY(-4px); }
         }
-        /* 星がくるくる回るアニメーション */
         @keyframes spin {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
 
         @media (max-width: 768px) {
-            header { padding: 0 20px; height: 65px; }
+            header { padding: 0 20px; height: 80px; }
+            header.scrolled { height: 75px; }
             .logo { font-size: 1.1rem; gap: 8px; }
             .logo-icon { font-size: 1.4rem; }
             .logo-text span { font-size: 0.75rem; letter-spacing: 1px; }
@@ -563,7 +570,6 @@
             .lang-btn { padding: 4px 10px; font-size: 0.75rem; }
             
             .container { padding: 60px 15px; }
-            .project-tag { font-size: 1.1rem; padding: 4px 14px; margin-bottom: 15px; }
             .hero h1 { font-size: 2.5rem; letter-spacing: 4px; word-break: keep-all; overflow-wrap: anywhere; margin: 15px 0 25px 0; }
             .hero p { font-size: 1rem; letter-spacing: 2px; padding: 0 10px; }
             .launch-text { font-size: 1.3rem; letter-spacing: 4px; padding: 8px 20px; }
@@ -589,7 +595,14 @@
                 0% { top: 100%; }
                 100% { top: -65%; }
             }
-            .btn-home-back { padding: 10px 22px; font-size: 0.85rem; bottom: 30px; }
+            .btn-home-back { 
+                padding: 12px 26px; 
+                font-size: 0.9rem; 
+                bottom: 8%; 
+                width: auto;
+                max-width: 80%;
+                justify-content: center;
+            }
         }
 
         @media (max-width: 480px) {
@@ -600,6 +613,7 @@
             .footer-credit { font-size: 0.65rem; }
             header { padding: 0 10px; }
             .nav-container { gap: 8px; }
+            .project-tag { font-size: 0.65rem; padding: 2px 8px; }
         }
     </style>
 </head>
@@ -618,31 +632,35 @@
                 <span id="txt-main-logo" style="font-size:1.4rem; color:#fff; font-weight:bold; letter-spacing:0;">星空観賞会</span>
             </div>
         </a>
-        <div class="nav-container">
-            <nav>
-                <ul>
-                    <li><a href="#home" class="nav-link active" id="nav-home">Home</a></li>
-                    <li><a href="#partners" class="nav-link" id="nav-partners">Partners</a></li>
-                </ul>
-            </nav>
-            <div class="lang-switcher" id="lang-switcher">
-                <button class="lang-btn">🌐 <span id="current-lang">JA</span> ▼</button>
-                <ul class="lang-dropdown">
-                    <li onclick="changeLanguage('ja')">日本語</li>
-                    <li onclick="changeLanguage('en')">English</li>
-                    <li onclick="changeLanguage('es')">Español</li>
-                    <li onclick="changeLanguage('zh')">简体中文</li>
-                    <li onclick="changeLanguage('ko')">한국어</li>
-                </ul>
+        
+        <div class="right-nav-box">
+            <div class="nav-container">
+                <nav>
+                    <ul>
+                        <li><a href="#home" class="nav-link active" id="nav-home">Home</a></li>
+                        <li><a href="#partners" class="nav-link" id="nav-partners">Partners</a></li>
+                    </ul>
+                </nav>
+                <div class="lang-switcher" id="lang-switcher">
+                    <button class="lang-btn">🌐 <span id="current-lang">JA</span> ▼</button>
+                    <ul class="lang-dropdown">
+                        <li onclick="changeLanguage('ja')">日本語</li>
+                        <li onclick="changeLanguage('en')">English</li>
+                        <li onclick="changeLanguage('es')">Español</li>
+                        <li onclick="changeLanguage('zh')">简体中文</li>
+                        <li onclick="changeLanguage('ko')">한국어</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="project-tag">
+                <span>⭐</span><div id="txt-project-tag">星と君ぷろじぇくと</div><span>⭐</span>
             </div>
         </div>
     </header>
 
     <div class="content">
         <div id="home" class="hero">
-            <div class="project-tag">
-                <span>⭐</span><div id="txt-project-tag">星と君ぷろじぇくと</div><span>⭐</span>
-            </div>
             <p id="txt-hero-sub">星空案内ツアーガイド最高峰の体験</p>
             <h1 id="txt-hero-title">銀河の旅人</h1>
             <div class="launch-text" id="btn-launch">2026年8月始動</div>
@@ -709,7 +727,7 @@
                 cinemaBack: "ホームへ戻る",
                 cinemaText: `
                     <p>長野県は星空の観察に適しています。</p>
-                    <p style="margin-top: 30px;">阿智村・野辺山、そして大町市が</p>
+                    <p style="margin-top: 30px;">阿智村・野辺山、精度大町市が</p>
                     <p><span class="love-highlight">愛</span>を込めてあなたを</p>
                     <p>宇宙の旅へお連れします。</p>
                 `
