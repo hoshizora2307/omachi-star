@@ -59,6 +59,49 @@
             z-index: -1;
         }
 
+        /* ===== 星の彗星 ===== */
+        #comet-field {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .comet {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            will-change: transform;
+        }
+        .comet-tail {
+            position: absolute;
+            left: 0;
+            top: -4px;
+            width: 190px;
+            height: 8px;
+            transform-origin: 0 50%;
+            border-radius: 8px;
+            filter: blur(2.5px);
+            background: linear-gradient(90deg,
+                rgba(255, 244, 214, 0.95) 0%,
+                rgba(230, 194, 122, 0.55) 22%,
+                rgba(123, 242, 255, 0.22) 55%,
+                rgba(123, 242, 255, 0) 100%);
+        }
+        .comet-star {
+            position: absolute;
+            left: 0;
+            top: 0;
+            transform: translate(-50%, -50%);
+            filter: drop-shadow(0 0 7px rgba(230, 194, 122, 0.65))
+                    drop-shadow(0 0 15px rgba(123, 242, 255, 0.35));
+        }
+        @media (max-width: 768px) {
+            .comet-tail { width: 130px; height: 6px; }
+        }
+
         header {
             position: fixed;
             top: 0;
@@ -622,6 +665,9 @@
     </video>
     <div class="overlay"></div>
 
+    <!-- 星の彗星が画面を行き来するレイヤー -->
+    <div id="comet-field" aria-hidden="true"></div>
+
     <header id="main-header">
         <a href="#" class="logo">
             <div class="logo-icon">✦</div>
@@ -947,6 +993,90 @@
             const newTextBox = textBox.cloneNode(true);
             textBox.parentNode.replaceChild(newTextBox, textBox);
         });
+    </script>
+
+    <!-- ===== 星の彗星アニメーション ===== -->
+    <script>
+    (function () {
+        var field = document.getElementById('comet-field');
+        if (!field) return;
+
+        var faces = [
+            'star_1_happy.png',
+            'star_2_open.png',
+            'star_3_sparkle.png',
+            'star_4_surprised.png',
+            'star_5_wink.png'
+        ];
+        var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        // 画面幅で彗星の数を調整
+        var COUNT = window.innerWidth < 768 ? 3 : 5;
+        var comets = [];
+
+        function rand(a, b) { return a + Math.random() * (b - a); }
+
+        for (var i = 0; i < COUNT; i++) {
+            var el = document.createElement('div');
+            el.className = 'comet';
+            var tail = document.createElement('div');
+            tail.className = 'comet-tail';
+            var img = document.createElement('img');
+            img.className = 'comet-star';
+            img.src = faces[i % faces.length];
+            img.alt = '';
+            img.draggable = false;
+            el.appendChild(tail);
+            el.appendChild(img);
+            field.appendChild(el);
+
+            var size = rand(38, 68);
+            img.style.width = size + 'px';
+            var speed = reduce ? rand(0.15, 0.3) : rand(0.7, 1.9);
+            var dir = Math.random() * Math.PI * 2;
+            comets.push({
+                el: el, tail: tail, img: img, size: size,
+                x: rand(size, window.innerWidth - size),
+                y: rand(size, window.innerHeight - size),
+                vx: Math.cos(dir) * speed,
+                vy: Math.sin(dir) * speed * 0.6,
+                phase: rand(0, Math.PI * 2),
+                wobble: rand(6, 12)
+            });
+        }
+
+        function frame(t) {
+            var W = window.innerWidth, H = window.innerHeight;
+            for (var i = 0; i < comets.length; i++) {
+                var c = comets[i];
+                c.x += c.vx;
+                c.y += c.vy;
+                // 画面端で反射 → 行ったり来たり
+                if (c.x < 0) { c.x = 0; c.vx = Math.abs(c.vx); }
+                else if (c.x > W) { c.x = W; c.vx = -Math.abs(c.vx); }
+                if (c.y < 0) { c.y = 0; c.vy = Math.abs(c.vy); }
+                else if (c.y > H) { c.y = H; c.vy = -Math.abs(c.vy); }
+
+                // 進行方向（尾はその反対に伸ばす）
+                var ang = Math.atan2(c.vy, c.vx) * 180 / Math.PI;
+                c.el.style.transform = 'translate(' + c.x + 'px,' + c.y + 'px)';
+                c.tail.style.transform = 'rotate(' + (ang + 180) + 'deg)';
+                // 星をふわっと揺らす
+                var w = Math.sin(t / 600 + c.phase) * c.wobble;
+                c.img.style.transform = 'translate(-50%,-50%) rotate(' + w + 'deg)';
+            }
+            requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+
+        // ウィンドウリサイズで彗星を画面内に収める
+        window.addEventListener('resize', function () {
+            var W = window.innerWidth, H = window.innerHeight;
+            for (var i = 0; i < comets.length; i++) {
+                comets[i].x = Math.min(comets[i].x, W);
+                comets[i].y = Math.min(comets[i].y, H);
+            }
+        });
+    })();
     </script>
 </body>
 </html>
