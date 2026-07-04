@@ -383,6 +383,26 @@
             border-color: var(--accent-gold);
         }
 
+        .partner-logo-card {
+            padding: 14px;
+            text-decoration: none;
+            color: inherit;
+        }
+        .partner-logo-card img {
+            width: 100%;
+            max-width: 175px;
+            height: auto;
+            display: block;
+            background: #fff;
+            padding: 9px 13px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
+        .partner-logo-card:hover img {
+            box-shadow: 0 4px 18px rgba(230, 194, 122, 0.55);
+        }
+
         .to-top {
             position: fixed;
             bottom: 25px;
@@ -714,7 +734,9 @@
             <section id="partners" class="fade-in-up">
                 <h2 class="sec-title" id="txt-partner-title">PARTNERS</h2>
                 <div class="partner-grid">
-                    <div class="partner-card" id="p1">緑翠亭 景水</div>
+                    <a href="https://www.keisui.jp/" target="_blank" rel="noopener noreferrer" class="partner-card partner-logo-card" id="p1" aria-label="緑翠亭 景水 公式サイト（新しいタブで開きます）">
+                        <img src="keisui_logo.png" alt="緑翠亭 景水">
+                    </a>
                     <div class="partner-card" id="p2">薬師の湯</div>
                     <div class="partner-card">ねるだけ</div>
                     <div class="partner-card" id="p4">大町温泉郷観光協会</div>
@@ -887,7 +909,6 @@
             document.getElementById('txt-hero-title').innerText = translations[lang].heroTitle;
             document.getElementById('btn-launch').innerText = translations[lang].btnLaunch;
             document.getElementById('txt-partner-title').innerText = translations[lang].partnerTitle;
-            document.getElementById('p1').innerText = translations[lang].p1;
             document.getElementById('p2').innerText = translations[lang].p2;
             document.getElementById('p4').innerText = translations[lang].p4;
             document.getElementById('txt-company').innerText = translations[lang].company;
@@ -998,8 +1019,9 @@
     <!-- ===== 星の彗星アニメーション ===== -->
     <script>
     (function () {
+        var COMETS_ENABLED = false;   // ← 星を再表示したいときは true に
         var field = document.getElementById('comet-field');
-        if (!field) return;
+        if (!field || !COMETS_ENABLED) return;
 
         var faces = [
             'star_1_happy.png',
