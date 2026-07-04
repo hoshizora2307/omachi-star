@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>プリン星団を守れ！</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #000;
+    font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+    overflow: hidden;
+    user-select: none;
+  }
+  #gameCanvas { display: block; width: 100vw; height: 100vh; }
+
+  /* ===== UI OVERLAY ===== */
+  #ui {
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 10;
+  }
+  #hud {
+    position: absolute; top: 16px; left: 0; right: 0;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 24px;
+  }
+  .hud-box {
+    background: rgba(10,6,30,0.72);
+    border: 1.5px solid rgba(255,220,80,0.35);
+    border-radius: 10px;
+    padding: 6px 18px;
+    color: #ffe87a;
+    font-size: 1rem;
+    letter-spacing: 1px;
+    text-shadow: 0 0 8px rgba(255,220,80,0.5);
+  }
+  .hud-box span { font-size: 1.3rem; font-weight: bold; }
+  #livesRow { display: flex; gap: 6px; align-items: center; }
+  .heart { font-size: 1.4rem; }
+
+  /* ===== SCREENS ===== */
+  .screen {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    background: radial-gradient(ellipse at 50% 60%, #0a0620 0%, #000 100%);
+    z-index: 20;
+    pointer-events: all;
+  }
+  .screen.hidden { display: none; }
+
+  .game-title {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 0 0 30px #ffd700, 0 0 60px #ff8c00;
+    letter-spacing: 4px;
+    margin-bottom: 4px;
+  }
+  .sub-title {
+    font-size: 1rem; color: #aaa;
+    letter-spacing: 3px; margin-bottom: 32px;
+  }
+  .player-img-lg {
+    width: 120px; height: 120px;
+    image-rendering: pixelated;
+    filter: drop-shadow(0 0 24px rgba(255,200,50,0.8));
+    animation: floatBig 2.4s ease-in-out infinite;
+    margin-bottom: 24px;
+  }
+  @keyframes floatBig {
+    0%,100% { transform: translateY(0) rotate(-4deg); }
+    50% { transform: translateY(-18px) rotate(4deg); }
+  }
+  .btn {
+    background: linear-gradient(135deg, #ffd700, #ff8c00);
+    color: #1a0a00; font-weight: 900;
+    border: none; border-radius: 50px;
+    padding: 14px 52px; font-size: 1.15rem;
+    cursor: pointer; letter-spacing: 2px;
+    box-shadow: 0 0 30px rgba(255,200,50,0.6);
+    transition: transform 0.15s, box-shadow 0.15s;
+    margin: 8px;
+    pointer-events: all;
+  }
+  .btn:hover { transform: scale(1.08); box-shadow: 0 0 50px rgba(255,200,50,0.9); }
+  .btn-secondary {
+    background: transparent;
+    border: 2px solid rgba(255,220,80,0.5);
+    color: #ffe87a; border-radius: 50px;
+    padding: 10px 36px; font-size: 0.95rem;
+    cursor: pointer; letter-spacing: 2px;
+    transition: all 0.15s; margin: 6px;
+    pointer-events: all;
+  }
+  .btn-secondary:hover { background: rgba(255,220,80,0.1); border-color: #ffd700; }
+
+  /* Ranking panel */
+  #rankPanel {
+    background: rgba(10,6,30,0.95);
+    border: 1.5px solid rgba(255,220,80,0.4);
+    border-radius: 16px;
+    padding: 24px 32px;
+    min-width: 340px; max-width: 480px;
+    width: 90%;
+    margin: 16px 0;
+    max-height: 55vh;
+    overflow-y: auto;
+  }
+  .rank-title {
+    color: #ffd700; font-size: 1.1rem; font-weight: bold;
+    text-align: center; margin-bottom: 14px; letter-spacing: 3px;
+    text-shadow: 0 0 10px rgba(255,200,50,0.6);
+  }
+  .rank-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    color: #eee; font-size: 0.95rem;
+  }
+  .rank-row:last-child { border-bottom: none; }
+  .rank-num { color: #ffd700; font-weight: bold; min-width: 28px; }
+  .rank-num.gold   { color: #FFD700; text-shadow: 0 0 8px #FFD700; font-size: 1.1rem; }
+  .rank-num.silver { color: #C0C0C0; }
+  .rank-num.bronze { color: #CD7F32; }
+  .rank-name { flex: 1; padding: 0 10px; }
+  .rank-score { color: #ffe87a; font-weight: bold; }
+  .rank-empty { color: #555; text-align: center; padding: 20px 0; }
+
+  /* Game Over / Name Entry */
+  .go-score { font-size: 2.5rem; color: #ffd700; font-weight: 900;
+    text-shadow: 0 0 30px #ffd700; margin: 12px 0; }
+  .name-input {
+    background: rgba(255,255,255,0.07);
+    border: 2px solid rgba(255,220,80,0.5);
+    border-radius: 10px;
+    color: #fff; font-size: 1.2rem;
+    padding: 10px 20px;
+    text-align: center; width: 280px;
+    outline: none; margin: 10px 0;
+    letter-spacing: 2px;
+  }
+  .name-input:focus { border-color: #ffd700; }
+  .name-hint { color: #888; font-size: 0.8rem; margin-bottom: 8px; }
+
+  /* Controls hint */
+  #controlsHint {
+    position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%);
+    color: rgba(255,255,255,0.35); font-size: 0.75rem; letter-spacing: 1px;
+    z-index: 11; pointer-events: none;
+  }
+
+  /* Level banner */
+  #levelBanner {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    font-size: 2.8rem; font-weight: 900;
+    color: #fff; text-shadow: 0 0 40px #ffd700, 0 0 80px #ff8c00;
+    z-index: 15; pointer-events: none;
+    opacity: 0; transition: opacity 0.3s;
+  }
+
+  /* Stars bg canvas */
+  #bgCanvas {
+    position: fixed; inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* Loading */
+  #loadingMsg {
+    color: #ffe87a; font-size: 1.1rem; letter-spacing: 2px; margin-top: 10px;
+    animation: blink 1s infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* Mobile touch buttons */
+  #touchControls {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    display: none;
+    justify-content: space-between;
+    padding: 10px 20px 24px;
+    z-index: 12; pointer-events: all;
+  }
+  .touch-btn {
+    background: rgba(255,220,80,0.18);
+    border: 2px solid rgba(255,220,80,0.4);
+    border-radius: 50%; width: 64px; height: 64px;
+    color: #ffd700; font-size: 1.4rem;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; user-select: none;
+  }
+  .touch-center { display: flex; gap: 12px; }
+  @media (max-width: 768px) {
+    #touchControls { display: flex; }
+  }
+
+  /* Explosion particles */
+  .explosion {
+    position: fixed; pointer-events: none; z-index: 8;
+    font-size: 1.8rem; animation: explode 0.6s forwards;
+  }
+  @keyframes explode {
+    0%   { opacity: 1; transform: scale(0.5) rotate(0deg); }
+    60%  { opacity: 1; transform: scale(1.4) rotate(180deg); }
+    100% { opacity: 0; transform: scale(2) rotate(360deg); }
+  }
+</style>
+</head>
+<body>
+
+<!-- Background starfield -->
+<canvas id="bgCanvas"></canvas>
+
+<!-- Three.js Game Canvas -->
+<canvas id="gameCanvas"></canvas>
+
+<!-- HUD -->
+<div id="ui">
+  <div id="hud">
+    <div class="hud-box">スコア <span id="scoreVal">0</span></div>
+    <div class="hud-box" style="font-size:0.85rem;">
+      LEVEL <span id="levelVal">1</span>
+    </div>
+    <div class="hud-box">
+      <div id="livesRow"></div>
+    </div>
+  </div>
+</div>
+
+<div id="levelBanner">LEVEL UP!</div>
+<div id="controlsHint">← → 移動 &nbsp;|&nbsp; スペース/上 発射 &nbsp;|&nbsp; モバイル: 下のボタン</div>
+
+<!-- Touch controls for mobile -->
+<div id="touchControls">
+  <div class="touch-btn" id="tleft" ontouchstart="touchState.left=true" ontouchend="touchState.left=false">◀</div>
+  <div class="touch-center">
+    <div class="touch-btn" id="tshoot" ontouchstart="touchState.shoot=true" ontouchend="touchState.shoot=false">💥</div>
+  </div>
+  <div class="touch-btn" id="tright" ontouchstart="touchState.right=true" ontouchend="touchState.right=false">▶</div>
+</div>
+
+<!-- ===== TITLE SCREEN ===== -->
+<div class="screen" id="titleScreen">
+  <img src="star_3_sparkle.png" class="player-img-lg" alt="プリンAスター">
+  <div class="game-title">プリン星団を守れ！</div>
+  <div class="sub-title">プリン星団からやってきたプリンAスター</div>
+  <button class="btn" onclick="startGame()">ゲームスタート</button>
+  <button class="btn-secondary" onclick="showRanking()">🏆 ランキング</button>
+
+  <div id="rankPanel" style="margin-top:20px;">
+    <div class="rank-title">🏆 TOP 10 ランキング</div>
+    <div id="rankListTitle"><div class="rank-empty">読み込み中...</div></div>
+  </div>
+</div>
+
+<!-- ===== RANKING SCREEN ===== -->
+<div class="screen hidden" id="rankingScreen">
+  <div class="game-title" style="font-size:2rem;">🏆 ランキング</div>
+  <div id="rankPanel" style="margin-top:16px;">
+    <div class="rank-title">TOP 10</div>
+    <div id="rankListFull"><div class="rank-empty">読み込み中...</div></div>
+  </div>
+  <button class="btn-secondary" onclick="hideRanking()" style="margin-top:16px;">← 戻る</button>
+</div>
+
+<!-- ===== GAME OVER SCREEN ===== -->
+<div class="screen hidden" id="gameOverScreen">
+  <div class="game-title" style="font-size:2rem; color:#ff6b6b; text-shadow:0 0 30px #ff0000;">GAME OVER</div>
+  <div style="color:#aaa; margin:6px 0 2px; letter-spacing:2px;">YOUR SCORE</div>
+  <div class="go-score" id="finalScore">0</div>
+
+  <div id="nameEntryArea">
+    <div style="color:#ffe87a; margin-bottom:8px; font-size:1rem;">名前を入力してランキングに登録！</div>
+    <div class="name-hint">最大8文字</div>
+    <input class="name-input" id="playerNameInput" type="text" maxlength="8" placeholder="プレイヤー名" autocomplete="off">
+    <br>
+    <button class="btn" id="submitBtn" onclick="submitScore()">登録して終了</button>
+    <button class="btn-secondary" onclick="skipSubmit()">登録せずに終了</button>
+    <div id="submitMsg" style="color:#ffe87a; margin-top:8px; min-height:24px;"></div>
+  </div>
+
+  <div id="rankPanel" style="margin-top:12px;">
+    <div class="rank-title">🏆 TOP 10</div>
+    <div id="rankListGO"><div class="rank-empty">読み込み中...</div></div>
+  </div>
+</div>
+
+<!-- Three.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script>
+// ============================================================
+//  GLOBAL STATE
+// ============================================================
+const STAR_B64 = "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";
+
+const touchState = { left: false, right: false, shoot: false };
+const keys = {};
+let gameState = 'title'; // title | playing | gameover
+let score = 0;
+let lives = 3;
+let level = 1;
+let frameCount = 0;
+let lastShotFrame = 0;
+let lastEnemyFrame = 0;
+let scoreMultiplier = 1;
+let animId = null;
+
+// ============================================================
+//  STORAGE – Anthropic API (shared=true)
+// ============================================================
+const STORAGE_KEY = "purin_ranking_v1";
+
+async function loadRanking() {
+  try {
+    const res = await window.storage.get(STORAGE_KEY, true);
+    if (!res) return [];
+    return JSON.parse(res.value);
+  } catch(e) { return []; }
+}
+
+async function saveRanking(list) {
+  try {
+    await window.storage.set(STORAGE_KEY, JSON.stringify(list), true);
+  } catch(e) { console.error('save fail', e); }
+}
+
+async function addScore(name, pts) {
+  let list = await loadRanking();
+  list.push({ name: name.trim() || '匿名スター', score: pts, date: new Date().toLocaleDateString('ja-JP') });
+  list.sort((a,b) => b.score - a.score);
+  list = list.slice(0, 10);
+  await saveRanking(list);
+  return list;
+}
+
+// ============================================================
+//  RANKING UI
+// ============================================================
+function medal(rank) {
+  if (rank === 0) return '<span class="rank-num gold">🥇</span>';
+  if (rank === 1) return '<span class="rank-num silver">🥈</span>';
+  if (rank === 2) return '<span class="rank-num bronze">🥉</span>';
+  return `<span class="rank-num">${rank+1}</span>`;
+}
+function renderRanking(list, containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  if (!list || list.length === 0) {
+    el.innerHTML = '<div class="rank-empty">まだ記録がありません。<br>あなたが1位に！</div>';
+    return;
+  }
+  el.innerHTML = list.map((r, i) => `
+    <div class="rank-row">
+      ${medal(i)}
+      <span class="rank-name">${escHtml(r.name)}</span>
+      <span class="rank-score">${r.score.toLocaleString()}</span>
+    </div>`).join('');
+}
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+async function refreshRanking() {
+  const list = await loadRanking();
+  renderRanking(list, 'rankListTitle');
+  renderRanking(list, 'rankListFull');
+  renderRanking(list, 'rankListGO');
+}
+
+// ============================================================
+//  SCREEN MANAGEMENT
+// ============================================================
+function showScreen(id) {
+  ['titleScreen','rankingScreen','gameOverScreen'].forEach(s => {
+    document.getElementById(s).classList.toggle('hidden', s !== id);
+  });
+}
+function showRanking() {
+  showScreen('rankingScreen');
+  refreshRanking();
+}
+function hideRanking() { showScreen('titleScreen'); }
+
+// ============================================================
+//  BACKGROUND STARFIELD (2D canvas)
+// ============================================================
+const bgCanvas = document.getElementById('bgCanvas');
+const bgCtx = bgCanvas.getContext('2d');
+let bgStars = [];
+function initBg() {
+  bgCanvas.width = window.innerWidth;
+  bgCanvas.height = window.innerHeight;
+  bgStars = Array.from({length: 200}, () => ({
+    x: Math.random() * bgCanvas.width,
+    y: Math.random() * bgCanvas.height,
+    r: Math.random() * 1.5 + 0.3,
+    s: Math.random() * 0.3 + 0.1,
+    a: Math.random()
+  }));
+}
+function drawBg(t) {
+  bgCtx.clearRect(0,0,bgCanvas.width,bgCanvas.height);
+  bgCtx.fillStyle = '#000';
+  bgCtx.fillRect(0,0,bgCanvas.width,bgCanvas.height);
+  for (const star of bgStars) {
+    star.a = 0.4 + 0.6 * (Math.sin(t * star.s + star.x) * 0.5 + 0.5);
+    bgCtx.beginPath();
+    bgCtx.arc(star.x, star.y, star.r, 0, Math.PI*2);
+    bgCtx.fillStyle = `rgba(255,255,240,${star.a})`;
+    bgCtx.fill();
+  }
+}
+
+// ============================================================
+//  THREE.JS SETUP
+// ============================================================
+const canvas = document.getElementById('gameCanvas');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setClearColor(0x000000, 0);
+
+const scene = new THREE.Scene();
+const W = () => window.innerWidth;
+const H = () => window.innerHeight;
+
+// Orthographic camera – game is 2D layout in 3D world
+let camera = new THREE.OrthographicCamera(-W()/2, W()/2, H()/2, -H()/2, 0.1, 2000);
+camera.position.z = 500;
+
+function resize() {
+  renderer.setSize(W(), H());
+  camera.left = -W()/2; camera.right = W()/2;
+  camera.top = H()/2; camera.bottom = -H()/2;
+  camera.updateProjectionMatrix();
+  initBg();
+}
+window.addEventListener('resize', resize);
+resize();
+
+// Lighting
+const ambLight = new THREE.AmbientLight(0x8888cc, 0.8);
+scene.add(ambLight);
+const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+dirLight.position.set(1, 2, 3);
+scene.add(dirLight);
+const pointLight = new THREE.PointLight(0x4488ff, 1.5, 600);
+pointLight.position.set(0, 0, 200);
+scene.add(pointLight);
+
+// ============================================================
+//  PLAYER (sprite)
+// ============================================================
+const starTexture = new THREE.TextureLoader().load('data:image/png;base64,' + STAR_B64);
+let player, playerSprite;
+
+function createPlayer() {
+  if (player) scene.remove(player);
+  const mat = new THREE.SpriteMaterial({ map: starTexture, transparent: true });
+  playerSprite = new THREE.Sprite(mat);
+  playerSprite.scale.set(70, 70, 1);
+  playerSprite.position.set(0, -H()/2 + 80, 1);
+  scene.add(playerSprite);
+  player = playerSprite;
+}
+
+// ============================================================
+//  BULLETS
+// ============================================================
+const bullets = [];
+const bulletGeo = new THREE.CylinderGeometry(3, 1.5, 18, 8);
+
+function shoot() {
+  if (frameCount - lastShotFrame < 10) return;
+  lastShotFrame = frameCount;
+
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0xffee33,
+    emissive: 0xffaa00,
+    emissiveIntensity: 2,
+    metalness: 0.5,
+    roughness: 0.1
+  });
+  const mesh = new THREE.Mesh(bulletGeo, mat);
+  mesh.position.set(player.position.x, player.position.y + 40, 0);
+  mesh.rotation.x = Math.PI/2;
+  scene.add(mesh);
+  bullets.push({ mesh, vy: 14 + level * 0.5 });
+}
+
+function updateBullets() {
+  for (let i = bullets.length-1; i >= 0; i--) {
+    const b = bullets[i];
+    b.mesh.position.y += b.vy;
+    b.mesh.rotation.z += 0.2;
+    if (b.mesh.position.y > H()/2 + 30) {
+      scene.remove(b.mesh);
+      bullets.splice(i, 1);
+    }
+  }
+}
+
+// ============================================================
+//  ENEMIES – 3D Polygonal
+// ============================================================
+const enemies = [];
+
+const ENEMY_TYPES = [
+  // [geo, color, emissive, size, hp, score, speed]
+  { geo: () => new THREE.TetrahedronGeometry(1, 0),      color: 0xff2244, em: 0x880011, size:28, hp:1, pts:100, speed:1.8 },
+  { geo: () => new THREE.OctahedronGeometry(1, 0),       color: 0xff6600, em: 0x882200, size:36, hp:2, pts:200, speed:1.4 },
+  { geo: () => new THREE.IcosahedronGeometry(1, 0),      color: 0x8800ff, em: 0x440088, size:44, hp:3, pts:350, speed:1.1 },
+  { geo: () => new THREE.BoxGeometry(1,1,1),              color: 0x00aaff, em: 0x004488, size:34, hp:2, pts:250, speed:1.5 },
+  { geo: () => new THREE.CylinderGeometry(0,1,1.6,6),    color: 0xff0088, em: 0x880033, size:50, hp:4, pts:500, speed:0.9 },
+  { geo: () => new THREE.SphereGeometry(1, 6, 6),        color: 0x00ff88, em: 0x008844, size:52, hp:5, pts:700, speed:0.7 },
+  { geo: () => new THREE.TorusGeometry(1, 0.4, 6, 8),   color: 0xffcc00, em: 0x886600, size:58, hp:6, pts:900, speed:0.65 },
+];
+
+function spawnEnemy() {
+  const typePool = ENEMY_TYPES.slice(0, Math.min(2 + Math.floor(level/1.5), ENEMY_TYPES.length));
+  const t = typePool[Math.floor(Math.random() * typePool.length)];
+  const s = t.size * (0.7 + Math.random() * 0.9);
+
+  const geo = t.geo();
+  const mat = new THREE.MeshStandardMaterial({
+    color: t.color,
+    emissive: t.em,
+    emissiveIntensity: 1.2,
+    metalness: 0.7,
+    roughness: 0.2,
+    wireframe: Math.random() < 0.15
+  });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.scale.set(s, s, s);
+  mesh.position.set(
+    (Math.random() - 0.5) * (W() - 80),
+    H()/2 + s + 10,
+    Math.random() * 60 - 30
+  );
+
+  // Random sinusoidal drift
+  const drift = (Math.random() - 0.5) * 2.5;
+  const driftFreq = 0.02 + Math.random() * 0.03;
+  const spd = (t.speed + level * 0.15) * (0.8 + Math.random() * 0.4);
+
+  scene.add(mesh);
+  enemies.push({ mesh, vy: -spd, drift, driftFreq, hp: t.hp, maxHp: t.hp, pts: t.pts, size: s, rx:Math.random()*0.06-0.03, ry:Math.random()*0.06-0.03 });
+}
+
+function updateEnemies() {
+  const interval = Math.max(30, 90 - level * 6);
+  if (frameCount - lastEnemyFrame > interval) {
+    spawnEnemy();
+    if (level > 3 && Math.random() < 0.3) spawnEnemy();
+    lastEnemyFrame = frameCount;
+  }
+
+  for (let i = enemies.length-1; i >= 0; i--) {
+    const e = enemies[i];
+    e.mesh.position.y += e.vy;
+    e.mesh.position.x += Math.sin(frameCount * e.driftFreq) * e.drift;
+    e.mesh.rotation.x += e.rx;
+    e.mesh.rotation.y += e.ry;
+
+    if (e.mesh.position.y < -H()/2 - e.size - 10) {
+      scene.remove(e.mesh);
+      enemies.splice(i, 1);
+    }
+  }
+}
+
+// ============================================================
+//  COLLISION DETECTION
+// ============================================================
+function checkCollisions() {
+  for (let bi = bullets.length-1; bi >= 0; bi--) {
+    const b = bullets[bi];
+    for (let ei = enemies.length-1; ei >= 0; ei--) {
+      const e = enemies[ei];
+      const dx = b.mesh.position.x - e.mesh.position.x;
+      const dy = b.mesh.position.y - e.mesh.position.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < e.size * 0.85) {
+        // Hit!
+        scene.remove(b.mesh);
+        bullets.splice(bi, 1);
+        e.hp--;
+        // Flash
+        e.mesh.material.emissiveIntensity = 4;
+        setTimeout(() => { if (e.mesh.material) e.mesh.material.emissiveIntensity = 1.2; }, 80);
+
+        if (e.hp <= 0) {
+          spawnExplosion(e.mesh.position.x, e.mesh.position.y);
+          addScore2(e.pts * scoreMultiplier);
+          scene.remove(e.mesh);
+          enemies.splice(ei, 1);
+        }
+        break;
+      }
+    }
+  }
+
+  // Player-enemy collision
+  if (!player) return;
+  for (let ei = enemies.length-1; ei >= 0; ei--) {
+    const e = enemies[ei];
+    const dx = player.position.x - e.mesh.position.x;
+    const dy = player.position.y - e.mesh.position.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist < e.size * 0.7 + 22) {
+      scene.remove(e.mesh);
+      enemies.splice(ei, 1);
+      spawnExplosion(player.position.x, player.position.y, '💥');
+      playerHit();
+    }
+  }
+}
+
+// ============================================================
+//  EXPLOSION (DOM emoji burst)
+// ============================================================
+function spawnExplosion(worldX, worldY, emoji) {
+  const emojis = emoji ? [emoji] : ['✨','💫','⭐','🌟'];
+  for (let i = 0; i < 3; i++) {
+    const el = document.createElement('div');
+    el.className = 'explosion';
+    el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    // Convert world coords to screen
+    const sx = worldX + W()/2;
+    const sy = H()/2 - worldY;
+    el.style.left = (sx + (Math.random()-0.5)*40) + 'px';
+    el.style.top  = (sy + (Math.random()-0.5)*40) + 'px';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 700);
+  }
+}
+
+// ============================================================
+//  SCORE / LIVES / LEVEL
+// ============================================================
+function addScore2(pts) {
+  score += pts;
+  document.getElementById('scoreVal').textContent = score.toLocaleString();
+  // Level up every 3000 pts (scaled)
+  const newLevel = Math.floor(score / 3000) + 1;
+  if (newLevel > level) {
+    level = newLevel;
+    scoreMultiplier = 1 + (level-1) * 0.2;
+    document.getElementById('levelVal').textContent = level;
+    showLevelBanner();
+  }
+}
+
+function showLevelBanner() {
+  const b = document.getElementById('levelBanner');
+  b.textContent = `LEVEL ${level}!`;
+  b.style.opacity = 1;
+  setTimeout(() => { b.style.opacity = 0; }, 1200);
+}
+
+function updateLivesUI() {
+  const row = document.getElementById('livesRow');
+  row.innerHTML = '';
+  for (let i = 0; i < lives; i++) {
+    const h = document.createElement('span');
+    h.className = 'heart'; h.textContent = '⭐';
+    row.appendChild(h);
+  }
+}
+
+function playerHit() {
+  lives--;
+  updateLivesUI();
+  // Flash red
+  if (player) {
+    player.material.color.set(0xff0000);
+    setTimeout(() => { if (player) player.material.color.set(0xffffff); }, 300);
+  }
+  if (lives <= 0) triggerGameOver();
+}
+
+// ============================================================
+//  GAME LOOP
+// ============================================================
+const PLAYER_SPEED = 6;
+
+function gameLoop(t) {
+  animId = requestAnimationFrame(gameLoop);
+  frameCount++;
+
+  drawBg(t * 0.001);
+
+  if (gameState !== 'playing') {
+    renderer.render(scene, camera);
+    return;
+  }
+
+  // Player movement
+  if (player) {
+    const spd = PLAYER_SPEED + level * 0.2;
+    if ((keys['ArrowLeft'] || keys['a'] || touchState.left) && player.position.x > -W()/2 + 40)
+      player.position.x -= spd;
+    if ((keys['ArrowRight'] || keys['d'] || touchState.right) && player.position.x < W()/2 - 40)
+      player.position.x += spd;
+    if (keys['ArrowUp'] || keys[' '] || touchState.shoot)
+      shoot();
+
+    // Tilt based on movement
+    player.material.rotation = ((keys['ArrowLeft']||touchState.left) ? -0.25 : (keys['ArrowRight']||touchState.right) ? 0.25 : 0);
+  }
+
+  updateBullets();
+  updateEnemies();
+  checkCollisions();
+
+  // Rotate all enemies
+  renderer.render(scene, camera);
+}
+
+// ============================================================
+//  GAME CONTROL
+// ============================================================
+function clearScene() {
+  [...enemies].forEach(e => scene.remove(e.mesh));
+  enemies.length = 0;
+  [...bullets].forEach(b => scene.remove(b.mesh));
+  bullets.length = 0;
+}
+
+function startGame() {
+  showScreen(null); // hide all
+  document.getElementById('titleScreen').classList.add('hidden');
+  document.getElementById('rankingScreen').classList.add('hidden');
+  document.getElementById('gameOverScreen').classList.add('hidden');
+
+  score = 0; lives = 3; level = 1; frameCount = 0;
+  lastShotFrame = 0; lastEnemyFrame = 0; scoreMultiplier = 1;
+  document.getElementById('scoreVal').textContent = '0';
+  document.getElementById('levelVal').textContent = '1';
+  updateLivesUI();
+
+  clearScene();
+  createPlayer();
+  gameState = 'playing';
+}
+
+async function triggerGameOver() {
+  gameState = 'gameover';
+  clearScene();
+  if (player) { scene.remove(player); player = null; }
+
+  document.getElementById('finalScore').textContent = score.toLocaleString();
+  document.getElementById('playerNameInput').value = '';
+  document.getElementById('submitMsg').textContent = '';
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('nameEntryArea').style.display = 'block';
+
+  await refreshRanking();
+  showScreen('gameOverScreen');
+}
+
+async function submitScore() {
+  const name = document.getElementById('playerNameInput').value.trim() || '匿名スター';
+  document.getElementById('submitBtn').disabled = true;
+  document.getElementById('submitMsg').textContent = '登録中...';
+  try {
+    const list = await addScore(name, score);
+    renderRanking(list, 'rankListGO');
+    document.getElementById('nameEntryArea').style.display = 'none';
+    document.getElementById('submitMsg').textContent = '✅ 登録しました！';
+    // Also refresh title screen list
+    renderRanking(list, 'rankListTitle');
+  } catch(e) {
+    document.getElementById('submitMsg').textContent = '⚠️ 登録に失敗しました';
+    document.getElementById('submitBtn').disabled = false;
+  }
+}
+
+async function skipSubmit() {
+  document.getElementById('nameEntryArea').style.display = 'none';
+  await refreshRanking();
+  setTimeout(() => {
+    showScreen('titleScreen');
+    refreshRanking();
+  }, 400);
+}
+
+// ============================================================
+//  INPUT
+// ============================================================
+window.addEventListener('keydown', e => {
+  keys[e.key] = true;
+  if (e.key === ' ') e.preventDefault();
+});
+window.addEventListener('keyup', e => { keys[e.key] = false; });
+
+// ============================================================
+//  INIT
+// ============================================================
+initBg();
+refreshRanking();
+showScreen('titleScreen');
+gameLoop(0);
+</script>
+
+</body>
+</html>
