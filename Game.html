@@ -12,7 +12,7 @@
     overflow: hidden;
     user-select: none;
   }
-  #gameCanvas { display: block; width: 100vw; height: 100vh; }
+  #gameCanvas { display: block; position: fixed; inset: 0; z-index: 1; }
 
   /* ===== UI OVERLAY ===== */
   #ui {
@@ -222,7 +222,7 @@
 
   #bgCanvas {
     position: fixed; inset: 0;
-    z-index: 0;
+    z-index: -1;
     pointer-events: none;
   }
 
@@ -501,7 +501,7 @@ let camera = new THREE.OrthographicCamera(-W()/2, W()/2, H()/2, -H()/2, 0.1, 200
 camera.position.z = 500;
 
 function resize() {
-  renderer.setSize(W(), H());
+  renderer.setSize(W(), H(), false);
   camera.left = -W()/2; camera.right = W()/2;
   camera.top = H()/2; camera.bottom = -H()/2;
   camera.updateProjectionMatrix();
