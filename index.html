@@ -64,7 +64,7 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 90px;
+            height: 106px;
             background: transparent;
             display: flex;
             justify-content: space-between;
@@ -75,7 +75,7 @@
         }
 
         header.scrolled {
-            height: 80px;
+            height: 92px;
             background: rgba(6, 10, 23, 0.9);
             backdrop-filter: blur(15px);
             border-bottom: 1px solid rgba(230, 194, 122, 0.2);
@@ -220,15 +220,15 @@
         }
 
         .project-logo-img {
-            height: 52px;
+            height: 68px;
             width: auto;
             object-fit: contain;
-            filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.45));
+            filter: drop-shadow(0 2px 7px rgba(0, 0, 0, 0.5));
             transition: height 0.4s ease;
         }
 
         header.scrolled .project-logo-img {
-            height: 44px;
+            height: 56px;
         }
 
         .content {
@@ -555,8 +555,8 @@
         }
 
         @media (max-width: 768px) {
-            header { padding: 0 20px; height: 80px; }
-            header.scrolled { height: 75px; }
+            header { padding: 0 20px; height: 92px; }
+            header.scrolled { height: 82px; }
             .logo { font-size: 1.1rem; gap: 8px; }
             .logo-icon { font-size: 1.4rem; }
             .logo-text span { font-size: 0.75rem; letter-spacing: 1px; }
@@ -564,7 +564,8 @@
             nav ul { gap: 15px; }
             nav a { font-size: 0.85rem; }
             .lang-btn { padding: 4px 10px; font-size: 0.75rem; }
-            .project-logo-img { height: 46px; }
+            .project-logo-img { height: 56px; }
+            header.scrolled .project-logo-img { height: 46px; }
             
             .container { padding: 60px 15px; }
             .hero h1 { font-size: 2.5rem; letter-spacing: 4px; word-break: keep-all; overflow-wrap: anywhere; margin: 15px 0 25px 0; }
@@ -610,7 +611,7 @@
             .footer-credit { font-size: 0.65rem; }
             header { padding: 0 10px; }
             .nav-container { gap: 8px; }
-            .project-logo-img { height: 40px; }
+            .project-logo-img { height: 52px; }
         }
     </style>
 </head>
