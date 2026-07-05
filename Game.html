@@ -204,4 +204,711 @@
   .item-mint  { border: 2px solid rgba(100,255,180,0.7); }
   .item-popup-img {
     height: 160px; width: auto;
-    filter: drop-shadow(0
+    filter: drop-shadow(0 0 20px rgba(255,255,255,0.4));
+    animation: imgSpin 2.2s forwards;
+  }
+  @keyframes imgSpin {
+    0%  { transform: rotate(-30deg) scale(0.4); }
+    30% { transform: rotate(15deg) scale(1.15); }
+    55% { transform: rotate(-5deg) scale(1); }
+    80% { transform: rotate(0deg) scale(1); }
+    100%{ transform: rotate(20deg) scale(0.5); }
+  }
+  .item-popup-label {
+    font-size: 1.5rem; font-weight: 900; letter-spacing: 2px; margin-top: 10px;
+  }
+  .item-lemon .item-popup-label { color: #ffe840; text-shadow: 0 0 12px #ffe840; }
+  .item-mint  .item-popup-label { color: #64ffb4; text-shadow: 0 0 12px #64ffb4; }
+  .item-popup-effect {
+    font-size: 1.8rem; font-weight: 900; color: #fff;
+    text-shadow: 0 0 20px rgba(255,255,255,0.8);
+    margin: 6px 0 4px; letter-spacing: 2px;
+  }
+  .item-popup-name {
+    font-size: 0.9rem; color: rgba(255,255,255,0.5);
+    letter-spacing: 1px; margin-top: 4px;
+  }
+
+  #bgCanvas {
+    position: fixed; inset: 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .explosion {
+    position: fixed; pointer-events: none; z-index: 8;
+    font-size: 1.8rem; animation: explode 0.6s forwards;
+  }
+  @keyframes explode {
+    0%   { opacity: 1; transform: scale(0.5) rotate(0deg); }
+    60%  { opacity: 1; transform: scale(1.4) rotate(180deg); }
+    100% { opacity: 0; transform: scale(2) rotate(360deg); }
+  }
+
+  .credit {
+    position: absolute;
+    top: 10px;
+    color: rgba(255,255,255,0.6);
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    text-align: center;
+    width: 100%;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+<canvas id="gameCanvas"></canvas>
+
+<div id="ui">
+  <div id="hud">
+    <div class="hud-box">スコア <span id="scoreVal">0</span></div>
+    <div class="hud-box">LEVEL <span id="levelVal">1</span></div>
+    <div class="hud-box hud-time">TIME <span id="timeVal">30</span></div>
+    <div class="hud-box">
+      <div id="livesRow"></div>
+    </div>
+  </div>
+</div>
+
+<div id="levelBanner">STAGE CLEAR!</div>
+<div id="controlsHint">画面をスワイプして移動（オート連射）</div>
+
+<div class="screen" id="titleScreen">
+  <div class="credit">製作：MONDOCOLO STUDIO</div>
+  
+  <img src="star_3_sparkle.png" class="player-img-lg" alt="プリンAスター" onerror="this.onerror=null; this.src='star_2_open.png'">
+  <div class="game-title">プリン星団を守れ！</div>
+  <div class="sub-title">プリン星団からやってきたプリンAスター</div>
+  <button class="btn" onclick="startGame()">ゲームスタート</button>
+  <button class="btn-secondary" onclick="showRanking()">🏆 ランキング</button>
+
+  <div id="rankPanel">
+    <div class="rank-title">🏆 TOP 10 ランキング</div>
+    <div id="rankListTitle"><div class="rank-empty">読み込み中...</div></div>
+  </div>
+</div>
+
+<div class="screen hidden" id="rankingScreen">
+  <div class="game-title" style="font-size:2.5rem;">🏆 ランキング</div>
+  <div id="rankPanel" style="margin-top:16px;">
+    <div class="rank-title">TOP 10</div>
+    <div id="rankListFull"><div class="rank-empty">読み込み中...</div></div>
+  </div>
+  <button class="btn-secondary" onclick="hideRanking()" style="margin-top:16px;">← 戻る</button>
+</div>
+
+<div class="screen hidden" id="gameOverScreen">
+  <div class="game-title" style="font-size:2.8rem; color:#ff6b6b; text-shadow:0 0 30px #ff0000;">GAME OVER</div>
+  <div style="color:#aaa; margin:6px 0 2px; letter-spacing:2px; font-size:1.2rem;">YOUR SCORE</div>
+  <div class="go-score" id="finalScore">0</div>
+
+  <div id="nameEntryArea">
+    <div style="color:#ffe87a; margin-bottom:8px; font-size:1.2rem;">名前を入力してランキングに登録！</div>
+    <div class="name-hint">最大8文字</div>
+    <input class="name-input" id="playerNameInput" type="text" maxlength="8" placeholder="プレイヤー名" autocomplete="off">
+    <br>
+    <button class="btn" id="submitBtn" onclick="submitScore()">登録して終了</button>
+    <button class="btn-secondary" onclick="skipSubmit()">登録せずに終了</button>
+    <div id="submitMsg" style="color:#ffe87a; margin-top:8px; min-height:24px; font-size:1.2rem;"></div>
+  </div>
+
+  <div id="rankPanel" style="margin-top:12px;">
+    <div class="rank-title">🏆 TOP 10</div>
+    <div id="rankListGO"><div class="rank-empty">読み込み中...</div></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script>
+const keys = {};
+let gameState = 'title'; 
+let score = 0;
+let lives = 3;
+let level = 1;
+let frameCount = 0;
+let lastShotFrame = 0;
+let lastEnemyFrame = 0;
+let scoreMultiplier = 1;
+let animId = null;
+
+let stageTime = 30.0;
+let lastTime = 0;
+
+async function loadRanking() {
+  try {
+    const data = localStorage.getItem("purin_ranking_v1");
+    return data ? JSON.parse(data) : [];
+  } catch(e) {
+    return [];
+  }
+}
+async function saveRanking(list) {
+  try {
+    localStorage.setItem("purin_ranking_v1", JSON.stringify(list));
+  } catch(e) {}
+}
+async function addScore(name, pts) {
+  let list = await loadRanking();
+  list.push({ name: name.trim() || '匿名スター', score: pts, date: new Date().toLocaleDateString('ja-JP') });
+  list.sort((a,b) => b.score - a.score);
+  list = list.slice(0, 10);
+  await saveRanking(list);
+  return list;
+}
+
+function medal(rank) {
+  if (rank === 0) return '<span class="rank-num gold">🥇</span>';
+  if (rank === 1) return '<span class="rank-num silver">🥈</span>';
+  if (rank === 2) return '<span class="rank-num bronze">🥉</span>';
+  return `<span class="rank-num">${rank+1}</span>`;
+}
+function renderRanking(list, containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  if (!list || list.length === 0) {
+    el.innerHTML = '<div class="rank-empty">まだ記録がありません。<br>あなたが1位に！</div>';
+    return;
+  }
+  el.innerHTML = list.map((r, i) => `
+    <div class="rank-row">
+      ${medal(i)}
+      <span class="rank-name">${escHtml(r.name)}</span>
+      <span class="rank-score">${r.score.toLocaleString()}</span>
+    </div>`).join('');
+}
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+async function refreshRanking() {
+  const list = await loadRanking();
+  renderRanking(list, 'rankListTitle');
+  renderRanking(list, 'rankListFull');
+  renderRanking(list, 'rankListGO');
+}
+
+function showScreen(id) {
+  ['titleScreen','rankingScreen','gameOverScreen'].forEach(s => {
+    document.getElementById(s).classList.toggle('hidden', s !== id);
+  });
+}
+function showRanking() {
+  showScreen('rankingScreen');
+  refreshRanking();
+}
+function hideRanking() { showScreen('titleScreen'); }
+
+const bgCanvas = document.getElementById('bgCanvas');
+const bgCtx = bgCanvas.getContext('2d');
+let bgStars = [];
+function initBg() {
+  bgCanvas.width = window.innerWidth;
+  bgCanvas.height = window.innerHeight;
+  bgStars = Array.from({length: 200}, () => ({
+    x: Math.random() * bgCanvas.width,
+    y: Math.random() * bgCanvas.height,
+    r: Math.random() * 1.5 + 0.3,
+    s: Math.random() * 0.3 + 0.1,
+    a: Math.random()
+  }));
+}
+function drawBg(t) {
+  bgCtx.clearRect(0,0,bgCanvas.width,bgCanvas.height);
+  bgCtx.fillStyle = '#000';
+  bgCtx.fillRect(0,0,bgCanvas.width,bgCanvas.height);
+  for (const star of bgStars) {
+    star.a = 0.4 + 0.6 * (Math.sin(t * star.s + star.x) * 0.5 + 0.5);
+    bgCtx.beginPath();
+    bgCtx.arc(star.x, star.y, star.r, 0, Math.PI*2);
+    bgCtx.fillStyle = `rgba(255,255,240,${star.a})`;
+    bgCtx.fill();
+  }
+}
+
+const items = [];
+let multiShot = 1;
+let speedBoost = 1.0;
+let multiShotTimer = 0;
+let speedTimer = 0;
+const ITEM_DURATION = 600;
+
+const canvas = document.getElementById('gameCanvas');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setClearColor(0x000000, 0);
+
+const scene = new THREE.Scene();
+const W = () => window.innerWidth;
+const H = () => window.innerHeight;
+
+let camera = new THREE.OrthographicCamera(-W()/2, W()/2, H()/2, -H()/2, 0.1, 2000);
+camera.position.z = 500;
+
+function resize() {
+  renderer.setSize(W(), H(), false);
+  camera.left = -W()/2; camera.right = W()/2;
+  camera.top = H()/2; camera.bottom = -H()/2;
+  camera.updateProjectionMatrix();
+  initBg();
+}
+window.addEventListener('resize', resize);
+resize();
+
+const ambLight = new THREE.AmbientLight(0x8888cc, 0.8);
+scene.add(ambLight);
+const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+dirLight.position.set(1, 2, 3);
+scene.add(dirLight);
+const pointLight = new THREE.PointLight(0x4488ff, 1.5, 600);
+pointLight.position.set(0, 0, 200);
+scene.add(pointLight);
+
+const textureLoader = new THREE.TextureLoader();
+const starTexture  = textureLoader.load('star_2_open.png');
+const lemonTexture = textureLoader.load('item_lemon.png');
+const mintTexture  = textureLoader.load('item_mint.png');
+
+let player, playerSprite;
+
+function createPlayer() {
+  if (player) scene.remove(player);
+  const mat = new THREE.SpriteMaterial({ map: starTexture, transparent: true });
+  playerSprite = new THREE.Sprite(mat);
+  playerSprite.scale.set(70, 70, 1);
+  playerSprite.position.set(0, -H()/2 + 120, 1);
+  scene.add(playerSprite);
+  player = playerSprite;
+}
+
+const bullets = [];
+
+// 弾のジオメトリとマテリアルを事前に作成（メモリの過負荷を防ぐため）
+const bulletGeo = new THREE.CylinderGeometry(0, 4, 12, 5); 
+const bulletMatSingle = new THREE.MeshStandardMaterial({
+  color: 0xffeebb,
+  emissive: 0xffbb00,
+  emissiveIntensity: 1.5,
+  metalness: 0.2,
+  roughness: 0.3
+});
+const bulletMatMulti = new THREE.MeshStandardMaterial({
+  color: 0x88ffee,
+  emissive: 0x00aa88,
+  emissiveIntensity: 1.5,
+  metalness: 0.2,
+  roughness: 0.3
+});
+
+function shoot() {
+  if (frameCount - lastShotFrame < 35) return; 
+  lastShotFrame = frameCount;
+
+  const offsets = [];
+  if (multiShot === 1) offsets.push(0);
+  else for (let k=0;k<multiShot;k++) offsets.push((k-(multiShot-1)/2)*22);
+
+  offsets.forEach(ox => {
+    const mat = multiShot > 1 ? bulletMatMulti : bulletMatSingle;
+    const mesh = new THREE.Mesh(bulletGeo, mat);
+    mesh.position.set(player.position.x + ox, player.position.y + 40, 0);
+    scene.add(mesh);
+    bullets.push({ mesh, vy: 14 + level * 0.4 });
+  });
+}
+
+function updateBullets() {
+  for (let i = bullets.length-1; i >= 0; i--) {
+    const b = bullets[i];
+    b.mesh.position.y += b.vy;
+    b.mesh.rotation.y += 0.2;
+    if (b.mesh.position.y > H()/2 + 30) {
+      scene.remove(b.mesh);
+      bullets.splice(i, 1);
+    }
+  }
+}
+
+const enemies = [];
+const ENEMY_TYPES = [
+  { geo: () => new THREE.TetrahedronGeometry(1, 0),      color: 0xff2244, em: 0x880011, size:28, hp:1, pts:100, speed:1.8 },
+  { geo: () => new THREE.OctahedronGeometry(1, 0),       color: 0xff6600, em: 0x882200, size:36, hp:2, pts:200, speed:1.4 },
+  { geo: () => new THREE.IcosahedronGeometry(1, 0),      color: 0x8800ff, em: 0x440088, size:44, hp:3, pts:350, speed:1.1 },
+  { geo: () => new THREE.BoxGeometry(1,1,1),             color: 0x00aaff, em: 0x004488, size:34, hp:2, pts:250, speed:1.5 },
+  { geo: () => new THREE.CylinderGeometry(0,1,1.6,6),    color: 0xff0088, em: 0x880033, size:50, hp:4, pts:500, speed:0.9 },
+  { geo: () => new THREE.SphereGeometry(1, 6, 6),        color: 0x00ff88, em: 0x008844, size:52, hp:5, pts:700, speed:0.7 },
+  { geo: () => new THREE.TorusGeometry(1, 0.4, 6, 8),    color: 0xffcc00, em: 0x886600, size:58, hp:6, pts:900, speed:0.65 },
+];
+
+function spawnEnemy() {
+  const typePool = ENEMY_TYPES.slice(0, Math.min(2 + Math.floor(level/1.5), ENEMY_TYPES.length));
+  const t = typePool[Math.floor(Math.random() * typePool.length)];
+  const s = t.size * (0.7 + Math.random() * 0.9);
+
+  const geo = t.geo();
+  const mat = new THREE.MeshStandardMaterial({
+    color: t.color,
+    emissive: t.em,
+    emissiveIntensity: 1.2,
+    metalness: 0.7,
+    roughness: 0.2,
+    wireframe: Math.random() < 0.15
+  });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.scale.set(s, s, s);
+  mesh.position.set(
+    (Math.random() - 0.5) * (W() - 80),
+    H()/2 + s + 10,
+    Math.random() * 60 - 30
+  );
+
+  const drift = (Math.random() - 0.5) * 2.5;
+  const driftFreq = 0.02 + Math.random() * 0.03;
+  const spd = (t.speed + level * 0.15) * (0.8 + Math.random() * 0.4);
+
+  scene.add(mesh);
+  enemies.push({ mesh, vy: -spd, drift, driftFreq, hp: t.hp, maxHp: t.hp, pts: t.pts, size: s, rx:Math.random()*0.06-0.03, ry:Math.random()*0.06-0.03 });
+}
+
+function updateEnemies() {
+  const interval = Math.max(20, 80 - level * 5);
+  if (frameCount - lastEnemyFrame > interval) {
+    spawnEnemy();
+    if (level > 3 && Math.random() < 0.3) spawnEnemy();
+    lastEnemyFrame = frameCount;
+  }
+
+  for (let i = enemies.length-1; i >= 0; i--) {
+    const e = enemies[i];
+    e.mesh.position.y += e.vy;
+    e.mesh.position.x += Math.sin(frameCount * e.driftFreq) * e.drift;
+    e.mesh.rotation.x += e.rx;
+    e.mesh.rotation.y += e.ry;
+
+    if (e.mesh.position.y < -H()/2 - e.size - 10) {
+      scene.remove(e.mesh);
+      enemies.splice(i, 1);
+    }
+  }
+}
+
+function spawnItem() {
+  const isLemon = Math.random() < 0.5;
+  const tex = isLemon ? lemonTexture : mintTexture;
+  const type = isLemon ? 'multishot' : 'speed';
+
+  const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
+  const sprite = new THREE.Sprite(mat);
+  
+  if (tex.image) {
+    const aspect = tex.image.height / tex.image.width;
+    sprite.scale.set(44, 44 * aspect, 1);
+  } else {
+    sprite.scale.set(44, 44, 1);
+  }
+  
+  sprite.position.set(
+    (Math.random() - 0.5) * (W() - 100),
+    H()/2 + 30,
+    2
+  );
+  scene.add(sprite);
+  items.push({ sprite, type, vy: -(1.5 + level * 0.1) });
+}
+
+function updateItems() {
+  if (frameCount % 400 === 200 && Math.random() < 0.7) spawnItem();
+
+  for (let i = items.length-1; i >= 0; i--) {
+    const it = items[i];
+    it.sprite.position.y += it.vy;
+    it.sprite.material.rotation = Math.sin(frameCount * 0.05 + i) * 0.3;
+    if (it.sprite.position.y < -H()/2 - 40) {
+      scene.remove(it.sprite);
+      items.splice(i, 1);
+    }
+  }
+
+  if (multiShotTimer > 0) { multiShotTimer--; if (multiShotTimer===0) multiShot=1; }
+  if (speedTimer > 0)     { speedTimer--;      if (speedTimer===0)    speedBoost=1.0; }
+}
+
+function showItemGet(type) {
+  const overlay = document.createElement('div');
+  overlay.className = 'item-overlay';
+  const isLemon = type === 'multishot';
+  
+  const imgSrc = isLemon ? 'item_lemon.png' : 'item_mint.png';
+  
+  overlay.innerHTML = `
+    <div class="item-popup ${isLemon ? 'item-lemon' : 'item-mint'}">
+      <img src="${imgSrc}" class="item-popup-img" alt="">
+      <div class="item-popup-label">${isLemon ? '🍋 AROMA LEMON' : '🌿 AROMA MINT'}</div>
+      <div class="item-popup-effect">${isLemon ? '弾数 UP ×' + (multiShot) + '発！' : '速度 UP ×' + speedBoost.toFixed(1) + '！'}</div>
+      <div class="item-popup-name">${isLemon ? 'Lemongrass Aroma Alcohol' : 'Mint Aroma Alcohol'}</div>
+    </div>`;
+  document.body.appendChild(overlay);
+  setTimeout(() => overlay.remove(), 2200);
+}
+
+function checkCollisions() {
+  for (let bi = bullets.length-1; bi >= 0; bi--) {
+    const b = bullets[bi];
+    for (let ei = enemies.length-1; ei >= 0; ei--) {
+      const e = enemies[ei];
+      const dx = b.mesh.position.x - e.mesh.position.x;
+      const dy = b.mesh.position.y - e.mesh.position.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < e.size * 0.85) {
+        scene.remove(b.mesh);
+        bullets.splice(bi, 1);
+        e.hp--;
+        e.mesh.material.emissiveIntensity = 4;
+        setTimeout(() => { if (e.mesh.material) e.mesh.material.emissiveIntensity = 1.2; }, 80);
+
+        if (e.hp <= 0) {
+          spawnExplosion(e.mesh.position.x, e.mesh.position.y);
+          addScore2(e.pts * scoreMultiplier);
+          scene.remove(e.mesh);
+          enemies.splice(ei, 1);
+        }
+        break;
+      }
+    }
+  }
+
+  if (player) {
+    for (let i = items.length-1; i >= 0; i--) {
+      const it = items[i];
+      const dx = player.position.x - it.sprite.position.x;
+      const dy = player.position.y - it.sprite.position.y;
+      if (Math.sqrt(dx*dx+dy*dy) < 50) {
+        scene.remove(it.sprite);
+        items.splice(i, 1);
+        if (it.type === 'multishot') {
+          multiShot = Math.min(5, multiShot + 1);
+          multiShotTimer = ITEM_DURATION;
+        } else {
+          speedBoost = Math.min(2.5, speedBoost + 0.4);
+          speedTimer = ITEM_DURATION;
+        }
+        spawnExplosion(it.sprite.position.x, it.sprite.position.y, '🌟');
+        showItemGet(it.type);
+      }
+    }
+  }
+
+  if (!player) return;
+  for (let ei = enemies.length-1; ei >= 0; ei--) {
+    const e = enemies[ei];
+    const dx = player.position.x - e.mesh.position.x;
+    const dy = player.position.y - e.mesh.position.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist < e.size * 0.7 + 22) {
+      scene.remove(e.mesh);
+      enemies.splice(ei, 1);
+      spawnExplosion(player.position.x, player.position.y, '💥');
+      playerHit();
+    }
+  }
+}
+
+function spawnExplosion(worldX, worldY, emoji) {
+  const emojis = emoji ? [emoji] : ['✨','💫','⭐','🌟'];
+  for (let i = 0; i < 3; i++) {
+    const el = document.createElement('div');
+    el.className = 'explosion';
+    el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    const sx = worldX + W()/2;
+    const sy = H()/2 - worldY;
+    el.style.left = (sx + (Math.random()-0.5)*40) + 'px';
+    el.style.top  = (sy + (Math.random()-0.5)*40) + 'px';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 700);
+  }
+}
+
+function addScore2(pts) {
+  score += pts;
+  document.getElementById('scoreVal').textContent = score.toLocaleString();
+}
+
+function showLevelBanner() {
+  const b = document.getElementById('levelBanner');
+  b.innerHTML = `STAGE CLEAR!<br><span style="font-size: 2rem;">STAGE ${level}</span>`;
+  b.style.opacity = 1;
+  setTimeout(() => { b.style.opacity = 0; }, 2000);
+}
+
+function updateLivesUI() {
+  const row = document.getElementById('livesRow');
+  row.innerHTML = '';
+  for (let i = 0; i < lives; i++) {
+    const h = document.createElement('span');
+    h.className = 'heart'; h.textContent = '⭐';
+    row.appendChild(h);
+  }
+}
+
+function playerHit() {
+  lives--;
+  updateLivesUI();
+  if (player) {
+    player.material.color.set(0xff0000);
+    setTimeout(() => { if (player) player.material.color.set(0xffffff); }, 300);
+  }
+  if (lives <= 0) triggerGameOver();
+}
+
+const PLAYER_SPEED = 6;
+
+function gameLoop(t) {
+  animId = requestAnimationFrame(gameLoop);
+  
+  let dt = 0;
+  if (lastTime !== 0) {
+      dt = (t - lastTime) / 1000;
+      if (dt > 0.1) dt = 0.016;
+  }
+  lastTime = t;
+
+  frameCount++;
+  drawBg(t * 0.001);
+
+  if (gameState !== 'playing') {
+    renderer.render(scene, camera);
+    return;
+  }
+
+  stageTime -= dt;
+  if (stageTime <= 0) {
+    level++;
+    stageTime = 30.0;
+    scoreMultiplier = 1 + (level-1) * 0.2;
+    document.getElementById('levelVal').textContent = level;
+    showLevelBanner();
+  }
+  document.getElementById('timeVal').textContent = Math.ceil(stageTime);
+
+  if (player) {
+    const spd = (PLAYER_SPEED + level * 0.2) * speedBoost;
+    if ((keys['ArrowLeft'] || keys['a']) && player.position.x > -W()/2 + 40)
+      player.position.x -= spd;
+    if ((keys['ArrowRight'] || keys['d']) && player.position.x < W()/2 - 40)
+      player.position.x += spd;
+
+    shoot();
+
+    player.material.rotation = (keys['ArrowLeft'] ? -0.25 : keys['ArrowRight'] ? 0.25 : 0);
+  }
+
+  updateBullets();
+  updateEnemies();
+  updateItems();
+  checkCollisions();
+
+  renderer.render(scene, camera);
+}
+
+function clearScene() {
+  [...enemies].forEach(e => scene.remove(e.mesh));
+  enemies.length = 0;
+  [...bullets].forEach(b => scene.remove(b.mesh));
+  bullets.length = 0;
+  [...items].forEach(it => scene.remove(it.sprite));
+  items.length = 0;
+  multiShot = 1; speedBoost = 1.0;
+  multiShotTimer = 0; speedTimer = 0;
+}
+
+function startGame() {
+  showScreen(null);
+  document.getElementById('titleScreen').classList.add('hidden');
+  document.getElementById('rankingScreen').classList.add('hidden');
+  document.getElementById('gameOverScreen').classList.add('hidden');
+
+  score = 0; lives = 3; level = 1; frameCount = 0;
+  lastShotFrame = 0; lastEnemyFrame = 0; scoreMultiplier = 1;
+  stageTime = 30.0; lastTime = 0;
+  
+  document.getElementById('scoreVal').textContent = '0';
+  document.getElementById('levelVal').textContent = '1';
+  document.getElementById('timeVal').textContent = '30';
+  updateLivesUI();
+
+  clearScene();
+  createPlayer();
+  gameState = 'playing';
+}
+
+async function triggerGameOver() {
+  gameState = 'gameover';
+  clearScene();
+  if (player) { scene.remove(player); player = null; }
+
+  document.getElementById('finalScore').textContent = score.toLocaleString();
+  document.getElementById('playerNameInput').value = '';
+  document.getElementById('submitMsg').textContent = '';
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('nameEntryArea').style.display = 'block';
+
+  await refreshRanking();
+  showScreen('gameOverScreen');
+}
+
+async function submitScore() {
+  const name = document.getElementById('playerNameInput').value.trim() || '匿名スター';
+  document.getElementById('submitBtn').disabled = true;
+  document.getElementById('submitMsg').textContent = '登録中...';
+  try {
+    const list = await addScore(name, score);
+    renderRanking(list, 'rankListGO');
+    document.getElementById('nameEntryArea').style.display = 'none';
+    document.getElementById('submitMsg').textContent = '✅ 登録しました！';
+    renderRanking(list, 'rankListTitle');
+  } catch(e) {
+    document.getElementById('submitMsg').textContent = '⚠️ 登録に失敗しました';
+    document.getElementById('submitBtn').disabled = false;
+  }
+}
+
+async function skipSubmit() {
+  document.getElementById('nameEntryArea').style.display = 'none';
+  await refreshRanking();
+  setTimeout(() => {
+    showScreen('titleScreen');
+    refreshRanking();
+  }, 400);
+}
+
+window.addEventListener('keydown', e => {
+  keys[e.key] = true;
+  if (e.key === ' ') e.preventDefault();
+});
+window.addEventListener('keyup', e => { keys[e.key] = false; });
+
+function handleTouchMove(e) {
+  if (gameState !== 'playing' || !player) return;
+  e.preventDefault(); 
+  
+  const touch = e.touches[0];
+  const rect = canvas.getBoundingClientRect();
+  
+  const screenX = touch.clientX - rect.left;
+  const worldX = (screenX / rect.width) * W() - W() / 2;
+  
+  player.position.x = Math.max(-W()/2 + 40, Math.min(W()/2 - 40, worldX));
+}
+canvas.addEventListener('touchstart', handleTouchMove, { passive: false });
+canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+
+initBg();
+refreshRanking();
+showScreen('titleScreen');
+requestAnimationFrame(gameLoop);
+</script>
+
+</body>
+</html>
