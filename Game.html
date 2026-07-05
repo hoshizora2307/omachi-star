@@ -456,10 +456,10 @@ function createPlayer() {
 }
 
 const bullets = [];
-const bulletGeo = new THREE.CylinderGeometry(3, 1.5, 18, 8);
+const bulletGeo = new THREE.SphereGeometry(5, 16, 16);
 
 function shoot() {
-  if (frameCount - lastShotFrame < 8) return; 
+  if (frameCount - lastShotFrame < 20) return; 
   lastShotFrame = frameCount;
 
   const offsets = [];
@@ -468,8 +468,8 @@ function shoot() {
 
   offsets.forEach(ox => {
     const mat = new THREE.MeshStandardMaterial({
-      color: multiShot > 1 ? 0x88ffee : 0xffee33,
-      emissive: multiShot > 1 ? 0x00aa88 : 0xffaa00,
+      color: multiShot > 1 ? 0x88ffee : 0xff99cc,
+      emissive: multiShot > 1 ? 0x00aa88 : 0xff3388,
       emissiveIntensity: 2,
       metalness: 0.5,
       roughness: 0.1
@@ -564,7 +564,7 @@ function spawnItem() {
 
   const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
   const sprite = new THREE.Sprite(mat);
-  sprite.scale.set(44, 44, 1);
+  sprite.scale.set(44, 44 * (isLemon ? 297/92 : 286/84), 1);
   sprite.position.set(
     (Math.random() - 0.5) * (W() - 100),
     H()/2 + 30,
