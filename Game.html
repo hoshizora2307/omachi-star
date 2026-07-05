@@ -41,6 +41,7 @@
     letter-spacing: 1px;
     text-shadow: 0 0 8px rgba(255,220,80,0.5);
     white-space: nowrap;
+    transition: transform 0.1s;
   }
   .hud-box span { font-size: 1.3rem; font-weight: bold; }
   .hud-time { color: #64ffb4; border-color: rgba(100,255,180,0.35); }
@@ -163,13 +164,14 @@
   }
 
   #levelBanner {
-    position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%) scale(0.5);
     font-size: 3.5rem; font-weight: 900;
     color: #fff; text-shadow: 0 0 40px #ffd700, 0 0 80px #ff8c00;
     z-index: 15; pointer-events: none;
-    opacity: 0; transition: opacity 0.3s;
+    opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     text-align: center;
   }
+  #levelBanner.show { opacity: 1; transform: translate(-50%,-50%) scale(1); }
 
   .item-overlay {
     position: fixed; inset: 0;
@@ -177,83 +179,48 @@
     z-index: 50; pointer-events: none;
     animation: overlayFade 2.2s forwards;
   }
-  @keyframes overlayFade {
-    0%   { opacity: 0; }
-    15%  { opacity: 1; }
-    75%  { opacity: 1; }
-    100% { opacity: 0; }
-  }
+  @keyframes overlayFade { 0% { opacity: 0; } 15% { opacity: 1; } 75% { opacity: 1; } 100% { opacity: 0; } }
   .item-popup {
     display: flex; flex-direction: column; align-items: center;
-    background: rgba(5,5,20,0.88);
-    border-radius: 22px;
-    padding: 24px 36px 20px;
-    box-shadow: 0 0 60px rgba(255,255,255,0.15);
-    animation: popupZoom 2.2s forwards;
+    background: rgba(5,5,20,0.88); border-radius: 22px; padding: 24px 36px 20px;
+    box-shadow: 0 0 60px rgba(255,255,255,0.15); animation: popupZoom 2.2s forwards;
   }
-  @keyframes popupZoom {
-    0%   { transform: scale(0.3) rotate(-25deg); }
-    20%  { transform: scale(1.18) rotate(8deg); }
-    35%  { transform: scale(0.97) rotate(-3deg); }
-    50%  { transform: scale(1.04) rotate(1deg); }
-    65%  { transform: scale(1) rotate(0deg); }
-    85%  { transform: scale(1) rotate(0deg); }
-    100% { transform: scale(0.7) rotate(15deg); }
-  }
+  @keyframes popupZoom { 0% { transform: scale(0.3) rotate(-25deg); } 20% { transform: scale(1.18) rotate(8deg); } 35% { transform: scale(0.97) rotate(-3deg); } 50% { transform: scale(1.04) rotate(1deg); } 65% { transform: scale(1) rotate(0deg); } 85% { transform: scale(1) rotate(0deg); } 100% { transform: scale(0.7) rotate(15deg); } }
   .item-lemon { border: 2px solid rgba(255,230,80,0.7); }
   .item-mint  { border: 2px solid rgba(100,255,180,0.7); }
-  .item-popup-img {
-    height: 160px; width: auto;
-    filter: drop-shadow(0 0 20px rgba(255,255,255,0.4));
-    animation: imgSpin 2.2s forwards;
-  }
-  @keyframes imgSpin {
-    0%  { transform: rotate(-30deg) scale(0.4); }
-    30% { transform: rotate(15deg) scale(1.15); }
-    55% { transform: rotate(-5deg) scale(1); }
-    80% { transform: rotate(0deg) scale(1); }
-    100%{ transform: rotate(20deg) scale(0.5); }
-  }
-  .item-popup-label {
-    font-size: 1.5rem; font-weight: 900; letter-spacing: 2px; margin-top: 10px;
-  }
+  .item-popup-img { height: 160px; width: auto; filter: drop-shadow(0 0 20px rgba(255,255,255,0.4)); animation: imgSpin 2.2s forwards; }
+  @keyframes imgSpin { 0% { transform: rotate(-30deg) scale(0.4); } 30% { transform: rotate(15deg) scale(1.15); } 55% { transform: rotate(-5deg) scale(1); } 80% { transform: rotate(0deg) scale(1); } 100%{ transform: rotate(20deg) scale(0.5); } }
+  .item-popup-label { font-size: 1.5rem; font-weight: 900; letter-spacing: 2px; margin-top: 10px; }
   .item-lemon .item-popup-label { color: #ffe840; text-shadow: 0 0 12px #ffe840; }
   .item-mint  .item-popup-label { color: #64ffb4; text-shadow: 0 0 12px #64ffb4; }
-  .item-popup-effect {
-    font-size: 1.8rem; font-weight: 900; color: #fff;
-    text-shadow: 0 0 20px rgba(255,255,255,0.8);
-    margin: 6px 0 4px; letter-spacing: 2px;
-  }
-  .item-popup-name {
-    font-size: 0.9rem; color: rgba(255,255,255,0.5);
-    letter-spacing: 1px; margin-top: 4px;
-  }
+  .item-popup-effect { font-size: 1.8rem; font-weight: 900; color: #fff; text-shadow: 0 0 20px rgba(255,255,255,0.8); margin: 6px 0 4px; letter-spacing: 2px; }
+  .item-popup-name { font-size: 0.9rem; color: rgba(255,255,255,0.5); letter-spacing: 1px; margin-top: 4px; }
 
-  #bgCanvas {
-    position: fixed; inset: 0;
-    z-index: -1;
-    pointer-events: none;
-  }
+  #bgCanvas { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
 
   .explosion {
     position: fixed; pointer-events: none; z-index: 8;
     font-size: 1.8rem; animation: explode 0.6s forwards;
   }
-  @keyframes explode {
-    0%   { opacity: 1; transform: scale(0.5) rotate(0deg); }
-    60%  { opacity: 1; transform: scale(1.4) rotate(180deg); }
-    100% { opacity: 0; transform: scale(2) rotate(360deg); }
+  @keyframes explode { 0% { opacity: 1; transform: scale(0.5) rotate(0deg); } 60% { opacity: 1; transform: scale(1.4) rotate(180deg); } 100% { opacity: 0; transform: scale(2) rotate(360deg); } }
+
+  /* ダメージポップアップ用のCSS */
+  .damage-text {
+    position: fixed; z-index: 100; pointer-events: none;
+    font-size: 1.6rem; font-weight: 900;
+    text-shadow: 0px 3px 0px rgba(0,0,0,0.8), 0 0 15px currentColor;
+    animation: dmgFloat 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  }
+  @keyframes dmgFloat {
+    0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
+    30% { opacity: 1; transform: translate(-50%, -100%) scale(1.3); }
+    100% { opacity: 0; transform: translate(-50%, -150%) scale(1); }
   }
 
   .credit {
-    position: absolute;
-    top: 10px;
-    color: rgba(255,255,255,0.6);
-    font-size: 0.9rem;
-    letter-spacing: 2px;
-    text-align: center;
-    width: 100%;
-    pointer-events: none;
+    position: absolute; top: 10px; color: rgba(255,255,255,0.6);
+    font-size: 0.9rem; letter-spacing: 2px; text-align: center;
+    width: 100%; pointer-events: none;
   }
 </style>
 </head>
@@ -264,7 +231,7 @@
 
 <div id="ui">
   <div id="hud">
-    <div class="hud-box">スコア <span id="scoreVal">0</span></div>
+    <div class="hud-box" id="scoreBox">スコア <span id="scoreVal">0</span></div>
     <div class="hud-box">LEVEL <span id="levelVal">1</span></div>
     <div class="hud-box hud-time">TIME <span id="timeVal">30</span></div>
     <div class="hud-box">
@@ -338,19 +305,51 @@ let animId = null;
 let stageTime = 30.0;
 let lastTime = 0;
 
+// ==========================================
+// ★ジュース（派手さ）管理変数
+let shakeTime = 0;
+let shakeMag = 0;
+let hitStop = 0;
+let warpFactor = 0; // ステージクリア時の背景ワープ効果
+// ==========================================
+
+// ==========================================
+// ★サーバー通信用API設定
+// サーバーを構築した際、以下の空文字 "" の中にAPIのURLを入れてください。
+// （例: "https://my-game-server.com/api/ranking"）
+const API_URL = ""; 
+// ==========================================
+
 async function loadRanking() {
   try {
+    if (API_URL) {
+      const res = await fetch(API_URL);
+      return await res.json();
+    } else {
+      throw new Error("Local");
+    }
+  } catch(e) {
     const data = localStorage.getItem("purin_ranking_v1");
     return data ? JSON.parse(data) : [];
-  } catch(e) {
-    return [];
   }
 }
+
 async function saveRanking(list) {
   try {
+    if (API_URL) {
+      await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(list)
+      });
+    } else {
+      throw new Error("Local");
+    }
+  } catch(e) {
     localStorage.setItem("purin_ranking_v1", JSON.stringify(list));
-  } catch(e) {}
+  }
 }
+
 async function addScore(name, pts) {
   let list = await loadRanking();
   list.push({ name: name.trim() || '匿名スター', score: pts, date: new Date().toLocaleDateString('ja-JP') });
@@ -395,10 +394,7 @@ function showScreen(id) {
     document.getElementById(s).classList.toggle('hidden', s !== id);
   });
 }
-function showRanking() {
-  showScreen('rankingScreen');
-  refreshRanking();
-}
+function showRanking() { showScreen('rankingScreen'); refreshRanking(); }
 function hideRanking() { showScreen('titleScreen'); }
 
 const bgCanvas = document.getElementById('bgCanvas');
@@ -416,16 +412,34 @@ function initBg() {
   }));
 }
 function drawBg(t) {
-  bgCtx.clearRect(0,0,bgCanvas.width,bgCanvas.height);
-  bgCtx.fillStyle = '#000';
+  // ワープ中はモーションブラーをかける
+  bgCtx.fillStyle = warpFactor > 0.1 ? 'rgba(0, 0, 0, 0.3)' : '#000';
   bgCtx.fillRect(0,0,bgCanvas.width,bgCanvas.height);
+  
   for (const star of bgStars) {
-    star.a = 0.4 + 0.6 * (Math.sin(t * star.s + star.x) * 0.5 + 0.5);
+    // ワープ中は星の落下速度が劇的にアップ
+    star.y += (0.5 + star.s) * (1 + warpFactor * 40);
+    if (star.y > bgCanvas.height) {
+      star.y = 0;
+      star.x = Math.random() * bgCanvas.width;
+    }
+    
     bgCtx.beginPath();
-    bgCtx.arc(star.x, star.y, star.r, 0, Math.PI*2);
-    bgCtx.fillStyle = `rgba(255,255,240,${star.a})`;
-    bgCtx.fill();
+    if (warpFactor > 0.1) {
+      // 加速中は星を線にして描画（ワープ効果）
+      bgCtx.moveTo(star.x, star.y);
+      bgCtx.lineTo(star.x, star.y - (0.5 + star.s) * warpFactor * 40);
+      bgCtx.lineWidth = star.r;
+      bgCtx.strokeStyle = `rgba(255,255,240,${star.a})`;
+      bgCtx.stroke();
+    } else {
+      star.a = 0.4 + 0.6 * (Math.sin(t * star.s + star.x) * 0.5 + 0.5);
+      bgCtx.arc(star.x, star.y, star.r, 0, Math.PI*2);
+      bgCtx.fillStyle = `rgba(255,255,240,${star.a})`;
+      bgCtx.fill();
+    }
   }
+  if (warpFactor > 0) warpFactor *= 0.95; // ワープエフェクトの減衰
 }
 
 const items = [];
@@ -485,21 +499,13 @@ function createPlayer() {
 
 const bullets = [];
 
-// 弾のジオメトリとマテリアルを事前に作成（メモリの過負荷を防ぐため）
-const bulletGeo = new THREE.CylinderGeometry(0, 4, 12, 5); 
+// メモリ負荷対策: ジオメトリとマテリアルを使い回す
+const bulletGeo = new THREE.IcosahedronGeometry(4, 0); // 宝石っぽくて可愛い多面体
 const bulletMatSingle = new THREE.MeshStandardMaterial({
-  color: 0xffeebb,
-  emissive: 0xffbb00,
-  emissiveIntensity: 1.5,
-  metalness: 0.2,
-  roughness: 0.3
+  color: 0xffeebb, emissive: 0xffbb00, emissiveIntensity: 1.5, metalness: 0.2, roughness: 0.3
 });
 const bulletMatMulti = new THREE.MeshStandardMaterial({
-  color: 0x88ffee,
-  emissive: 0x00aa88,
-  emissiveIntensity: 1.5,
-  metalness: 0.2,
-  roughness: 0.3
+  color: 0x88ffee, emissive: 0x00aa88, emissiveIntensity: 1.5, metalness: 0.2, roughness: 0.3
 });
 
 function shoot() {
@@ -524,6 +530,7 @@ function updateBullets() {
     const b = bullets[i];
     b.mesh.position.y += b.vy;
     b.mesh.rotation.y += 0.2;
+    b.mesh.rotation.x += 0.1;
     if (b.mesh.position.y > H()/2 + 30) {
       scene.remove(b.mesh);
       bullets.splice(i, 1);
@@ -549,20 +556,12 @@ function spawnEnemy() {
 
   const geo = t.geo();
   const mat = new THREE.MeshStandardMaterial({
-    color: t.color,
-    emissive: t.em,
-    emissiveIntensity: 1.2,
-    metalness: 0.7,
-    roughness: 0.2,
+    color: t.color, emissive: t.em, emissiveIntensity: 1.2, metalness: 0.7, roughness: 0.2,
     wireframe: Math.random() < 0.15
   });
   const mesh = new THREE.Mesh(geo, mat);
   mesh.scale.set(s, s, s);
-  mesh.position.set(
-    (Math.random() - 0.5) * (W() - 80),
-    H()/2 + s + 10,
-    Math.random() * 60 - 30
-  );
+  mesh.position.set((Math.random() - 0.5) * (W() - 80), H()/2 + s + 10, Math.random() * 60 - 30);
 
   const drift = (Math.random() - 0.5) * 2.5;
   const driftFreq = 0.02 + Math.random() * 0.03;
@@ -597,25 +596,18 @@ function updateEnemies() {
 function spawnItem() {
   const isLemon = Math.random() < 0.5;
   const tex = isLemon ? lemonTexture : mintTexture;
-  const type = isLemon ? 'multishot' : 'speed';
-
   const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
   const sprite = new THREE.Sprite(mat);
   
   if (tex.image) {
-    const aspect = tex.image.height / tex.image.width;
-    sprite.scale.set(44, 44 * aspect, 1);
+    sprite.scale.set(44, 44 * (tex.image.height / tex.image.width), 1);
   } else {
     sprite.scale.set(44, 44, 1);
   }
   
-  sprite.position.set(
-    (Math.random() - 0.5) * (W() - 100),
-    H()/2 + 30,
-    2
-  );
+  sprite.position.set((Math.random() - 0.5) * (W() - 100), H()/2 + 30, 2);
   scene.add(sprite);
-  items.push({ sprite, type, vy: -(1.5 + level * 0.1) });
+  items.push({ sprite, type: isLemon ? 'multishot' : 'speed', vy: -(1.5 + level * 0.1) });
 }
 
 function updateItems() {
@@ -630,7 +622,6 @@ function updateItems() {
       items.splice(i, 1);
     }
   }
-
   if (multiShotTimer > 0) { multiShotTimer--; if (multiShotTimer===0) multiShot=1; }
   if (speedTimer > 0)     { speedTimer--;      if (speedTimer===0)    speedBoost=1.0; }
 }
@@ -640,17 +631,26 @@ function showItemGet(type) {
   overlay.className = 'item-overlay';
   const isLemon = type === 'multishot';
   
-  const imgSrc = isLemon ? 'item_lemon.png' : 'item_mint.png';
-  
   overlay.innerHTML = `
     <div class="item-popup ${isLemon ? 'item-lemon' : 'item-mint'}">
-      <img src="${imgSrc}" class="item-popup-img" alt="">
+      <img src="${isLemon ? 'item_lemon.png' : 'item_mint.png'}" class="item-popup-img" alt="">
       <div class="item-popup-label">${isLemon ? '🍋 AROMA LEMON' : '🌿 AROMA MINT'}</div>
       <div class="item-popup-effect">${isLemon ? '弾数 UP ×' + (multiShot) + '発！' : '速度 UP ×' + speedBoost.toFixed(1) + '！'}</div>
-      <div class="item-popup-name">${isLemon ? 'Lemongrass Aroma Alcohol' : 'Mint Aroma Alcohol'}</div>
     </div>`;
   document.body.appendChild(overlay);
   setTimeout(() => overlay.remove(), 2200);
+}
+
+// ダメージポップアップ
+function spawnDamageText(worldX, worldY, amount, color = '#fff') {
+  const el = document.createElement('div');
+  el.className = 'damage-text';
+  el.style.color = color;
+  el.textContent = amount;
+  el.style.left = (worldX + W()/2) + 'px';
+  el.style.top = (H()/2 - worldY) + 'px';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 800);
 }
 
 function checkCollisions() {
@@ -658,9 +658,7 @@ function checkCollisions() {
     const b = bullets[bi];
     for (let ei = enemies.length-1; ei >= 0; ei--) {
       const e = enemies[ei];
-      const dx = b.mesh.position.x - e.mesh.position.x;
-      const dy = b.mesh.position.y - e.mesh.position.y;
-      const dist = Math.sqrt(dx*dx + dy*dy);
+      const dist = Math.sqrt((b.mesh.position.x - e.mesh.position.x)**2 + (b.mesh.position.y - e.mesh.position.y)**2);
       if (dist < e.size * 0.85) {
         scene.remove(b.mesh);
         bullets.splice(bi, 1);
@@ -670,7 +668,13 @@ function checkCollisions() {
 
         if (e.hp <= 0) {
           spawnExplosion(e.mesh.position.x, e.mesh.position.y);
-          addScore2(e.pts * scoreMultiplier);
+          const pts = Math.floor(e.pts * scoreMultiplier);
+          addScore2(pts);
+          spawnDamageText(e.mesh.position.x, e.mesh.position.y, pts, '#ffe87a'); // ダメージポップアップ
+          
+          hitStop = 2; // 敵撃破時のヒットストップ
+          shakeTime = 8; shakeMag = 4; // 軽い画面揺れ
+
           scene.remove(e.mesh);
           enemies.splice(ei, 1);
         }
@@ -682,18 +686,12 @@ function checkCollisions() {
   if (player) {
     for (let i = items.length-1; i >= 0; i--) {
       const it = items[i];
-      const dx = player.position.x - it.sprite.position.x;
-      const dy = player.position.y - it.sprite.position.y;
-      if (Math.sqrt(dx*dx+dy*dy) < 50) {
+      const dist = Math.sqrt((player.position.x - it.sprite.position.x)**2 + (player.position.y - it.sprite.position.y)**2);
+      if (dist < 50) {
         scene.remove(it.sprite);
         items.splice(i, 1);
-        if (it.type === 'multishot') {
-          multiShot = Math.min(5, multiShot + 1);
-          multiShotTimer = ITEM_DURATION;
-        } else {
-          speedBoost = Math.min(2.5, speedBoost + 0.4);
-          speedTimer = ITEM_DURATION;
-        }
+        if (it.type === 'multishot') { multiShot = Math.min(5, multiShot + 1); multiShotTimer = ITEM_DURATION; } 
+        else { speedBoost = Math.min(2.5, speedBoost + 0.4); speedTimer = ITEM_DURATION; }
         spawnExplosion(it.sprite.position.x, it.sprite.position.y, '🌟');
         showItemGet(it.type);
       }
@@ -703,9 +701,7 @@ function checkCollisions() {
   if (!player) return;
   for (let ei = enemies.length-1; ei >= 0; ei--) {
     const e = enemies[ei];
-    const dx = player.position.x - e.mesh.position.x;
-    const dy = player.position.y - e.mesh.position.y;
-    const dist = Math.sqrt(dx*dx + dy*dy);
+    const dist = Math.sqrt((player.position.x - e.mesh.position.x)**2 + (player.position.y - e.mesh.position.y)**2);
     if (dist < e.size * 0.7 + 22) {
       scene.remove(e.mesh);
       enemies.splice(ei, 1);
@@ -721,10 +717,8 @@ function spawnExplosion(worldX, worldY, emoji) {
     const el = document.createElement('div');
     el.className = 'explosion';
     el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-    const sx = worldX + W()/2;
-    const sy = H()/2 - worldY;
-    el.style.left = (sx + (Math.random()-0.5)*40) + 'px';
-    el.style.top  = (sy + (Math.random()-0.5)*40) + 'px';
+    el.style.left = (worldX + W()/2 + (Math.random()-0.5)*40) + 'px';
+    el.style.top  = (H()/2 - worldY + (Math.random()-0.5)*40) + 'px';
     document.body.appendChild(el);
     setTimeout(() => el.remove(), 700);
   }
@@ -732,14 +726,22 @@ function spawnExplosion(worldX, worldY, emoji) {
 
 function addScore2(pts) {
   score += pts;
+  const el = document.getElementById('scoreBox');
   document.getElementById('scoreVal').textContent = score.toLocaleString();
+  // スコア獲得時にUIを少しバウンドさせる
+  el.style.transform = 'scale(1.1)';
+  setTimeout(() => el.style.transform = 'scale(1)', 100);
 }
 
 function showLevelBanner() {
   const b = document.getElementById('levelBanner');
   b.innerHTML = `STAGE CLEAR!<br><span style="font-size: 2rem;">STAGE ${level}</span>`;
-  b.style.opacity = 1;
-  setTimeout(() => { b.style.opacity = 0; }, 2000);
+  b.classList.add('show');
+  
+  warpFactor = 1.0; // ワープ演出発動
+  ambLight.color.setHSL((level * 0.1) % 1.0, 0.8, 0.6); // ステージごとに照明の色を変える
+
+  setTimeout(() => { b.classList.remove('show'); }, 2000);
 }
 
 function updateLivesUI() {
@@ -755,6 +757,10 @@ function updateLivesUI() {
 function playerHit() {
   lives--;
   updateLivesUI();
+  
+  hitStop = 15; // 被弾時の強いヒットストップ
+  shakeTime = 20; shakeMag = 15; // 被弾時の強い画面揺れ
+
   if (player) {
     player.material.color.set(0xff0000);
     setTimeout(() => { if (player) player.material.color.set(0xffffff); }, 300);
@@ -782,6 +788,23 @@ function gameLoop(t) {
     return;
   }
 
+  // ★ヒットストップ処理（演出中はゲーム進行をスキップ）
+  if (hitStop > 0) {
+    hitStop--;
+    return;
+  }
+
+  // ★スクリーンシェイク処理
+  if (shakeTime > 0) {
+    shakeTime--;
+    const dx = (Math.random() - 0.5) * shakeMag;
+    const dy = (Math.random() - 0.5) * shakeMag;
+    canvas.style.transform = `translate(${dx}px, ${dy}px)`;
+    shakeMag *= 0.9;
+  } else {
+    canvas.style.transform = 'none';
+  }
+
   stageTime -= dt;
   if (stageTime <= 0) {
     level++;
@@ -794,13 +817,10 @@ function gameLoop(t) {
 
   if (player) {
     const spd = (PLAYER_SPEED + level * 0.2) * speedBoost;
-    if ((keys['ArrowLeft'] || keys['a']) && player.position.x > -W()/2 + 40)
-      player.position.x -= spd;
-    if ((keys['ArrowRight'] || keys['d']) && player.position.x < W()/2 - 40)
-      player.position.x += spd;
+    if ((keys['ArrowLeft'] || keys['a']) && player.position.x > -W()/2 + 40) player.position.x -= spd;
+    if ((keys['ArrowRight'] || keys['d']) && player.position.x < W()/2 - 40) player.position.x += spd;
 
     shoot();
-
     player.material.rotation = (keys['ArrowLeft'] ? -0.25 : keys['ArrowRight'] ? 0.25 : 0);
   }
 
@@ -832,6 +852,7 @@ function startGame() {
   score = 0; lives = 3; level = 1; frameCount = 0;
   lastShotFrame = 0; lastEnemyFrame = 0; scoreMultiplier = 1;
   stageTime = 30.0; lastTime = 0;
+  warpFactor = 0; ambLight.color.setHex(0x8888cc); // 照明リセット
   
   document.getElementById('scoreVal').textContent = '0';
   document.getElementById('levelVal').textContent = '1';
@@ -895,7 +916,6 @@ function handleTouchMove(e) {
   
   const touch = e.touches[0];
   const rect = canvas.getBoundingClientRect();
-  
   const screenX = touch.clientX - rect.left;
   const worldX = (screenX / rect.width) * W() - W() / 2;
   
