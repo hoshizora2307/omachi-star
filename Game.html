@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -204,7 +205,6 @@
   }
   @keyframes explode { 0% { opacity: 1; transform: scale(0.5) rotate(0deg); } 60% { opacity: 1; transform: scale(1.4) rotate(180deg); } 100% { opacity: 0; transform: scale(2) rotate(360deg); } }
 
-  /* ダメージポップアップ用のCSS */
   .damage-text {
     position: fixed; z-index: 100; pointer-events: none;
     font-size: 1.6rem; font-weight: 900;
@@ -305,58 +305,42 @@ let animId = null;
 let stageTime = 30.0;
 let lastTime = 0;
 
-// ==========================================
-// ★ジュース（派手さ）管理変数
 let shakeTime = 0;
 let shakeMag = 0;
 let hitStop = 0;
-let warpFactor = 0; // ステージクリア時の背景ワープ効果
-// ==========================================
+let warpFactor = 0;
 
-// ==========================================
-// ★サーバー通信用API設定
-// サーバーを構築した際、以下の空文字 "" の中にAPIのURLを入れてください。
-// （例: "https://my-game-server.com/api/ranking"）
-const API_URL = ""; 
-// ==========================================
+const SUPABASE_URL = 'https://ufjojhraqyzqqzlkokwd.supabase.co/rest/v1/';
+const SUPABASE_KEY = 'sb_publishable_ha-q_6WBEngyBT3dOLMJQQ_EZsVSGI6';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 async function loadRanking() {
   try {
-    if (API_URL) {
-      const res = await fetch(API_URL);
-      return await res.json();
-    } else {
-      throw new Error("Local");
-    }
+    const { data, error } = await supabase
+      .from('purin_ranking')
+      .select('name, score')
+      .order('score', { ascending: false })
+      .limit(10);
+    
+    if (error) throw error;
+    return data;
   } catch(e) {
-    const data = localStorage.getItem("purin_ranking_v1");
-    return data ? JSON.parse(data) : [];
-  }
-}
-
-async function saveRanking(list) {
-  try {
-    if (API_URL) {
-      await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(list)
-      });
-    } else {
-      throw new Error("Local");
-    }
-  } catch(e) {
-    localStorage.setItem("purin_ranking_v1", JSON.stringify(list));
+    return [];
   }
 }
 
 async function addScore(name, pts) {
-  let list = await loadRanking();
-  list.push({ name: name.trim() || '匿名スター', score: pts, date: new Date().toLocaleDateString('ja-JP') });
-  list.sort((a,b) => b.score - a.score);
-  list = list.slice(0, 10);
-  await saveRanking(list);
-  return list;
+  const playerName = name.trim() || '匿名スター';
+  try {
+    const { error: insertError } = await supabase
+      .from('purin_ranking')
+      .insert([{ name: playerName, score: pts }]);
+      
+    if (insertError) throw insertError;
+    return await loadRanking();
+  } catch(e) {
+    throw e; 
+  }
 }
 
 function medal(rank) {
@@ -412,12 +396,10 @@ function initBg() {
   }));
 }
 function drawBg(t) {
-  // ワープ中はモーションブラーをかける
   bgCtx.fillStyle = warpFactor > 0.1 ? 'rgba(0, 0, 0, 0.3)' : '#000';
   bgCtx.fillRect(0,0,bgCanvas.width,bgCanvas.height);
   
   for (const star of bgStars) {
-    // ワープ中は星の落下速度が劇的にアップ
     star.y += (0.5 + star.s) * (1 + warpFactor * 40);
     if (star.y > bgCanvas.height) {
       star.y = 0;
@@ -426,7 +408,6 @@ function drawBg(t) {
     
     bgCtx.beginPath();
     if (warpFactor > 0.1) {
-      // 加速中は星を線にして描画（ワープ効果）
       bgCtx.moveTo(star.x, star.y);
       bgCtx.lineTo(star.x, star.y - (0.5 + star.s) * warpFactor * 40);
       bgCtx.lineWidth = star.r;
@@ -439,7 +420,7 @@ function drawBg(t) {
       bgCtx.fill();
     }
   }
-  if (warpFactor > 0) warpFactor *= 0.95; // ワープエフェクトの減衰
+  if (warpFactor > 0) warpFactor *= 0.95; 
 }
 
 const items = [];
@@ -499,8 +480,7 @@ function createPlayer() {
 
 const bullets = [];
 
-// メモリ負荷対策: ジオメトリとマテリアルを使い回す
-const bulletGeo = new THREE.IcosahedronGeometry(4, 0); // 宝石っぽくて可愛い多面体
+const bulletGeo = new THREE.IcosahedronGeometry(4, 0); 
 const bulletMatSingle = new THREE.MeshStandardMaterial({
   color: 0xffeebb, emissive: 0xffbb00, emissiveIntensity: 1.5, metalness: 0.2, roughness: 0.3
 });
@@ -641,7 +621,6 @@ function showItemGet(type) {
   setTimeout(() => overlay.remove(), 2200);
 }
 
-// ダメージポップアップ
 function spawnDamageText(worldX, worldY, amount, color = '#fff') {
   const el = document.createElement('div');
   el.className = 'damage-text';
@@ -670,10 +649,10 @@ function checkCollisions() {
           spawnExplosion(e.mesh.position.x, e.mesh.position.y);
           const pts = Math.floor(e.pts * scoreMultiplier);
           addScore2(pts);
-          spawnDamageText(e.mesh.position.x, e.mesh.position.y, pts, '#ffe87a'); // ダメージポップアップ
+          spawnDamageText(e.mesh.position.x, e.mesh.position.y, pts, '#ffe87a'); 
           
-          hitStop = 2; // 敵撃破時のヒットストップ
-          shakeTime = 8; shakeMag = 4; // 軽い画面揺れ
+          hitStop = 2; 
+          shakeTime = 8; shakeMag = 4; 
 
           scene.remove(e.mesh);
           enemies.splice(ei, 1);
@@ -728,7 +707,6 @@ function addScore2(pts) {
   score += pts;
   const el = document.getElementById('scoreBox');
   document.getElementById('scoreVal').textContent = score.toLocaleString();
-  // スコア獲得時にUIを少しバウンドさせる
   el.style.transform = 'scale(1.1)';
   setTimeout(() => el.style.transform = 'scale(1)', 100);
 }
@@ -738,8 +716,8 @@ function showLevelBanner() {
   b.innerHTML = `STAGE CLEAR!<br><span style="font-size: 2rem;">STAGE ${level}</span>`;
   b.classList.add('show');
   
-  warpFactor = 1.0; // ワープ演出発動
-  ambLight.color.setHSL((level * 0.1) % 1.0, 0.8, 0.6); // ステージごとに照明の色を変える
+  warpFactor = 1.0; 
+  ambLight.color.setHSL((level * 0.1) % 1.0, 0.8, 0.6); 
 
   setTimeout(() => { b.classList.remove('show'); }, 2000);
 }
@@ -758,8 +736,8 @@ function playerHit() {
   lives--;
   updateLivesUI();
   
-  hitStop = 15; // 被弾時の強いヒットストップ
-  shakeTime = 20; shakeMag = 15; // 被弾時の強い画面揺れ
+  hitStop = 15; 
+  shakeTime = 20; shakeMag = 15; 
 
   if (player) {
     player.material.color.set(0xff0000);
@@ -788,13 +766,11 @@ function gameLoop(t) {
     return;
   }
 
-  // ★ヒットストップ処理（演出中はゲーム進行をスキップ）
   if (hitStop > 0) {
     hitStop--;
     return;
   }
 
-  // ★スクリーンシェイク処理
   if (shakeTime > 0) {
     shakeTime--;
     const dx = (Math.random() - 0.5) * shakeMag;
@@ -852,7 +828,7 @@ function startGame() {
   score = 0; lives = 3; level = 1; frameCount = 0;
   lastShotFrame = 0; lastEnemyFrame = 0; scoreMultiplier = 1;
   stageTime = 30.0; lastTime = 0;
-  warpFactor = 0; ambLight.color.setHex(0x8888cc); // 照明リセット
+  warpFactor = 0; ambLight.color.setHex(0x8888cc); 
   
   document.getElementById('scoreVal').textContent = '0';
   document.getElementById('levelVal').textContent = '1';
