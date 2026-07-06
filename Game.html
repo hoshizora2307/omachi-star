@@ -310,12 +310,19 @@ let shakeMag = 0;
 let hitStop = 0;
 let warpFactor = 0;
 
-const SUPABASE_URL = 'https://ufjojhraqyzqqzlkokwd.supabase.co/rest/v1/';
+const SUPABASE_URL = 'https://ufjojhraqyzqqzlkokwd.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_ha-q_6WBEngyBT3dOLMJQQ_EZsVSGI6';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let supabase = null;
+try {
+  if (SUPABASE_URL.startsWith('https://')) {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  }
+} catch (e) {}
 
 async function loadRanking() {
   try {
+    if (!supabase) throw new Error();
     const { data, error } = await supabase
       .from('purin_ranking')
       .select('name, score')
@@ -325,13 +332,15 @@ async function loadRanking() {
     if (error) throw error;
     return data;
   } catch(e) {
-    return [];
+    const data = localStorage.getItem("purin_ranking_v1");
+    return data ? JSON.parse(data) : [];
   }
 }
 
 async function addScore(name, pts) {
   const playerName = name.trim() || '匿名スター';
   try {
+    if (!supabase) throw new Error();
     const { error: insertError } = await supabase
       .from('purin_ranking')
       .insert([{ name: playerName, score: pts }]);
@@ -339,7 +348,12 @@ async function addScore(name, pts) {
     if (insertError) throw insertError;
     return await loadRanking();
   } catch(e) {
-    throw e; 
+    let list = await loadRanking();
+    list.push({ name: playerName, score: pts, date: new Date().toLocaleDateString('ja-JP') });
+    list.sort((a,b) => b.score - a.score);
+    list = list.slice(0, 10);
+    localStorage.setItem("purin_ranking_v1", JSON.stringify(list));
+    return list;
   }
 }
 
