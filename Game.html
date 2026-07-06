@@ -313,17 +313,17 @@ let warpFactor = 0;
 const SUPABASE_URL = 'https://ufjojhraqyzqqzlkokwd.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_ha-q_6WBEngyBT3dOLMJQQ_EZsVSGI6';
 
-let supabase = null;
+let supabaseClient = null;
 try {
   if (SUPABASE_URL.startsWith('https://')) {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   }
 } catch (e) {}
 
 async function loadRanking() {
   try {
-    if (!supabase) throw new Error();
-    const { data, error } = await supabase
+    if (!supabaseClient) throw new Error();
+    const { data, error } = await supabaseClient
       .from('purin_ranking')
       .select('name, score')
       .order('score', { ascending: false })
@@ -340,8 +340,8 @@ async function loadRanking() {
 async function addScore(name, pts) {
   const playerName = name.trim() || '匿名スター';
   try {
-    if (!supabase) throw new Error();
-    const { error: insertError } = await supabase
+    if (!supabaseClient) throw new Error();
+    const { error: insertError } = await supabaseClient
       .from('purin_ranking')
       .insert([{ name: playerName, score: pts }]);
       
