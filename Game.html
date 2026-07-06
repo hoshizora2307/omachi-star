@@ -59,7 +59,6 @@
   #livesRow { display: flex; gap: 4px; align-items: center; }
   .heart { font-size: 1.2rem; }
 
-  /* 画面から見切れないようにスクロール可能に修正 */
   .screen {
     position: fixed; inset: 0;
     display: flex; flex-direction: column;
@@ -342,38 +341,44 @@ try {
 
 async function loadRanking() {
   try {
-    if (!supabaseClient) throw new Error();
-    const { data, error } = await supabaseClient
-      .from('purin_ranking')
-      .select('name, score')
-      .order('score', { ascending: false })
-      .limit(10);
-    
-    if (error) throw error;
-    return data;
-  } catch(e) {
-    const data = localStorage.getItem("purin_ranking_v1");
-    return data ? JSON.parse(data) : [];
+    if (supabaseClient) {
+      const { data, error } = await supabaseClient
+        .from('purin_ranking')
+        .select('name, score')
+        .order('score', { ascending: false })
+        .limit(10);
+      if (!error && data) return data;
+    }
+  } catch(e) {}
+  
+  try {
+    const localData = localStorage.getItem("purin_ranking_v1");
+    return localData ? JSON.parse(localData) : [];
+  } catch (err) {
+    return [];
   }
 }
 
 async function addScore(name, pts) {
   const playerName = name.trim() || '匿名スター';
   try {
-    if (!supabaseClient) throw new Error();
-    const { error: insertError } = await supabaseClient
-      .from('purin_ranking')
-      .insert([{ name: playerName, score: pts }]);
-      
-    if (insertError) throw insertError;
-    return await loadRanking();
-  } catch(e) {
+    if (supabaseClient) {
+      const { error } = await supabaseClient
+        .from('purin_ranking')
+        .insert([{ name: playerName, score: pts }]);
+      if (!error) return await loadRanking();
+    }
+  } catch(e) {}
+  
+  try {
     let list = await loadRanking();
     list.push({ name: playerName, score: pts, date: new Date().toLocaleDateString('ja-JP') });
     list.sort((a,b) => b.score - a.score);
     list = list.slice(0, 10);
     localStorage.setItem("purin_ranking_v1", JSON.stringify(list));
     return list;
+  } catch(err) {
+    return [];
   }
 }
 
@@ -401,10 +406,17 @@ function escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 async function refreshRanking() {
-  const list = await loadRanking();
-  renderRanking(list, 'rankListTitle');
-  renderRanking(list, 'rankListFull');
-  renderRanking(list, 'rankListGO');
+  try {
+    const list = await loadRanking();
+    renderRanking(list, 'rankListTitle');
+    renderRanking(list, 'rankListFull');
+    renderRanking(list, 'rankListGO');
+  } catch (e) {
+    const empty = [];
+    renderRanking(empty, 'rankListTitle');
+    renderRanking(empty, 'rankListFull');
+    renderRanking(empty, 'rankListGO');
+  }
 }
 
 function showScreen(id) {
