@@ -334,10 +334,15 @@ const SUPABASE_KEY = 'sb_publishable_ha-q_6WBEngyBT3dOLMJQQ_EZsVSGI6';
 
 let supabaseClient = null;
 try {
-  if (SUPABASE_URL.startsWith('https://')) {
+  if (!window.supabase) {
+    console.error('[Supabase] ライブラリが読み込まれていません（CDNのブロック等を確認）');
+  } else if (SUPABASE_URL.startsWith('https://')) {
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    console.log('[Supabase] クライアント初期化OK');
   }
-} catch (e) {}
+} catch (e) {
+  console.error('[Supabase] 初期化に失敗:', e);
+}
 
 async function loadRanking() {
   try {
@@ -347,9 +352,12 @@ async function loadRanking() {
         .select('name, score')
         .order('score', { ascending: false })
         .limit(10);
+      if (error) console.error('[Supabase] 読み込みエラー:', error);
       if (!error && data) return data;
     }
-  } catch(e) {}
+  } catch(e) {
+    console.error('[Supabase] loadRanking 例外:', e);
+  }
   
   try {
     const localData = localStorage.getItem("purin_ranking_v1");
@@ -366,9 +374,12 @@ async function addScore(name, pts) {
       const { error } = await supabaseClient
         .from('purin_ranking')
         .insert([{ name: playerName, score: pts }]);
+      if (error) console.error('[Supabase] 登録エラー:', error);
       if (!error) return await loadRanking();
     }
-  } catch(e) {}
+  } catch(e) {
+    console.error('[Supabase] addScore 例外:', e);
+  }
   
   try {
     let list = await loadRanking();
