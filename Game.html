@@ -296,6 +296,7 @@
     <div style="color:#ffe87a; margin-bottom:8px; font-size:1.2rem; text-align: center;">名前を入力してランキングに登録！</div>
     <div class="name-hint">最大8文字</div>
     <input class="name-input" id="playerNameInput" type="text" maxlength="8" placeholder="プレイヤー名" autocomplete="off">
+    <br>
     <button class="btn" id="submitBtn" onclick="submitScore()">登録して終了</button>
     <button class="btn-secondary" onclick="skipSubmit()">登録せずに終了</button>
     <div id="submitMsg" style="color:#ffe87a; margin-top:8px; min-height:24px; font-size:1.2rem; text-align: center;"></div>
@@ -310,660 +311,659 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
 <script>
-const keys = {};
-let gameState = 'title'; 
-let score = 0;
-let lives = 3;
-let level = 1;
-let frameCount = 0;
-let lastShotFrame = 0;
-let lastEnemyFrame = 0;
-let scoreMultiplier = 1;
-let animId = null;
+// ==========================================
+// ★ 保護カプセル（古いコードと衝突しないように全てを囲む）
+// ==========================================
+(function() {
+  const keys = {};
+  let gameState = 'title'; 
+  let score = 0;
+  let lives = 3;
+  let level = 1;
+  let frameCount = 0;
+  let lastShotFrame = 0;
+  let lastEnemyFrame = 0;
+  let scoreMultiplier = 1;
+  let animId = null;
 
-let stageTime = 30.0;
-let lastTime = 0;
+  let stageTime = 30.0;
+  let lastTime = 0;
 
-let shakeTime = 0;
-let shakeMag = 0;
-let hitStop = 0;
-let warpFactor = 0;
+  let shakeTime = 0;
+  let shakeMag = 0;
+  let hitStop = 0;
+  let warpFactor = 0;
 
-const SUPABASE_URL = 'https://ufjojhraqyzqqzlkokwd.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_ha-q_6WBEngyBT3dOLMJQQ_EZsVSGI6';
+  const SUPABASE_URL = 'https://ufjojhraqyzqqzlkokwd.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_ha-q_6WBEngyBT3dOLMJQQ_EZsVSGI6';
 
-let supabaseClient = null;
-try {
-  if (!window.supabase) {
-    console.error('[Supabase] ライブラリが読み込まれていません（CDNのブロック等を確認）');
-  } else if (SUPABASE_URL.startsWith('https://')) {
-    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    console.log('[Supabase] クライアント初期化OK');
-  }
-} catch (e) {
-  console.error('[Supabase] 初期化に失敗:', e);
-}
-
-async function loadRanking() {
+  let supabaseClient = null;
   try {
-    if (supabaseClient) {
-      const { data, error } = await supabaseClient
-        .from('purin_ranking')
-        .select('name, score')
-        .order('score', { ascending: false })
-        .limit(10);
-      if (error) console.error('[Supabase] 読み込みエラー:', error);
-      if (!error && data) return data;
+    if (window.supabase) {
+      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     }
-  } catch(e) {
-    console.error('[Supabase] loadRanking 例外:', e);
-  }
-  
-  try {
-    const localData = localStorage.getItem("purin_ranking_v1");
-    return localData ? JSON.parse(localData) : [];
-  } catch (err) {
-    return [];
-  }
-}
-
-async function addScore(name, pts) {
-  const playerName = name.trim() || '匿名スター';
-  try {
-    if (supabaseClient) {
-      const { error } = await supabaseClient
-        .from('purin_ranking')
-        .insert([{ name: playerName, score: pts }]);
-      if (error) console.error('[Supabase] 登録エラー:', error);
-      if (!error) return await loadRanking();
-    }
-  } catch(e) {
-    console.error('[Supabase] addScore 例外:', e);
-  }
-  
-  try {
-    let list = await loadRanking();
-    list.push({ name: playerName, score: pts, date: new Date().toLocaleDateString('ja-JP') });
-    list.sort((a,b) => b.score - a.score);
-    list = list.slice(0, 10);
-    localStorage.setItem("purin_ranking_v1", JSON.stringify(list));
-    return list;
-  } catch(err) {
-    return [];
-  }
-}
-
-function medal(rank) {
-  if (rank === 0) return '<span class="rank-num gold">🥇</span>';
-  if (rank === 1) return '<span class="rank-num silver">🥈</span>';
-  if (rank === 2) return '<span class="rank-num bronze">🥉</span>';
-  return `<span class="rank-num">${rank+1}</span>`;
-}
-function renderRanking(list, containerId) {
-  const el = document.getElementById(containerId);
-  if (!el) return;
-  if (!list || list.length === 0) {
-    el.innerHTML = '<div class="rank-empty">まだ記録がありません。<br>あなたが1位に！</div>';
-    return;
-  }
-  el.innerHTML = list.map((r, i) => `
-    <div class="rank-row">
-      ${medal(i)}
-      <span class="rank-name">${escHtml(r.name)}</span>
-      <span class="rank-score">${r.score.toLocaleString()}</span>
-    </div>`).join('');
-}
-function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-async function refreshRanking() {
-  try {
-    const list = await loadRanking();
-    renderRanking(list, 'rankListTitle');
-    renderRanking(list, 'rankListFull');
-    renderRanking(list, 'rankListGO');
   } catch (e) {
-    const empty = [];
-    renderRanking(empty, 'rankListTitle');
-    renderRanking(empty, 'rankListFull');
-    renderRanking(empty, 'rankListGO');
+    console.error("Supabase初期化エラー", e);
   }
-}
 
-function showScreen(id) {
-  ['titleScreen','rankingScreen','gameOverScreen'].forEach(s => {
-    document.getElementById(s).classList.toggle('hidden', s !== id);
-  });
-}
-function showRanking() { showScreen('rankingScreen'); refreshRanking(); }
-function hideRanking() { showScreen('titleScreen'); }
+  async function loadRanking() {
+    try {
+      if (supabaseClient) {
+        const { data, error } = await supabaseClient
+          .from('purin_ranking')
+          .select('name, score')
+          .order('score', { ascending: false })
+          .limit(10);
+        
+        if (!error && data) return data;
+      }
+    } catch(e) {}
+    
+    try {
+      const localData = localStorage.getItem("purin_ranking_v1");
+      return localData ? JSON.parse(localData) : [];
+    } catch (err) {
+      return [];
+    }
+  }
 
-const bgCanvas = document.getElementById('bgCanvas');
-const bgCtx = bgCanvas.getContext('2d');
-let bgStars = [];
-function initBg() {
-  bgCanvas.width = window.innerWidth;
-  bgCanvas.height = window.innerHeight;
-  bgStars = Array.from({length: 200}, () => ({
-    x: Math.random() * bgCanvas.width,
-    y: Math.random() * bgCanvas.height,
-    r: Math.random() * 1.5 + 0.3,
-    s: Math.random() * 0.3 + 0.1,
-    a: Math.random()
-  }));
-}
-function drawBg(t) {
-  bgCtx.fillStyle = warpFactor > 0.1 ? 'rgba(0, 0, 0, 0.3)' : '#000';
-  bgCtx.fillRect(0,0,bgCanvas.width,bgCanvas.height);
+  async function addScore(name, pts) {
+    const playerName = name.trim() || '匿名スター';
+    try {
+      if (supabaseClient) {
+        const { error } = await supabaseClient
+          .from('purin_ranking')
+          .insert([{ name: playerName, score: pts }]);
+        if (!error) return await loadRanking();
+      }
+    } catch(e) {}
+    
+    try {
+      let list = await loadRanking();
+      list.push({ name: playerName, score: pts, date: new Date().toLocaleDateString('ja-JP') });
+      list.sort((a,b) => b.score - a.score);
+      list = list.slice(0, 10);
+      localStorage.setItem("purin_ranking_v1", JSON.stringify(list));
+      return list;
+    } catch(err) {
+      return [];
+    }
+  }
+
+  function medal(rank) {
+    if (rank === 0) return '<span class="rank-num gold">🥇</span>';
+    if (rank === 1) return '<span class="rank-num silver">🥈</span>';
+    if (rank === 2) return '<span class="rank-num bronze">🥉</span>';
+    return `<span class="rank-num">${rank+1}</span>`;
+  }
+  function renderRanking(list, containerId) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    if (!list || list.length === 0) {
+      el.innerHTML = '<div class="rank-empty">まだ記録がありません。<br>あなたが1位に！</div>';
+      return;
+    }
+    el.innerHTML = list.map((r, i) => `
+      <div class="rank-row">
+        ${medal(i)}
+        <span class="rank-name">${escHtml(r.name)}</span>
+        <span class="rank-score">${r.score.toLocaleString()}</span>
+      </div>`).join('');
+  }
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  async function refreshRanking() {
+    try {
+      const list = await loadRanking();
+      renderRanking(list, 'rankListTitle');
+      renderRanking(list, 'rankListFull');
+      renderRanking(list, 'rankListGO');
+    } catch (e) {
+      const empty = [];
+      renderRanking(empty, 'rankListTitle');
+      renderRanking(empty, 'rankListFull');
+      renderRanking(empty, 'rankListGO');
+    }
+  }
+
+  function showScreen(id) {
+    ['titleScreen','rankingScreen','gameOverScreen'].forEach(s => {
+      document.getElementById(s).classList.toggle('hidden', s !== id);
+    });
+  }
   
-  for (const star of bgStars) {
-    star.y += (0.5 + star.s) * (1 + warpFactor * 40);
-    if (star.y > bgCanvas.height) {
-      star.y = 0;
-      star.x = Math.random() * bgCanvas.width;
+  // HTML側からボタンを押せるように window オブジェクトに登録
+  window.showRanking = function() { showScreen('rankingScreen'); refreshRanking(); }
+  window.hideRanking = function() { showScreen('titleScreen'); }
+
+  const bgCanvas = document.getElementById('bgCanvas');
+  const bgCtx = bgCanvas.getContext('2d');
+  let bgStars = [];
+  function initBg() {
+    bgCanvas.width = window.innerWidth;
+    bgCanvas.height = window.innerHeight;
+    bgStars = Array.from({length: 200}, () => ({
+      x: Math.random() * bgCanvas.width,
+      y: Math.random() * bgCanvas.height,
+      r: Math.random() * 1.5 + 0.3,
+      s: Math.random() * 0.3 + 0.1,
+      a: Math.random()
+    }));
+  }
+  function drawBg(t) {
+    bgCtx.fillStyle = warpFactor > 0.1 ? 'rgba(0, 0, 0, 0.3)' : '#000';
+    bgCtx.fillRect(0,0,bgCanvas.width,bgCanvas.height);
+    
+    for (const star of bgStars) {
+      star.y += (0.5 + star.s) * (1 + warpFactor * 40);
+      if (star.y > bgCanvas.height) {
+        star.y = 0;
+        star.x = Math.random() * bgCanvas.width;
+      }
+      
+      bgCtx.beginPath();
+      if (warpFactor > 0.1) {
+        bgCtx.moveTo(star.x, star.y);
+        bgCtx.lineTo(star.x, star.y - (0.5 + star.s) * warpFactor * 40);
+        bgCtx.lineWidth = star.r;
+        bgCtx.strokeStyle = `rgba(255,255,240,${star.a})`;
+        bgCtx.stroke();
+      } else {
+        star.a = 0.4 + 0.6 * (Math.sin(t * star.s + star.x) * 0.5 + 0.5);
+        bgCtx.arc(star.x, star.y, star.r, 0, Math.PI*2);
+        bgCtx.fillStyle = `rgba(255,255,240,${star.a})`;
+        bgCtx.fill();
+      }
+    }
+    if (warpFactor > 0) warpFactor *= 0.95; 
+  }
+
+  const items = [];
+  let multiShot = 1;
+  let speedBoost = 1.0;
+  let multiShotTimer = 0;
+  let speedTimer = 0;
+  const ITEM_DURATION = 600;
+
+  const canvas = document.getElementById('gameCanvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setClearColor(0x000000, 0);
+
+  const scene = new THREE.Scene();
+  const W = () => window.innerWidth;
+  const H = () => window.innerHeight;
+
+  let camera = new THREE.OrthographicCamera(-W()/2, W()/2, H()/2, -H()/2, 0.1, 2000);
+  camera.position.z = 500;
+
+  function resize() {
+    renderer.setSize(W(), H(), false);
+    camera.left = -W()/2; camera.right = W()/2;
+    camera.top = H()/2; camera.bottom = -H()/2;
+    camera.updateProjectionMatrix();
+    initBg();
+    if (player) {
+      player.position.y = -H()/2 + 180;
+    }
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  const ambLight = new THREE.AmbientLight(0x8888cc, 0.8);
+  scene.add(ambLight);
+  const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+  dirLight.position.set(1, 2, 3);
+  scene.add(dirLight);
+  const pointLight = new THREE.PointLight(0x4488ff, 1.5, 600);
+  pointLight.position.set(0, 0, 200);
+  scene.add(pointLight);
+
+  const textureLoader = new THREE.TextureLoader();
+  const starTexture  = textureLoader.load('star_2_open.png');
+  const lemonTexture = textureLoader.load('item_lemon.png');
+  const mintTexture  = textureLoader.load('item_mint.png');
+
+  let player, playerSprite;
+
+  function createPlayer() {
+    if (player) scene.remove(player);
+    const mat = new THREE.SpriteMaterial({ map: starTexture, transparent: true });
+    playerSprite = new THREE.Sprite(mat);
+    playerSprite.scale.set(70, 70, 1);
+    playerSprite.position.set(0, -H()/2 + 180, 1); 
+    scene.add(playerSprite);
+    player = playerSprite;
+  }
+
+  const bullets = [];
+  const bulletGeo = new THREE.IcosahedronGeometry(4, 0); 
+  const bulletMatSingle = new THREE.MeshStandardMaterial({
+    color: 0xffeebb, emissive: 0xffbb00, emissiveIntensity: 1.5, metalness: 0.2, roughness: 0.3
+  });
+  const bulletMatMulti = new THREE.MeshStandardMaterial({
+    color: 0x88ffee, emissive: 0x00aa88, emissiveIntensity: 1.5, metalness: 0.2, roughness: 0.3
+  });
+
+  function shoot() {
+    if (frameCount - lastShotFrame < 35) return; 
+    lastShotFrame = frameCount;
+
+    const offsets = [];
+    if (multiShot === 1) offsets.push(0);
+    else for (let k=0;k<multiShot;k++) offsets.push((k-(multiShot-1)/2)*22);
+
+    offsets.forEach(ox => {
+      const mat = multiShot > 1 ? bulletMatMulti : bulletMatSingle;
+      const mesh = new THREE.Mesh(bulletGeo, mat);
+      mesh.position.set(player.position.x + ox, player.position.y + 40, 0);
+      scene.add(mesh);
+      bullets.push({ mesh, vy: 14 + level * 0.4 });
+    });
+  }
+
+  function updateBullets() {
+    for (let i = bullets.length-1; i >= 0; i--) {
+      const b = bullets[i];
+      b.mesh.position.y += b.vy;
+      b.mesh.rotation.y += 0.2;
+      b.mesh.rotation.x += 0.1;
+      if (b.mesh.position.y > H()/2 + 30) {
+        scene.remove(b.mesh);
+        bullets.splice(i, 1);
+      }
+    }
+  }
+
+  const enemies = [];
+  const ENEMY_TYPES = [
+    { geo: () => new THREE.TetrahedronGeometry(1, 0),      color: 0xff2244, em: 0x880011, size:28, hp:1, pts:100, speed:1.8 },
+    { geo: () => new THREE.OctahedronGeometry(1, 0),       color: 0xff6600, em: 0x882200, size:36, hp:2, pts:200, speed:1.4 },
+    { geo: () => new THREE.IcosahedronGeometry(1, 0),      color: 0x8800ff, em: 0x440088, size:44, hp:3, pts:350, speed:1.1 },
+    { geo: () => new THREE.BoxGeometry(1,1,1),             color: 0x00aaff, em: 0x004488, size:34, hp:2, pts:250, speed:1.5 },
+    { geo: () => new THREE.CylinderGeometry(0,1,1.6,6),    color: 0xff0088, em: 0x880033, size:50, hp:4, pts:500, speed:0.9 },
+    { geo: () => new THREE.SphereGeometry(1, 6, 6),        color: 0x00ff88, em: 0x008844, size:52, hp:5, pts:700, speed:0.7 },
+    { geo: () => new THREE.TorusGeometry(1, 0.4, 6, 8),    color: 0xffcc00, em: 0x886600, size:58, hp:6, pts:900, speed:0.65 },
+  ];
+
+  function spawnEnemy() {
+    const typePool = ENEMY_TYPES.slice(0, Math.min(2 + Math.floor(level/1.5), ENEMY_TYPES.length));
+    const t = typePool[Math.floor(Math.random() * typePool.length)];
+    const s = t.size * (0.7 + Math.random() * 0.9);
+
+    const geo = t.geo();
+    const mat = new THREE.MeshStandardMaterial({
+      color: t.color, emissive: t.em, emissiveIntensity: 1.2, metalness: 0.7, roughness: 0.2,
+      wireframe: Math.random() < 0.15
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.scale.set(s, s, s);
+    mesh.position.set((Math.random() - 0.5) * (W() - 80), H()/2 + s + 10, Math.random() * 60 - 30);
+
+    const drift = (Math.random() - 0.5) * 2.5;
+    const driftFreq = 0.02 + Math.random() * 0.03;
+    const spd = (t.speed + level * 0.15) * (0.8 + Math.random() * 0.4);
+
+    scene.add(mesh);
+    enemies.push({ mesh, vy: -spd, drift, driftFreq, hp: t.hp, maxHp: t.hp, pts: t.pts, size: s, rx:Math.random()*0.06-0.03, ry:Math.random()*0.06-0.03 });
+  }
+
+  function updateEnemies() {
+    const interval = Math.max(20, 80 - level * 5);
+    if (frameCount - lastEnemyFrame > interval) {
+      spawnEnemy();
+      if (level > 3 && Math.random() < 0.3) spawnEnemy();
+      lastEnemyFrame = frameCount;
+    }
+
+    for (let i = enemies.length-1; i >= 0; i--) {
+      const e = enemies[i];
+      e.mesh.position.y += e.vy;
+      e.mesh.position.x += Math.sin(frameCount * e.driftFreq) * e.drift;
+      e.mesh.rotation.x += e.rx;
+      e.mesh.rotation.y += e.ry;
+
+      if (e.mesh.position.y < -H()/2 - e.size - 10) {
+        scene.remove(e.mesh);
+        enemies.splice(i, 1);
+      }
+    }
+  }
+
+  function spawnItem() {
+    const isLemon = Math.random() < 0.5;
+    const tex = isLemon ? lemonTexture : mintTexture;
+    const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
+    const sprite = new THREE.Sprite(mat);
+    
+    if (tex.image) {
+      sprite.scale.set(44, 44 * (tex.image.height / tex.image.width), 1);
+    } else {
+      sprite.scale.set(44, 44, 1);
     }
     
-    bgCtx.beginPath();
-    if (warpFactor > 0.1) {
-      bgCtx.moveTo(star.x, star.y);
-      bgCtx.lineTo(star.x, star.y - (0.5 + star.s) * warpFactor * 40);
-      bgCtx.lineWidth = star.r;
-      bgCtx.strokeStyle = `rgba(255,255,240,${star.a})`;
-      bgCtx.stroke();
-    } else {
-      star.a = 0.4 + 0.6 * (Math.sin(t * star.s + star.x) * 0.5 + 0.5);
-      bgCtx.arc(star.x, star.y, star.r, 0, Math.PI*2);
-      bgCtx.fillStyle = `rgba(255,255,240,${star.a})`;
-      bgCtx.fill();
-    }
-  }
-  if (warpFactor > 0) warpFactor *= 0.95; 
-}
-
-const items = [];
-let multiShot = 1;
-let speedBoost = 1.0;
-let multiShotTimer = 0;
-let speedTimer = 0;
-const ITEM_DURATION = 600;
-
-const canvas = document.getElementById('gameCanvas');
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-renderer.setPixelRatio(window.devicePixelRatio);
-renderer.setClearColor(0x000000, 0);
-
-const scene = new THREE.Scene();
-const W = () => window.innerWidth;
-const H = () => window.innerHeight;
-
-let camera = new THREE.OrthographicCamera(-W()/2, W()/2, H()/2, -H()/2, 0.1, 2000);
-camera.position.z = 500;
-
-function resize() {
-  renderer.setSize(W(), H(), false);
-  camera.left = -W()/2; camera.right = W()/2;
-  camera.top = H()/2; camera.bottom = -H()/2;
-  camera.updateProjectionMatrix();
-  initBg();
-  if (player) {
-    player.position.y = -H()/2 + 180;
-  }
-}
-window.addEventListener('resize', resize);
-resize();
-
-const ambLight = new THREE.AmbientLight(0x8888cc, 0.8);
-scene.add(ambLight);
-const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
-dirLight.position.set(1, 2, 3);
-scene.add(dirLight);
-const pointLight = new THREE.PointLight(0x4488ff, 1.5, 600);
-pointLight.position.set(0, 0, 200);
-scene.add(pointLight);
-
-const textureLoader = new THREE.TextureLoader();
-const starTexture  = textureLoader.load('star_2_open.png');
-const lemonTexture = textureLoader.load('item_lemon.png');
-const mintTexture  = textureLoader.load('item_mint.png');
-
-let player, playerSprite;
-
-function createPlayer() {
-  if (player) scene.remove(player);
-  const mat = new THREE.SpriteMaterial({ map: starTexture, transparent: true });
-  playerSprite = new THREE.Sprite(mat);
-  playerSprite.scale.set(70, 70, 1);
-  playerSprite.position.set(0, -H()/2 + 180, 1); 
-  scene.add(playerSprite);
-  player = playerSprite;
-}
-
-const bullets = [];
-
-const bulletGeo = new THREE.IcosahedronGeometry(4, 0); 
-const bulletMatSingle = new THREE.MeshStandardMaterial({
-  color: 0xffeebb, emissive: 0xffbb00, emissiveIntensity: 1.5, metalness: 0.2, roughness: 0.3
-});
-const bulletMatMulti = new THREE.MeshStandardMaterial({
-  color: 0x88ffee, emissive: 0x00aa88, emissiveIntensity: 1.5, metalness: 0.2, roughness: 0.3
-});
-
-function shoot() {
-  if (frameCount - lastShotFrame < 35) return; 
-  lastShotFrame = frameCount;
-
-  const offsets = [];
-  if (multiShot === 1) offsets.push(0);
-  else for (let k=0;k<multiShot;k++) offsets.push((k-(multiShot-1)/2)*22);
-
-  offsets.forEach(ox => {
-    const mat = multiShot > 1 ? bulletMatMulti : bulletMatSingle;
-    const mesh = new THREE.Mesh(bulletGeo, mat);
-    mesh.position.set(player.position.x + ox, player.position.y + 40, 0);
-    scene.add(mesh);
-    bullets.push({ mesh, vy: 14 + level * 0.4 });
-  });
-}
-
-function updateBullets() {
-  for (let i = bullets.length-1; i >= 0; i--) {
-    const b = bullets[i];
-    b.mesh.position.y += b.vy;
-    b.mesh.rotation.y += 0.2;
-    b.mesh.rotation.x += 0.1;
-    if (b.mesh.position.y > H()/2 + 30) {
-      scene.remove(b.mesh);
-      bullets.splice(i, 1);
-    }
-  }
-}
-
-const enemies = [];
-const ENEMY_TYPES = [
-  { geo: () => new THREE.TetrahedronGeometry(1, 0),      color: 0xff2244, em: 0x880011, size:28, hp:1, pts:100, speed:1.8 },
-  { geo: () => new THREE.OctahedronGeometry(1, 0),       color: 0xff6600, em: 0x882200, size:36, hp:2, pts:200, speed:1.4 },
-  { geo: () => new THREE.IcosahedronGeometry(1, 0),      color: 0x8800ff, em: 0x440088, size:44, hp:3, pts:350, speed:1.1 },
-  { geo: () => new THREE.BoxGeometry(1,1,1),             color: 0x00aaff, em: 0x004488, size:34, hp:2, pts:250, speed:1.5 },
-  { geo: () => new THREE.CylinderGeometry(0,1,1.6,6),    color: 0xff0088, em: 0x880033, size:50, hp:4, pts:500, speed:0.9 },
-  { geo: () => new THREE.SphereGeometry(1, 6, 6),        color: 0x00ff88, em: 0x008844, size:52, hp:5, pts:700, speed:0.7 },
-  { geo: () => new THREE.TorusGeometry(1, 0.4, 6, 8),    color: 0xffcc00, em: 0x886600, size:58, hp:6, pts:900, speed:0.65 },
-];
-
-function spawnEnemy() {
-  const typePool = ENEMY_TYPES.slice(0, Math.min(2 + Math.floor(level/1.5), ENEMY_TYPES.length));
-  const t = typePool[Math.floor(Math.random() * typePool.length)];
-  const s = t.size * (0.7 + Math.random() * 0.9);
-
-  const geo = t.geo();
-  const mat = new THREE.MeshStandardMaterial({
-    color: t.color, emissive: t.em, emissiveIntensity: 1.2, metalness: 0.7, roughness: 0.2,
-    wireframe: Math.random() < 0.15
-  });
-  const mesh = new THREE.Mesh(geo, mat);
-  mesh.scale.set(s, s, s);
-  mesh.position.set((Math.random() - 0.5) * (W() - 80), H()/2 + s + 10, Math.random() * 60 - 30);
-
-  const drift = (Math.random() - 0.5) * 2.5;
-  const driftFreq = 0.02 + Math.random() * 0.03;
-  const spd = (t.speed + level * 0.15) * (0.8 + Math.random() * 0.4);
-
-  scene.add(mesh);
-  enemies.push({ mesh, vy: -spd, drift, driftFreq, hp: t.hp, maxHp: t.hp, pts: t.pts, size: s, rx:Math.random()*0.06-0.03, ry:Math.random()*0.06-0.03 });
-}
-
-function updateEnemies() {
-  const interval = Math.max(20, 80 - level * 5);
-  if (frameCount - lastEnemyFrame > interval) {
-    spawnEnemy();
-    if (level > 3 && Math.random() < 0.3) spawnEnemy();
-    lastEnemyFrame = frameCount;
+    sprite.position.set((Math.random() - 0.5) * (W() - 100), H()/2 + 30, 2);
+    scene.add(sprite);
+    items.push({ sprite, type: isLemon ? 'multishot' : 'speed', vy: -(1.5 + level * 0.1) });
   }
 
-  for (let i = enemies.length-1; i >= 0; i--) {
-    const e = enemies[i];
-    e.mesh.position.y += e.vy;
-    e.mesh.position.x += Math.sin(frameCount * e.driftFreq) * e.drift;
-    e.mesh.rotation.x += e.rx;
-    e.mesh.rotation.y += e.ry;
+  function updateItems() {
+    if (frameCount % 400 === 200 && Math.random() < 0.7) spawnItem();
 
-    if (e.mesh.position.y < -H()/2 - e.size - 10) {
-      scene.remove(e.mesh);
-      enemies.splice(i, 1);
-    }
-  }
-}
-
-function spawnItem() {
-  const isLemon = Math.random() < 0.5;
-  const tex = isLemon ? lemonTexture : mintTexture;
-  const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
-  const sprite = new THREE.Sprite(mat);
-  
-  if (tex.image) {
-    sprite.scale.set(44, 44 * (tex.image.height / tex.image.width), 1);
-  } else {
-    sprite.scale.set(44, 44, 1);
-  }
-  
-  sprite.position.set((Math.random() - 0.5) * (W() - 100), H()/2 + 30, 2);
-  scene.add(sprite);
-  items.push({ sprite, type: isLemon ? 'multishot' : 'speed', vy: -(1.5 + level * 0.1) });
-}
-
-function updateItems() {
-  if (frameCount % 400 === 200 && Math.random() < 0.7) spawnItem();
-
-  for (let i = items.length-1; i >= 0; i--) {
-    const it = items[i];
-    it.sprite.position.y += it.vy;
-    it.sprite.material.rotation = Math.sin(frameCount * 0.05 + i) * 0.3;
-    if (it.sprite.position.y < -H()/2 - 40) {
-      scene.remove(it.sprite);
-      items.splice(i, 1);
-    }
-  }
-  if (multiShotTimer > 0) { multiShotTimer--; if (multiShotTimer===0) multiShot=1; }
-  if (speedTimer > 0)     { speedTimer--;      if (speedTimer===0)    speedBoost=1.0; }
-}
-
-function showItemGet(type) {
-  const overlay = document.createElement('div');
-  overlay.className = 'item-overlay';
-  const isLemon = type === 'multishot';
-  
-  overlay.innerHTML = `
-    <div class="item-popup ${isLemon ? 'item-lemon' : 'item-mint'}">
-      <img src="${isLemon ? 'item_lemon.png' : 'item_mint.png'}" class="item-popup-img" alt="">
-      <div class="item-popup-label">${isLemon ? '🍋 AROMA LEMON' : '🌿 AROMA MINT'}</div>
-      <div class="item-popup-effect">${isLemon ? '弾数 UP ×' + (multiShot) + '発！' : '速度 UP ×' + speedBoost.toFixed(1) + '！'}</div>
-    </div>`;
-  document.body.appendChild(overlay);
-  setTimeout(() => overlay.remove(), 2200);
-}
-
-function spawnDamageText(worldX, worldY, amount, color = '#fff') {
-  const el = document.createElement('div');
-  el.className = 'damage-text';
-  el.style.color = color;
-  el.textContent = amount;
-  el.style.left = (worldX + W()/2) + 'px';
-  el.style.top = (H()/2 - worldY) + 'px';
-  document.body.appendChild(el);
-  setTimeout(() => el.remove(), 800);
-}
-
-function checkCollisions() {
-  for (let bi = bullets.length-1; bi >= 0; bi--) {
-    const b = bullets[bi];
-    for (let ei = enemies.length-1; ei >= 0; ei--) {
-      const e = enemies[ei];
-      const dist = Math.sqrt((b.mesh.position.x - e.mesh.position.x)**2 + (b.mesh.position.y - e.mesh.position.y)**2);
-      if (dist < e.size * 0.85) {
-        scene.remove(b.mesh);
-        bullets.splice(bi, 1);
-        e.hp--;
-        e.mesh.material.emissiveIntensity = 4;
-        setTimeout(() => { if (e.mesh.material) e.mesh.material.emissiveIntensity = 1.2; }, 80);
-
-        if (e.hp <= 0) {
-          spawnExplosion(e.mesh.position.x, e.mesh.position.y);
-          const pts = Math.floor(e.pts * scoreMultiplier);
-          addScore2(pts);
-          spawnDamageText(e.mesh.position.x, e.mesh.position.y, pts, '#ffe87a'); 
-          
-          hitStop = 2; 
-          shakeTime = 8; shakeMag = 4; 
-
-          scene.remove(e.mesh);
-          enemies.splice(ei, 1);
-        }
-        break;
-      }
-    }
-  }
-
-  if (player) {
     for (let i = items.length-1; i >= 0; i--) {
       const it = items[i];
-      const dist = Math.sqrt((player.position.x - it.sprite.position.x)**2 + (player.position.y - it.sprite.position.y)**2);
-      if (dist < 50) {
+      it.sprite.position.y += it.vy;
+      it.sprite.material.rotation = Math.sin(frameCount * 0.05 + i) * 0.3;
+      if (it.sprite.position.y < -H()/2 - 40) {
         scene.remove(it.sprite);
         items.splice(i, 1);
-        if (it.type === 'multishot') { multiShot = Math.min(5, multiShot + 1); multiShotTimer = ITEM_DURATION; } 
-        else { speedBoost = Math.min(2.5, speedBoost + 0.4); speedTimer = ITEM_DURATION; }
-        spawnExplosion(it.sprite.position.x, it.sprite.position.y, '🌟');
-        showItemGet(it.type);
+      }
+    }
+    if (multiShotTimer > 0) { multiShotTimer--; if (multiShotTimer===0) multiShot=1; }
+    if (speedTimer > 0)     { speedTimer--;      if (speedTimer===0)    speedBoost=1.0; }
+  }
+
+  function showItemGet(type) {
+    const overlay = document.createElement('div');
+    overlay.className = 'item-overlay';
+    const isLemon = type === 'multishot';
+    
+    overlay.innerHTML = `
+      <div class="item-popup ${isLemon ? 'item-lemon' : 'item-mint'}">
+        <img src="${isLemon ? 'item_lemon.png' : 'item_mint.png'}" class="item-popup-img" alt="">
+        <div class="item-popup-label">${isLemon ? '🍋 AROMA LEMON' : '🌿 AROMA MINT'}</div>
+        <div class="item-popup-effect">${isLemon ? '弾数 UP ×' + (multiShot) + '発！' : '速度 UP ×' + speedBoost.toFixed(1) + '！'}</div>
+      </div>`;
+    document.body.appendChild(overlay);
+    setTimeout(() => overlay.remove(), 2200);
+  }
+
+  function spawnDamageText(worldX, worldY, amount, color = '#fff') {
+    const el = document.createElement('div');
+    el.className = 'damage-text';
+    el.style.color = color;
+    el.textContent = amount;
+    el.style.left = (worldX + W()/2) + 'px';
+    el.style.top = (H()/2 - worldY) + 'px';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 800);
+  }
+
+  function checkCollisions() {
+    for (let bi = bullets.length-1; bi >= 0; bi--) {
+      const b = bullets[bi];
+      for (let ei = enemies.length-1; ei >= 0; ei--) {
+        const e = enemies[ei];
+        const dist = Math.sqrt((b.mesh.position.x - e.mesh.position.x)**2 + (b.mesh.position.y - e.mesh.position.y)**2);
+        if (dist < e.size * 0.85) {
+          scene.remove(b.mesh);
+          bullets.splice(bi, 1);
+          e.hp--;
+          e.mesh.material.emissiveIntensity = 4;
+          setTimeout(() => { if (e.mesh.material) e.mesh.material.emissiveIntensity = 1.2; }, 80);
+
+          if (e.hp <= 0) {
+            spawnExplosion(e.mesh.position.x, e.mesh.position.y);
+            const pts = Math.floor(e.pts * scoreMultiplier);
+            addScore2(pts);
+            spawnDamageText(e.mesh.position.x, e.mesh.position.y, pts, '#ffe87a'); 
+            
+            hitStop = 2; 
+            shakeTime = 8; shakeMag = 4; 
+
+            scene.remove(e.mesh);
+            enemies.splice(ei, 1);
+          }
+          break;
+        }
+      }
+    }
+
+    if (player) {
+      for (let i = items.length-1; i >= 0; i--) {
+        const it = items[i];
+        const dist = Math.sqrt((player.position.x - it.sprite.position.x)**2 + (player.position.y - it.sprite.position.y)**2);
+        if (dist < 50) {
+          scene.remove(it.sprite);
+          items.splice(i, 1);
+          if (it.type === 'multishot') { multiShot = Math.min(5, multiShot + 1); multiShotTimer = ITEM_DURATION; } 
+          else { speedBoost = Math.min(2.5, speedBoost + 0.4); speedTimer = ITEM_DURATION; }
+          spawnExplosion(it.sprite.position.x, it.sprite.position.y, '🌟');
+          showItemGet(it.type);
+        }
+      }
+    }
+
+    if (!player) return;
+    for (let ei = enemies.length-1; ei >= 0; ei--) {
+      const e = enemies[ei];
+      const dist = Math.sqrt((player.position.x - e.mesh.position.x)**2 + (player.position.y - e.mesh.position.y)**2);
+      if (dist < e.size * 0.7 + 22) {
+        scene.remove(e.mesh);
+        enemies.splice(ei, 1);
+        spawnExplosion(player.position.x, player.position.y, '💥');
+        playerHit();
       }
     }
   }
 
-  if (!player) return;
-  for (let ei = enemies.length-1; ei >= 0; ei--) {
-    const e = enemies[ei];
-    const dist = Math.sqrt((player.position.x - e.mesh.position.x)**2 + (player.position.y - e.mesh.position.y)**2);
-    if (dist < e.size * 0.7 + 22) {
-      scene.remove(e.mesh);
-      enemies.splice(ei, 1);
-      spawnExplosion(player.position.x, player.position.y, '💥');
-      playerHit();
+  function spawnExplosion(worldX, worldY, emoji) {
+    const emojis = emoji ? [emoji] : ['✨','💫','⭐','🌟'];
+    for (let i = 0; i < 3; i++) {
+      const el = document.createElement('div');
+      el.className = 'explosion';
+      el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      el.style.left = (worldX + W()/2 + (Math.random()-0.5)*40) + 'px';
+      el.style.top  = (H()/2 - worldY + (Math.random()-0.5)*40) + 'px';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 700);
     }
   }
-}
 
-function spawnExplosion(worldX, worldY, emoji) {
-  const emojis = emoji ? [emoji] : ['✨','💫','⭐','🌟'];
-  for (let i = 0; i < 3; i++) {
-    const el = document.createElement('div');
-    el.className = 'explosion';
-    el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-    el.style.left = (worldX + W()/2 + (Math.random()-0.5)*40) + 'px';
-    el.style.top  = (H()/2 - worldY + (Math.random()-0.5)*40) + 'px';
-    document.body.appendChild(el);
-    setTimeout(() => el.remove(), 700);
+  function addScore2(pts) {
+    score += pts;
+    const el = document.getElementById('scoreBox');
+    document.getElementById('scoreVal').textContent = score.toLocaleString();
+    el.style.transform = 'scale(1.1)';
+    setTimeout(() => el.style.transform = 'scale(1)', 100);
   }
-}
 
-function addScore2(pts) {
-  score += pts;
-  const el = document.getElementById('scoreBox');
-  document.getElementById('scoreVal').textContent = score.toLocaleString();
-  el.style.transform = 'scale(1.1)';
-  setTimeout(() => el.style.transform = 'scale(1)', 100);
-}
+  function showLevelBanner() {
+    const b = document.getElementById('levelBanner');
+    b.innerHTML = `STAGE CLEAR!<br><span style="font-size: 2rem;">STAGE ${level}</span>`;
+    b.classList.add('show');
+    
+    warpFactor = 1.0; 
+    ambLight.color.setHSL((level * 0.1) % 1.0, 0.8, 0.6); 
 
-function showLevelBanner() {
-  const b = document.getElementById('levelBanner');
-  b.innerHTML = `STAGE CLEAR!<br><span style="font-size: 2rem;">STAGE ${level}</span>`;
-  b.classList.add('show');
-  
-  warpFactor = 1.0; 
-  ambLight.color.setHSL((level * 0.1) % 1.0, 0.8, 0.6); 
-
-  setTimeout(() => { b.classList.remove('show'); }, 2000);
-}
-
-function updateLivesUI() {
-  const row = document.getElementById('livesRow');
-  row.innerHTML = '';
-  for (let i = 0; i < lives; i++) {
-    const h = document.createElement('span');
-    h.className = 'heart'; h.textContent = '⭐';
-    row.appendChild(h);
+    setTimeout(() => { b.classList.remove('show'); }, 2000);
   }
-}
 
-function playerHit() {
-  lives--;
-  updateLivesUI();
-  
-  hitStop = 15; 
-  shakeTime = 20; shakeMag = 15; 
-
-  if (player) {
-    player.material.color.set(0xff0000);
-    setTimeout(() => { if (player) player.material.color.set(0xffffff); }, 300);
+  function updateLivesUI() {
+    const row = document.getElementById('livesRow');
+    row.innerHTML = '';
+    for (let i = 0; i < lives; i++) {
+      const h = document.createElement('span');
+      h.className = 'heart'; h.textContent = '⭐';
+      row.appendChild(h);
+    }
   }
-  if (lives <= 0) triggerGameOver();
-}
 
-const PLAYER_SPEED = 6;
+  function playerHit() {
+    lives--;
+    updateLivesUI();
+    
+    hitStop = 15; 
+    shakeTime = 20; shakeMag = 15; 
 
-function gameLoop(t) {
-  animId = requestAnimationFrame(gameLoop);
-  
-  let dt = 0;
-  if (lastTime !== 0) {
-      dt = (t - lastTime) / 1000;
-      if (dt > 0.1) dt = 0.016;
+    if (player) {
+      player.material.color.set(0xff0000);
+      setTimeout(() => { if (player) player.material.color.set(0xffffff); }, 300);
+    }
+    if (lives <= 0) triggerGameOver();
   }
-  lastTime = t;
 
-  frameCount++;
-  drawBg(t * 0.001);
+  const PLAYER_SPEED = 6;
 
-  if (gameState !== 'playing') {
+  function gameLoop(t) {
+    animId = requestAnimationFrame(gameLoop);
+    
+    let dt = 0;
+    if (lastTime !== 0) {
+        dt = (t - lastTime) / 1000;
+        if (dt > 0.1) dt = 0.016;
+    }
+    lastTime = t;
+
+    frameCount++;
+    drawBg(t * 0.001);
+
+    if (gameState !== 'playing') {
+      renderer.render(scene, camera);
+      return;
+    }
+
+    if (hitStop > 0) {
+      hitStop--;
+      return;
+    }
+
+    if (shakeTime > 0) {
+      shakeTime--;
+      const dx = (Math.random() - 0.5) * shakeMag;
+      const dy = (Math.random() - 0.5) * shakeMag;
+      canvas.style.transform = `translate(${dx}px, ${dy}px)`;
+      shakeMag *= 0.9;
+    } else {
+      canvas.style.transform = 'none';
+    }
+
+    stageTime -= dt;
+    if (stageTime <= 0) {
+      level++;
+      stageTime = 30.0;
+      scoreMultiplier = 1 + (level-1) * 0.2;
+      document.getElementById('levelVal').textContent = level;
+      showLevelBanner();
+    }
+    document.getElementById('timeVal').textContent = Math.ceil(stageTime);
+
+    if (player) {
+      const spd = (PLAYER_SPEED + level * 0.2) * speedBoost;
+      if ((keys['ArrowLeft'] || keys['a']) && player.position.x > -W()/2 + 40) player.position.x -= spd;
+      if ((keys['ArrowRight'] || keys['d']) && player.position.x < W()/2 - 40) player.position.x += spd;
+
+      shoot();
+      player.material.rotation = (keys['ArrowLeft'] ? -0.25 : keys['ArrowRight'] ? 0.25 : 0);
+    }
+
+    updateBullets();
+    updateEnemies();
+    updateItems();
+    checkCollisions();
+
     renderer.render(scene, camera);
-    return;
   }
 
-  if (hitStop > 0) {
-    hitStop--;
-    return;
+  function clearScene() {
+    [...enemies].forEach(e => scene.remove(e.mesh));
+    enemies.length = 0;
+    [...bullets].forEach(b => scene.remove(b.mesh));
+    bullets.length = 0;
+    [...items].forEach(it => scene.remove(it.sprite));
+    items.length = 0;
+    multiShot = 1; speedBoost = 1.0;
+    multiShotTimer = 0; speedTimer = 0;
   }
 
-  if (shakeTime > 0) {
-    shakeTime--;
-    const dx = (Math.random() - 0.5) * shakeMag;
-    const dy = (Math.random() - 0.5) * shakeMag;
-    canvas.style.transform = `translate(${dx}px, ${dy}px)`;
-    shakeMag *= 0.9;
-  } else {
-    canvas.style.transform = 'none';
+  window.startGame = function() {
+    showScreen(null);
+    document.getElementById('titleScreen').classList.add('hidden');
+    document.getElementById('rankingScreen').classList.add('hidden');
+    document.getElementById('gameOverScreen').classList.add('hidden');
+
+    score = 0; lives = 3; level = 1; frameCount = 0;
+    lastShotFrame = 0; lastEnemyFrame = 0; scoreMultiplier = 1;
+    stageTime = 30.0; lastTime = 0;
+    warpFactor = 0; ambLight.color.setHex(0x8888cc); 
+    
+    document.getElementById('scoreVal').textContent = '0';
+    document.getElementById('levelVal').textContent = '1';
+    document.getElementById('timeVal').textContent = '30';
+    updateLivesUI();
+
+    clearScene();
+    createPlayer();
+    gameState = 'playing';
   }
 
-  stageTime -= dt;
-  if (stageTime <= 0) {
-    level++;
-    stageTime = 30.0;
-    scoreMultiplier = 1 + (level-1) * 0.2;
-    document.getElementById('levelVal').textContent = level;
-    showLevelBanner();
-  }
-  document.getElementById('timeVal').textContent = Math.ceil(stageTime);
+  async function triggerGameOver() {
+    gameState = 'gameover';
+    clearScene();
+    if (player) { scene.remove(player); player = null; }
 
-  if (player) {
-    const spd = (PLAYER_SPEED + level * 0.2) * speedBoost;
-    if ((keys['ArrowLeft'] || keys['a']) && player.position.x > -W()/2 + 40) player.position.x -= spd;
-    if ((keys['ArrowRight'] || keys['d']) && player.position.x < W()/2 - 40) player.position.x += spd;
-
-    shoot();
-    player.material.rotation = (keys['ArrowLeft'] ? -0.25 : keys['ArrowRight'] ? 0.25 : 0);
-  }
-
-  updateBullets();
-  updateEnemies();
-  updateItems();
-  checkCollisions();
-
-  renderer.render(scene, camera);
-}
-
-function clearScene() {
-  [...enemies].forEach(e => scene.remove(e.mesh));
-  enemies.length = 0;
-  [...bullets].forEach(b => scene.remove(b.mesh));
-  bullets.length = 0;
-  [...items].forEach(it => scene.remove(it.sprite));
-  items.length = 0;
-  multiShot = 1; speedBoost = 1.0;
-  multiShotTimer = 0; speedTimer = 0;
-}
-
-function startGame() {
-  showScreen(null);
-  document.getElementById('titleScreen').classList.add('hidden');
-  document.getElementById('rankingScreen').classList.add('hidden');
-  document.getElementById('gameOverScreen').classList.add('hidden');
-
-  score = 0; lives = 3; level = 1; frameCount = 0;
-  lastShotFrame = 0; lastEnemyFrame = 0; scoreMultiplier = 1;
-  stageTime = 30.0; lastTime = 0;
-  warpFactor = 0; ambLight.color.setHex(0x8888cc); 
-  
-  document.getElementById('scoreVal').textContent = '0';
-  document.getElementById('levelVal').textContent = '1';
-  document.getElementById('timeVal').textContent = '30';
-  updateLivesUI();
-
-  clearScene();
-  createPlayer();
-  gameState = 'playing';
-}
-
-async function triggerGameOver() {
-  gameState = 'gameover';
-  clearScene();
-  if (player) { scene.remove(player); player = null; }
-
-  document.getElementById('finalScore').textContent = score.toLocaleString();
-  document.getElementById('playerNameInput').value = '';
-  document.getElementById('submitMsg').textContent = '';
-  document.getElementById('submitBtn').disabled = false;
-  document.getElementById('nameEntryArea').style.display = 'block';
-
-  await refreshRanking();
-  showScreen('gameOverScreen');
-}
-
-async function submitScore() {
-  const name = document.getElementById('playerNameInput').value.trim() || '匿名スター';
-  document.getElementById('submitBtn').disabled = true;
-  document.getElementById('submitMsg').textContent = '登録中...';
-  try {
-    const list = await addScore(name, score);
-    renderRanking(list, 'rankListGO');
-    document.getElementById('nameEntryArea').style.display = 'none';
-    document.getElementById('submitMsg').textContent = '✅ 登録しました！';
-    renderRanking(list, 'rankListTitle');
-  } catch(e) {
-    document.getElementById('submitMsg').textContent = '⚠️ 登録に失敗しました';
+    document.getElementById('finalScore').textContent = score.toLocaleString();
+    document.getElementById('playerNameInput').value = '';
+    document.getElementById('submitMsg').textContent = '';
     document.getElementById('submitBtn').disabled = false;
+    document.getElementById('nameEntryArea').style.display = 'block';
+
+    await refreshRanking();
+    showScreen('gameOverScreen');
   }
-}
 
-async function skipSubmit() {
-  document.getElementById('nameEntryArea').style.display = 'none';
-  await refreshRanking();
-  setTimeout(() => {
-    showScreen('titleScreen');
-    refreshRanking();
-  }, 400);
-}
+  window.submitScore = async function() {
+    const name = document.getElementById('playerNameInput').value.trim() || '匿名スター';
+    document.getElementById('submitBtn').disabled = true;
+    document.getElementById('submitMsg').textContent = '登録中...';
+    try {
+      const list = await addScore(name, score);
+      renderRanking(list, 'rankListGO');
+      document.getElementById('nameEntryArea').style.display = 'none';
+      document.getElementById('submitMsg').textContent = '✅ 登録しました！';
+      renderRanking(list, 'rankListTitle');
+    } catch(e) {
+      document.getElementById('submitMsg').textContent = '⚠️ 登録に失敗しました';
+      document.getElementById('submitBtn').disabled = false;
+    }
+  }
 
-window.addEventListener('keydown', e => {
-  keys[e.key] = true;
-  if (e.key === ' ') e.preventDefault();
-});
-window.addEventListener('keyup', e => { keys[e.key] = false; });
+  window.skipSubmit = async function() {
+    document.getElementById('nameEntryArea').style.display = 'none';
+    await refreshRanking();
+    setTimeout(() => {
+      showScreen('titleScreen');
+      refreshRanking();
+    }, 400);
+  }
 
-function handleTouchMove(e) {
-  if (gameState !== 'playing' || !player) return;
-  e.preventDefault(); 
-  
-  const touch = e.touches[0];
-  const rect = canvas.getBoundingClientRect();
-  const screenX = touch.clientX - rect.left;
-  const worldX = (screenX / rect.width) * W() - W() / 2;
-  
-  player.position.x = Math.max(-W()/2 + 40, Math.min(W()/2 - 40, worldX));
-}
-canvas.addEventListener('touchstart', handleTouchMove, { passive: false });
-canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+  window.addEventListener('keydown', e => {
+    keys[e.key] = true;
+    if (e.key === ' ') e.preventDefault();
+  });
+  window.addEventListener('keyup', e => { keys[e.key] = false; });
 
-initBg();
-refreshRanking();
-showScreen('titleScreen');
-requestAnimationFrame(gameLoop);
+  function handleTouchMove(e) {
+    if (gameState !== 'playing' || !player) return;
+    e.preventDefault(); 
+    
+    const touch = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    const screenX = touch.clientX - rect.left;
+    const worldX = (screenX / rect.width) * W() - W() / 2;
+    
+    player.position.x = Math.max(-W()/2 + 40, Math.min(W()/2 - 40, worldX));
+  }
+  canvas.addEventListener('touchstart', handleTouchMove, { passive: false });
+  canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+
+  initBg();
+  refreshRanking();
+  showScreen('titleScreen');
+  requestAnimationFrame(gameLoop);
+
+})();
 </script>
 
 </body>
