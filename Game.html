@@ -311,42 +311,34 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
 <script>
-// ==========================================
-// グローバル変数の宣言
-// ==========================================
-const keys = {};
-let gameState = 'title'; 
-let score = 0;
-let lives = 3;
-let level = 1;
-let frameCount = 0;
-let lastShotFrame = 0;
-let lastEnemyFrame = 0;
-let scoreMultiplier = 1;
-let animId = null;
+// 古いコードと重複しないようにすべての変数を新しく定義します
+var keys = {};
+var gameState = 'title'; 
+var score = 0;
+var lives = 3;
+var level = 1;
+var frameCount = 0;
+var lastShotFrame = 0;
+var lastEnemyFrame = 0;
+var scoreMultiplier = 1;
+var animId = null;
 
-let stageTime = 30.0;
-let lastTime = 0;
+var stageTime = 30.0;
+var lastTime = 0;
+var shakeTime = 0;
+var shakeMag = 0;
+var hitStop = 0;
+var warpFactor = 0;
 
-let shakeTime = 0;
-let shakeMag = 0;
-let hitStop = 0;
-let warpFactor = 0;
+var SUPABASE_URL = 'https://ufjojhraqyzqqzlkokwd.supabase.co';
+var SUPABASE_KEY = 'sb_publishable_ha-q_6WBEngyBT3dOLMJQQ_EZsVSGI6';
 
-// ==========================================
-// Supabase 設定
-// ==========================================
-const SUPABASE_URL = 'https://ufjojhraqyzqqzlkokwd.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_ha-q_6WBEngyBT3dOLMJQQ_EZsVSGI6';
-
-let supabaseClient = null;
+var supabaseClient = null;
 try {
   if (window.supabase) {
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   }
-} catch (e) {
-  console.error("Supabase初期化エラー", e);
-}
+} catch (e) {}
 
 async function loadRanking() {
   try {
@@ -356,7 +348,6 @@ async function loadRanking() {
         .select('name, score')
         .order('score', { ascending: false })
         .limit(10);
-      
       if (!error && data) return data;
     }
   } catch(e) {}
@@ -425,32 +416,22 @@ async function refreshRanking() {
     renderRanking(list, 'rankListFull');
     renderRanking(list, 'rankListGO');
   } catch (e) {
-    const empty = [];
-    renderRanking(empty, 'rankListTitle');
-    renderRanking(empty, 'rankListFull');
-    renderRanking(empty, 'rankListGO');
+    renderRanking([], 'rankListTitle');
+    renderRanking([], 'rankListFull');
+    renderRanking([], 'rankListGO');
   }
 }
 
-// ==========================================
-// 画面切り替えとボタン機能
-// ==========================================
 function showScreen(id) {
   ['titleScreen','rankingScreen','gameOverScreen'].forEach(s => {
     document.getElementById(s).classList.toggle('hidden', s !== id);
   });
 }
 
-function showRanking() { 
-  showScreen('rankingScreen'); 
-  refreshRanking(); 
-}
+window.showRanking = function() { showScreen('rankingScreen'); refreshRanking(); }
+window.hideRanking = function() { showScreen('titleScreen'); }
 
-function hideRanking() { 
-  showScreen('titleScreen'); 
-}
-
-function startGame() {
+window.startGame = function() {
   showScreen(null);
   document.getElementById('titleScreen').classList.add('hidden');
   document.getElementById('rankingScreen').classList.add('hidden');
@@ -471,7 +452,7 @@ function startGame() {
   gameState = 'playing';
 }
 
-async function submitScore() {
+window.submitScore = async function() {
   const name = document.getElementById('playerNameInput').value.trim() || '匿名スター';
   document.getElementById('submitBtn').disabled = true;
   document.getElementById('submitMsg').textContent = '登録中...';
@@ -487,7 +468,7 @@ async function submitScore() {
   }
 }
 
-async function skipSubmit() {
+window.skipSubmit = async function() {
   document.getElementById('nameEntryArea').style.display = 'none';
   await refreshRanking();
   setTimeout(() => {
@@ -496,12 +477,9 @@ async function skipSubmit() {
   }, 400);
 }
 
-// ==========================================
-// ゲームグラフィック・ロジック
-// ==========================================
-const bgCanvas = document.getElementById('bgCanvas');
-const bgCtx = bgCanvas.getContext('2d');
-let bgStars = [];
+var bgCanvas = document.getElementById('bgCanvas');
+var bgCtx = bgCanvas.getContext('2d');
+var bgStars = [];
 function initBg() {
   bgCanvas.width = window.innerWidth;
   bgCanvas.height = window.innerHeight;
@@ -513,6 +491,7 @@ function initBg() {
     a: Math.random()
   }));
 }
+
 function drawBg(t) {
   bgCtx.fillStyle = warpFactor > 0.1 ? 'rgba(0, 0, 0, 0.3)' : '#000';
   bgCtx.fillRect(0,0,bgCanvas.width,bgCanvas.height);
@@ -541,23 +520,23 @@ function drawBg(t) {
   if (warpFactor > 0) warpFactor *= 0.95; 
 }
 
-const items = [];
-let multiShot = 1;
-let speedBoost = 1.0;
-let multiShotTimer = 0;
-let speedTimer = 0;
-const ITEM_DURATION = 600;
+var items = [];
+var multiShot = 1;
+var speedBoost = 1.0;
+var multiShotTimer = 0;
+var speedTimer = 0;
+var ITEM_DURATION = 600;
 
-const canvas = document.getElementById('gameCanvas');
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+var canvas = document.getElementById('gameCanvas');
+var renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setClearColor(0x000000, 0);
 
-const scene = new THREE.Scene();
-const W = () => window.innerWidth;
-const H = () => window.innerHeight;
+var scene = new THREE.Scene();
+var W = () => window.innerWidth;
+var H = () => window.innerHeight;
 
-let camera = new THREE.OrthographicCamera(-W()/2, W()/2, H()/2, -H()/2, 0.1, 2000);
+var camera = new THREE.OrthographicCamera(-W()/2, W()/2, H()/2, -H()/2, 0.1, 2000);
 camera.position.z = 500;
 
 function resize() {
@@ -573,21 +552,21 @@ function resize() {
 window.addEventListener('resize', resize);
 resize();
 
-const ambLight = new THREE.AmbientLight(0x8888cc, 0.8);
+var ambLight = new THREE.AmbientLight(0x8888cc, 0.8);
 scene.add(ambLight);
-const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+var dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
 dirLight.position.set(1, 2, 3);
 scene.add(dirLight);
-const pointLight = new THREE.PointLight(0x4488ff, 1.5, 600);
+var pointLight = new THREE.PointLight(0x4488ff, 1.5, 600);
 pointLight.position.set(0, 0, 200);
 scene.add(pointLight);
 
-const textureLoader = new THREE.TextureLoader();
-const starTexture  = textureLoader.load('star_2_open.png');
-const lemonTexture = textureLoader.load('item_lemon.png');
-const mintTexture  = textureLoader.load('item_mint.png');
+var textureLoader = new THREE.TextureLoader();
+var starTexture  = textureLoader.load('star_2_open.png');
+var lemonTexture = textureLoader.load('item_lemon.png');
+var mintTexture  = textureLoader.load('item_mint.png');
 
-let player, playerSprite;
+var player, playerSprite;
 
 function createPlayer() {
   if (player) scene.remove(player);
@@ -599,12 +578,12 @@ function createPlayer() {
   player = playerSprite;
 }
 
-const bullets = [];
-const bulletGeo = new THREE.IcosahedronGeometry(4, 0); 
-const bulletMatSingle = new THREE.MeshStandardMaterial({
+var bullets = [];
+var bulletGeo = new THREE.IcosahedronGeometry(4, 0); 
+var bulletMatSingle = new THREE.MeshStandardMaterial({
   color: 0xffeebb, emissive: 0xffbb00, emissiveIntensity: 1.5, metalness: 0.2, roughness: 0.3
 });
-const bulletMatMulti = new THREE.MeshStandardMaterial({
+var bulletMatMulti = new THREE.MeshStandardMaterial({
   color: 0x88ffee, emissive: 0x00aa88, emissiveIntensity: 1.5, metalness: 0.2, roughness: 0.3
 });
 
@@ -638,8 +617,8 @@ function updateBullets() {
   }
 }
 
-const enemies = [];
-const ENEMY_TYPES = [
+var enemies = [];
+var ENEMY_TYPES = [
   { geo: () => new THREE.TetrahedronGeometry(1, 0),      color: 0xff2244, em: 0x880011, size:28, hp:1, pts:100, speed:1.8 },
   { geo: () => new THREE.OctahedronGeometry(1, 0),       color: 0xff6600, em: 0x882200, size:36, hp:2, pts:200, speed:1.4 },
   { geo: () => new THREE.IcosahedronGeometry(1, 0),      color: 0x8800ff, em: 0x440088, size:44, hp:3, pts:350, speed:1.1 },
@@ -866,33 +845,7 @@ function playerHit() {
   if (lives <= 0) triggerGameOver();
 }
 
-async function triggerGameOver() {
-  gameState = 'gameover';
-  clearScene();
-  if (player) { scene.remove(player); player = null; }
-
-  document.getElementById('finalScore').textContent = score.toLocaleString();
-  document.getElementById('playerNameInput').value = '';
-  document.getElementById('submitMsg').textContent = '';
-  document.getElementById('submitBtn').disabled = false;
-  document.getElementById('nameEntryArea').style.display = 'block';
-
-  await refreshRanking();
-  showScreen('gameOverScreen');
-}
-
-function clearScene() {
-  [...enemies].forEach(e => scene.remove(e.mesh));
-  enemies.length = 0;
-  [...bullets].forEach(b => scene.remove(b.mesh));
-  bullets.length = 0;
-  [...items].forEach(it => scene.remove(it.sprite));
-  items.length = 0;
-  multiShot = 1; speedBoost = 1.0;
-  multiShotTimer = 0; speedTimer = 0;
-}
-
-const PLAYER_SPEED = 6;
+var PLAYER_SPEED = 6;
 
 function gameLoop(t) {
   animId = requestAnimationFrame(gameLoop);
@@ -955,6 +908,17 @@ function gameLoop(t) {
   renderer.render(scene, camera);
 }
 
+function clearScene() {
+  [...enemies].forEach(e => scene.remove(e.mesh));
+  enemies.length = 0;
+  [...bullets].forEach(b => scene.remove(b.mesh));
+  bullets.length = 0;
+  [...items].forEach(it => scene.remove(it.sprite));
+  items.length = 0;
+  multiShot = 1; speedBoost = 1.0;
+  multiShotTimer = 0; speedTimer = 0;
+}
+
 window.addEventListener('keydown', e => {
   keys[e.key] = true;
   if (e.key === ' ') e.preventDefault();
@@ -979,7 +943,6 @@ initBg();
 refreshRanking();
 showScreen('titleScreen');
 requestAnimationFrame(gameLoop);
-
 </script>
 
 </body>
