@@ -59,7 +59,6 @@
             z-index: -1;
         }
 
-        /* ===== 星の彗星 ===== */
         #comet-field {
             position: fixed;
             inset: 0;
@@ -344,6 +343,59 @@
             background: rgba(230, 194, 122, 0.2);
             box-shadow: 0 0 20px var(--accent-glow);
             transform: scale(1.03);
+        }
+
+        #moon-phase {
+            margin-bottom: 80px;
+        }
+        
+        .moon-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(230, 194, 122, 0.4);
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            backdrop-filter: blur(15px);
+            max-width: 380px;
+            margin: 0 auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .moon-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px var(--accent-glow);
+        }
+
+        .moon-visual {
+            font-size: 6.5rem;
+            line-height: 1;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.5));
+            animation: pulse 4s infinite ease-in-out;
+        }
+
+        .moon-date {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+            letter-spacing: 3px;
+            margin-bottom: 12px;
+            font-family: 'Zen Maru Gothic', sans-serif;
+        }
+
+        .moon-age-text {
+            font-size: 1.5rem;
+            color: var(--accent-gold);
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+
+        .moon-name {
+            font-size: 1.2rem;
+            color: var(--text-main);
+            letter-spacing: 4px;
+            font-family: 'Kiwi Maru', serif;
         }
 
         .sec-title {
@@ -685,7 +737,6 @@
     </video>
     <div class="overlay"></div>
 
-    <!-- 星の彗星が画面を行き来するレイヤー -->
     <div id="comet-field" aria-hidden="true"></div>
 
     <header id="main-header">
@@ -731,6 +782,18 @@
         </div>
 
         <div class="container">
+            <section id="moon-phase" class="fade-in-up">
+                <h2 class="sec-title" id="txt-moon-sec-title">TODAY'S MOON</h2>
+                <div class="moon-card">
+                    <div class="moon-visual" id="moon-visual">🌕</div>
+                    <div class="moon-info">
+                        <div class="moon-date" id="moon-date"></div>
+                        <div class="moon-age-text"><span id="txt-moon-age-label">月齢</span>: <span id="moon-age-number"></span></div>
+                        <div class="moon-name" id="moon-name"></div>
+                    </div>
+                </div>
+            </section>
+
             <section id="partners" class="fade-in-up">
                 <h2 class="sec-title" id="txt-partner-title">PARTNERS</h2>
                 <div class="partner-grid">
@@ -796,7 +859,10 @@
                     <p style="margin-top: 30px;">阿智村・野辺山、そして大町市で、</p>
                     <p><span class="love-highlight">愛</span>を込めてあなたを</p>
                     <p>宇宙の旅へお連れします。</p>
-                `
+                `,
+                moonSecTitle: "TODAY'S MOON",
+                moonAgeLabel: "月齢",
+                moonPhases: ["新月", "三日月", "上弦の月", "十三夜", "満月", "居待月", "下弦の月", "二十六夜"]
             },
             en: {
                 projectTag: "Hoshi to Kimi Project",
@@ -820,7 +886,10 @@
                     <p style="margin-top: 30px;">Achi Village, Nobeyama, and Omachi City</p>
                     <p>bring you into a journey through the universe</p>
                     <p>with all our <span class="love-highlight">Love</span>.</p>
-                `
+                `,
+                moonSecTitle: "TODAY'S MOON",
+                moonAgeLabel: "Moon Age",
+                moonPhases: ["New Moon", "Waxing Crescent", "First Quarter", "Waxing Gibbous", "Full Moon", "Waning Gibbous", "Last Quarter", "Waning Crescent"]
             },
             es: {
                 projectTag: "Proyecto Hoshi to Kimi",
@@ -844,7 +913,10 @@
                     <p style="margin-top: 30px;">La villa de Achi, Nobeyama y la ciudad de Omachi</p>
                     <p>te llevarán a un maravilloso viaje por el universo</p>
                     <p>con todo nuestro <span class="love-highlight">Amor</span>.</p>
-                `
+                `,
+                moonSecTitle: "LA LUNA DE HOY",
+                moonAgeLabel: "Edad Lunar",
+                moonPhases: ["Luna Nueva", "Luna Creciente", "Cuarto Creciente", "Luna Gibosa Creciente", "Luna Llena", "Luna Gibosa Menguante", "Cuarto Menguante", "Luna Menguante"]
             },
             zh: {
                 projectTag: "星星与你企划",
@@ -868,7 +940,10 @@
                     <p style="margin-top: 30px;">阿智村、野边山以及大町市</p>
                     <p>将满怀<span class="love-highlight">爱</span>意，带您开启</p>
                     <p>一场浪漫の宇宙之旅。</p>
-                `
+                `,
+                moonSecTitle: "今日月相",
+                moonAgeLabel: "月龄",
+                moonPhases: ["新月", "娥眉月", "上弦月", "盈凸月", "满月", "亏凸月", "下弦月", "残月"]
             },
             ko: {
                 projectTag: "별과 당신 프로젝트",
@@ -892,7 +967,10 @@
                     <p style="margin-top: 30px;">아치 무라, 노베야마, 그리고 오마치 시에서,</p>
                     <p>당신을 <span class="love-highlight">사랑</span>을 담아</p>
                     <p>우주 여행으로 안내합니다.</p>
-                `
+                `,
+                moonSecTitle: "오늘의 달",
+                moonAgeLabel: "월령",
+                moonPhases: ["신월", "초승달", "상현달", "차오르는 달", "보름달", "이지러지는 달", "하현달", "그믐달"]
             }
         };
 
@@ -915,16 +993,19 @@
             document.getElementById('txt-address').innerText = translations[lang].address;
             document.getElementById('txt-credit').innerText = translations[lang].credit;
             document.getElementById('txt-cinema-back').innerText = translations[lang].cinemaBack;
-            
             document.getElementById('cinema-text-container').innerHTML = translations[lang].cinemaText;
+
+            document.getElementById('txt-moon-sec-title').innerText = translations[lang].moonSecTitle;
+            document.getElementById('txt-moon-age-label').innerText = translations[lang].moonAgeLabel;
+            
+            const currentPhaseIndex = document.getElementById('moon-visual').dataset.phaseIndex || 0;
+            document.getElementById('moon-name').innerText = translations[lang].moonPhases[currentPhaseIndex];
 
             document.getElementById('lang-switcher').classList.remove('open');
             
-            // エラー回避：プレビュー環境等でlocalStorageがブロックされても処理を止めない
             try {
                 localStorage.setItem('selectedLang', lang);
             } catch (e) {
-                console.warn("言語の保存がブロックされましたが、動作は続行します。");
             }
         }
 
@@ -935,18 +1016,15 @@
         });
         document.addEventListener('click', () => langSwitcher.classList.remove('open'));
 
-        // エラー回避：プレビュー環境等でlocalStorageがブロックされても処理を止めない
         let savedLang = 'ja';
         try {
             savedLang = localStorage.getItem('selectedLang') || 'ja';
         } catch (e) {
-            console.warn("保存された言語の読み込みがブロックされました。");
         }
         changeLanguage(savedLang);
 
         const header = document.getElementById('main-header');
         const toTopBtn = document.getElementById('to-top');
-        
         const btnLaunch = document.getElementById('btn-launch');
         const cinemaLayer = document.getElementById('cinema-layer');
         const btnCinemaClose = document.getElementById('btn-cinema-close');
@@ -1001,7 +1079,6 @@
             cinemaLayer.classList.add('active');
             cinemaVideo.currentTime = 0;
             cinemaVideo.play().catch(error => {
-                console.log("Video playback failed:", error);
             });
         });
 
@@ -1014,12 +1091,52 @@
             const newTextBox = textBox.cloneNode(true);
             textBox.parentNode.replaceChild(newTextBox, textBox);
         });
+
+        function initMoonPhase() {
+            const today = new Date();
+            
+            const y = today.getFullYear();
+            const m = String(today.getMonth() + 1).padStart(2, '0');
+            const d = String(today.getDate()).padStart(2, '0');
+            document.getElementById('moon-date').innerText = `${y}.${m}.${d}`;
+
+            const knownNewMoon = new Date(Date.UTC(2000, 0, 6, 18, 14)).getTime();
+            const lunarCycle = 29.530588853 * 24 * 60 * 60 * 1000;
+            const now = today.getTime();
+            
+            let ageMs = (now - knownNewMoon) % lunarCycle;
+            if (ageMs < 0) ageMs += lunarCycle;
+            
+            const age = ageMs / (1000 * 60 * 60 * 24);
+            document.getElementById('moon-age-number').innerText = age.toFixed(1);
+
+            let phaseIndex = 0;
+            let moonEmoji = "🌑";
+
+            if (age < 1.8)      { phaseIndex = 0; moonEmoji = "🌑"; }
+            else if (age < 5.5)  { phaseIndex = 1; moonEmoji = "🌒"; }
+            else if (age < 9.2)  { phaseIndex = 2; moonEmoji = "🌓"; }
+            else if (age < 12.9) { phaseIndex = 3; moonEmoji = "🌔"; }
+            else if (age < 16.6) { phaseIndex = 4; moonEmoji = "🌕"; }
+            else if (age < 20.3) { phaseIndex = 5; moonEmoji = "🌖"; }
+            else if (age < 24.0) { phaseIndex = 6; moonEmoji = "🌗"; }
+            else if (age < 27.7) { phaseIndex = 7; moonEmoji = "🌘"; }
+            else                 { phaseIndex = 0; moonEmoji = "🌑"; }
+
+            const visualEl = document.getElementById('moon-visual');
+            visualEl.innerText = moonEmoji;
+            visualEl.dataset.phaseIndex = phaseIndex;
+            
+            const lang = localStorage.getItem('selectedLang') || 'ja';
+            document.getElementById('moon-name').innerText = translations[lang].moonPhases[phaseIndex];
+        }
+
+        document.addEventListener('DOMContentLoaded', initMoonPhase);
     </script>
 
-    <!-- ===== 星の彗星アニメーション ===== -->
     <script>
     (function () {
-        var COMETS_ENABLED = false;   // ← 星を再表示したいときは true に
+        var COMETS_ENABLED = false;
         var field = document.getElementById('comet-field');
         if (!field || !COMETS_ENABLED) return;
 
@@ -1031,7 +1148,6 @@
             'star_5_wink.png'
         ];
         var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        // 画面幅で彗星の数を調整
         var COUNT = window.innerWidth < 768 ? 3 : 5;
         var comets = [];
 
@@ -1072,17 +1188,14 @@
                 var c = comets[i];
                 c.x += c.vx;
                 c.y += c.vy;
-                // 画面端で反射 → 行ったり来たり
                 if (c.x < 0) { c.x = 0; c.vx = Math.abs(c.vx); }
                 else if (c.x > W) { c.x = W; c.vx = -Math.abs(c.vx); }
                 if (c.y < 0) { c.y = 0; c.vy = Math.abs(c.vy); }
                 else if (c.y > H) { c.y = H; c.vy = -Math.abs(c.vy); }
 
-                // 進行方向（尾はその反対に伸ばす）
                 var ang = Math.atan2(c.vy, c.vx) * 180 / Math.PI;
                 c.el.style.transform = 'translate(' + c.x + 'px,' + c.y + 'px)';
                 c.tail.style.transform = 'rotate(' + (ang + 180) + 'deg)';
-                // 星をふわっと揺らす
                 var w = Math.sin(t / 600 + c.phase) * c.wobble;
                 c.img.style.transform = 'translate(-50%,-50%) rotate(' + w + 'deg)';
             }
@@ -1090,7 +1203,6 @@
         }
         requestAnimationFrame(frame);
 
-        // ウィンドウリサイズで彗星を画面内に収める
         window.addEventListener('resize', function () {
             var W = window.innerWidth, H = window.innerHeight;
             for (var i = 0; i < comets.length; i++) {
