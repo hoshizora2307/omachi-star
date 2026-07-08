@@ -111,7 +111,6 @@
             margin-top: 10px;
         }
 
-        /* 記事カードのスタイル */
         .news-list {
             display: flex;
             flex-direction: column;
@@ -169,7 +168,7 @@
             color: #cbd5e1;
             line-height: 1.8;
             font-size: 0.95rem;
-            white-space: pre-wrap; /* 改行をそのまま反映 */
+            white-space: pre-wrap;
         }
 
         footer {
@@ -220,7 +219,6 @@
         </div>
 
         <div class="news-list" id="news-container">
-            <!-- JavaScriptでここに記事が自動生成されます -->
         </div>
     </main>
 
@@ -228,10 +226,14 @@
         <div class="footer-credit">&copy; 株式会社MONDOCOLO. All rights reserved.</div>
     </footer>
 
-<script src="newsData.js"></script>
+    <script src="newsData.js?ver=1.0"></script>
     <script>
-            function renderNews() {
+        function renderNews() {
             const container = document.getElementById('news-container');
+            
+            if (!container || typeof newsData === 'undefined') {
+                return;
+            }
             
             newsData.forEach(news => {
                 const articleEl = document.createElement('article');
@@ -250,7 +252,6 @@
             });
         }
 
-        // ページ読み込み時に実行
         document.addEventListener('DOMContentLoaded', renderNews);
     </script>
 </body>
