@@ -1,1044 +1,1471 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>プリン星団を守れ！</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大町温泉郷 星空観賞会 ～銀河の旅人～</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✦</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@500&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-overlay: rgba(6, 10, 23, 0.75);
+            --text-main: #f0f8ff;
+            --accent-gold: #e6c27a;
+            --accent-glow: rgba(230, 194, 122, 0.4);
+            --card-bg: rgba(15, 23, 42, 0.6);
+            --accent-pink: #ff7495;
+            --kids-cyan: #7bf2ff;
+        }
 
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    background: #000;
-    font-family: 'Klee One', serif;
-    overflow: hidden;
-    user-select: none;
-    -webkit-user-select: none;
-    width: 100vw;
-    height: 100dvh;
-  }
-  #gameCanvas { 
-    display: block; 
-    position: fixed; 
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    z-index: 1; 
-    touch-action: none; 
-  }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-  #ui {
-    position: fixed; inset: 0;
-    pointer-events: none;
-    z-index: 10;
-  }
-  #hud {
-    position: absolute; top: 12px; left: 0; right: 0;
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 0 12px;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-  .hud-box {
-    background: rgba(10,6,30,0.72);
-    border: 1.5px solid rgba(255,220,80,0.35);
-    border-radius: 10px;
-    padding: 4px 12px;
-    color: #ffe87a;
-    font-size: 1rem;
-    letter-spacing: 1px;
-    text-shadow: 0 0 8px rgba(255,220,80,0.5);
-    white-space: nowrap;
-    transition: transform 0.1s;
-    display: flex;
-    align-items: center;
-  }
-  .hud-box span { font-size: 1.3rem; font-weight: bold; margin-left: 6px; }
-  .hud-time { color: #64ffb4; border-color: rgba(100,255,180,0.35); }
-  .hud-time span { color: #fff; text-shadow: 0 0 8px #64ffb4; }
-  #livesRow { display: flex; gap: 4px; margin-left: 8px; }
-  .heart { font-size: 1.2rem; filter: drop-shadow(0 0 4px #ffd700); }
+        html {
+            scroll-behavior: smooth;
+        }
 
-  .screen {
-    position: fixed; inset: 0;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: flex-start;
-    background: radial-gradient(ellipse at 50% 60%, #0a0620 0%, #000 100%);
-    z-index: 20;
-    pointer-events: all;
-    overflow-y: auto;
-    padding: 40px 0;
-  }
-  .screen.hidden { display: none; }
+        body {
+            font-family: 'Helvetica Neue', 'Hiragino Kaku Gothic ProN', sans-serif;
+            color: var(--text-main);
+            line-height: 1.6;
+            background-color: #060a17;
+            overflow-x: hidden;
+        }
 
-  .game-title {
-    font-size: clamp(2rem, 5vw, 3.2rem);
-    font-weight: 900;
-    color: #fff;
-    text-shadow: 0 0 30px #ffd700, 0 0 60px #ff8c00;
-    letter-spacing: 4px;
-    margin-bottom: 4px;
-    text-align: center;
-  }
-  .sub-title {
-    font-size: 1.2rem; color: #aaa;
-    letter-spacing: 3px; margin-bottom: 32px;
-    text-align: center;
-  }
-  .player-img-lg {
-    width: 120px; height: 120px;
-    image-rendering: pixelated;
-    filter: drop-shadow(0 0 24px rgba(255,200,50,0.8));
-    animation: floatBig 2.4s ease-in-out infinite;
-    margin-bottom: 24px;
-    margin-top: 20px;
-  }
-  @keyframes floatBig {
-    0%,100% { transform: translateY(0) rotate(-4deg); }
-    50% { transform: translateY(-18px) rotate(4deg); }
-  }
-  .btn {
-    background: linear-gradient(135deg, #ffd700, #ff8c00);
-    color: #1a0a00; font-weight: 900;
-    border: none; border-radius: 50px;
-    padding: 14px 52px; font-size: 1.3rem;
-    cursor: pointer; letter-spacing: 2px;
-    box-shadow: 0 0 30px rgba(255,200,50,0.6);
-    transition: transform 0.15s, box-shadow 0.15s;
-    margin: 8px;
-    pointer-events: all;
-    font-family: 'Klee One', serif;
-    flex-shrink: 0;
-  }
-  .btn:hover { transform: scale(1.08); box-shadow: 0 0 50px rgba(255,200,50,0.9); }
-  .btn-secondary {
-    background: transparent;
-    border: 2px solid rgba(255,220,80,0.5);
-    color: #ffe87a; border-radius: 50px;
-    padding: 10px 36px; font-size: 1.1rem;
-    cursor: pointer; letter-spacing: 2px;
-    transition: all 0.15s; margin: 6px;
-    pointer-events: all;
-    font-family: 'Klee One', serif;
-    flex-shrink: 0;
-  }
-  .btn-secondary:hover { background: rgba(255,220,80,0.1); border-color: #ffd700; }
+        body.no-scroll {
+            overflow: hidden;
+        }
 
-  #rankPanel {
-    background: rgba(10,6,30,0.95);
-    border: 1.5px solid rgba(255,220,80,0.4);
-    border-radius: 16px;
-    padding: 24px 32px;
-    min-width: 340px; max-width: 480px;
-    width: 90%;
-    margin: 16px 0;
-    flex-shrink: 0;
-  }
-  .rank-title {
-    color: #ffd700; font-size: 1.3rem; font-weight: bold;
-    text-align: center; margin-bottom: 14px; letter-spacing: 3px;
-    text-shadow: 0 0 10px rgba(255,200,50,0.6);
-  }
-  .rank-row {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 7px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.07);
-    color: #eee; font-size: 1.1rem;
-  }
-  .rank-row:last-child { border-bottom: none; }
-  .rank-num { color: #ffd700; font-weight: bold; min-width: 28px; }
-  .rank-num.gold   { color: #FFD700; text-shadow: 0 0 8px #FFD700; font-size: 1.2rem; }
-  .rank-num.silver { color: #C0C0C0; }
-  .rank-num.bronze { color: #CD7F32; }
-  .rank-name { flex: 1; padding: 0 10px; }
-  .rank-score { color: #ffe87a; font-weight: bold; }
-  .rank-empty { color: #555; text-align: center; padding: 20px 0; font-size: 1.1rem; }
+        .video-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            z-index: -2;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle at center, transparent 20%, var(--bg-overlay) 80%);
+            z-index: -1;
+        }
 
-  .go-score { font-size: 3rem; color: #ffd700; font-weight: 900;
-    text-shadow: 0 0 30px #ffd700; margin: 12px 0; text-align: center; }
-  .name-input {
-    background: rgba(255,255,255,0.07);
-    border: 2px solid rgba(255,220,80,0.5);
-    border-radius: 10px;
-    color: #fff; font-size: 1.4rem;
-    padding: 10px 20px;
-    text-align: center; width: 280px;
-    outline: none; margin: 10px 0;
-    letter-spacing: 2px;
-    font-family: 'Klee One', serif;
-  }
-  .name-input:focus { border-color: #ffd700; }
-  .name-hint { color: #888; font-size: 0.9rem; margin-bottom: 8px; text-align: center; }
+        /* ===== 星の彗星 ===== */
+        #comet-field {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .comet {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            will-change: transform;
+        }
+        .comet-tail {
+            position: absolute;
+            left: 0;
+            top: -4px;
+            width: 190px;
+            height: 8px;
+            transform-origin: 0 50%;
+            border-radius: 8px;
+            filter: blur(2.5px);
+            background: linear-gradient(90deg,
+                rgba(255, 244, 214, 0.95) 0%,
+                rgba(230, 194, 122, 0.55) 22%,
+                rgba(123, 242, 255, 0.22) 55%,
+                rgba(123, 242, 255, 0) 100%);
+        }
+        .comet-star {
+            position: absolute;
+            left: 0;
+            top: 0;
+            transform: translate(-50%, -50%);
+            filter: drop-shadow(0 0 7px rgba(230, 194, 122, 0.65))
+                    drop-shadow(0 0 15px rgba(123, 242, 255, 0.35));
+        }
+        @media (max-width: 768px) {
+            .comet-tail { width: 130px; height: 6px; }
+        }
 
-  #controlsHint {
-    position: fixed; bottom: 35px; left: 50%; transform: translateX(-50%);
-    color: rgba(255,255,255,0.6); font-size: 1rem; letter-spacing: 1px;
-    z-index: 11; pointer-events: none;
-    text-align: center;
-    width: 100%;
-  }
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 106px;
+            background: transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 50px;
+            z-index: 1000;
+            transition: all 0.4s ease;
+        }
 
-  #levelBanner {
-    position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%) scale(0.5);
-    font-size: 3.5rem; font-weight: 900;
-    color: #fff; text-shadow: 0 0 40px #ffd700, 0 0 80px #ff8c00;
-    z-index: 15; pointer-events: none;
-    opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    text-align: center;
-  }
-  #levelBanner.show { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+        header.scrolled {
+            height: 92px;
+            background: rgba(6, 10, 23, 0.9);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(230, 194, 122, 0.2);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
 
-  .item-overlay {
-    position: fixed; inset: 0;
-    display: flex; align-items: center; justify-content: center;
-    z-index: 50; pointer-events: none;
-    animation: overlayFade 2.2s forwards;
-  }
-  @keyframes overlayFade { 0% { opacity: 0; } 15% { opacity: 1; } 75% { opacity: 1; } 100% { opacity: 0; } }
-  .item-popup {
-    display: flex; flex-direction: column; align-items: center;
-    background: rgba(5,5,20,0.88); border-radius: 22px; padding: 24px 36px 20px;
-    box-shadow: 0 0 60px rgba(255,255,255,0.15); animation: popupZoom 2.2s forwards;
-  }
-  @keyframes popupZoom { 0% { transform: scale(0.3) rotate(-25deg); } 20% { transform: scale(1.18) rotate(8deg); } 35% { transform: scale(0.97) rotate(-3deg); } 50% { transform: scale(1.04) rotate(1deg); } 65% { transform: scale(1) rotate(0deg); } 85% { transform: scale(1) rotate(0deg); } 100% { transform: scale(0.7) rotate(15deg); } }
-  .item-lemon { border: 2px solid rgba(255,230,80,0.7); }
-  .item-mint  { border: 2px solid rgba(100,255,180,0.7); }
-  .item-popup-img { height: 160px; width: auto; filter: drop-shadow(0 0 20px rgba(255,255,255,0.4)); animation: imgSpin 2.2s forwards; }
-  @keyframes imgSpin { 0% { transform: rotate(-30deg) scale(0.4); } 30% { transform: rotate(15deg) scale(1.15); } 55% { transform: rotate(-5deg) scale(1); } 80% { transform: rotate(0deg) scale(1); } 100%{ transform: rotate(20deg) scale(0.5); } }
-  .item-popup-label { font-size: 1.5rem; font-weight: 900; letter-spacing: 2px; margin-top: 10px; }
-  .item-lemon .item-popup-label { color: #ffe840; text-shadow: 0 0 12px #ffe840; }
-  .item-mint  .item-popup-label { color: #64ffb4; text-shadow: 0 0 12px #64ffb4; }
-  .item-popup-effect { font-size: 1.8rem; font-weight: 900; color: #fff; text-shadow: 0 0 20px rgba(255,255,255,0.8); margin: 6px 0 4px; letter-spacing: 2px; }
-  .item-popup-name { font-size: 0.9rem; color: rgba(255,255,255,0.5); letter-spacing: 1px; margin-top: 4px; }
+        .logo {
+            font-size: 1.4rem;
+            font-weight: bold;
+            text-decoration: none;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
 
-  #bgCanvas { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+        .logo-icon {
+            color: var(--accent-gold);
+            font-size: 1.8rem;
+            animation: pulse 3s infinite ease-in-out;
+        }
 
-  .explosion {
-    position: fixed; pointer-events: none; z-index: 8;
-    font-size: 1.8rem; animation: explode 0.6s forwards;
-  }
-  @keyframes explode { 0% { opacity: 1; transform: scale(0.5) rotate(0deg); } 60% { opacity: 1; transform: scale(1.4) rotate(180deg); } 100% { opacity: 0; transform: scale(2) rotate(360deg); } }
+        .logo-text span {
+            color: var(--accent-gold);
+            font-size: 0.85rem;
+            display: block;
+            letter-spacing: 2px;
+        }
 
-  .damage-text {
-    position: fixed; z-index: 100; pointer-events: none;
-    font-size: 1.6rem; font-weight: 900;
-    text-shadow: 0px 3px 0px rgba(0,0,0,0.8), 0 0 15px currentColor;
-    animation: dmgFloat 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-  }
-  @keyframes dmgFloat {
-    0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
-    30% { opacity: 1; transform: translate(-50%, -100%) scale(1.3); }
-    100% { opacity: 0; transform: translate(-50%, -150%) scale(1); }
-  }
+        .right-nav-box {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 6px;
+        }
 
-  .credit {
-    position: absolute; top: 10px; color: rgba(255,255,255,0.6);
-    font-size: 0.9rem; letter-spacing: 2px; text-align: center;
-    width: 100%; pointer-events: none;
-  }
-  
-  #nameEntryArea {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-</style>
+        .nav-container {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 35px;
+        }
+
+        nav a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 0.95rem;
+            letter-spacing: 1px;
+            position: relative;
+            padding: 5px 0;
+            transition: color 0.3s;
+        }
+
+        nav a:hover, nav a.active {
+            color: var(--accent-gold);
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-gold);
+            transition: width 0.3s;
+        }
+        nav a:hover::after, nav a.active::after {
+            width: 100%;
+        }
+
+        .lang-switcher {
+            position: relative;
+            display: inline-block;
+        }
+
+        .lang-btn {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(230, 194, 122, 0.4);
+            color: var(--text-main);
+            padding: 5px 12px;
+            font-size: 0.8rem;
+            border-radius: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .lang-btn:hover {
+            background: rgba(230, 194, 122, 0.15);
+            border-color: var(--accent-gold);
+        }
+
+        .lang-dropdown {
+            position: absolute;
+            top: 120%;
+            right: 0;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(230, 194, 122, 0.3);
+            border-radius: 8px;
+            list-style: none;
+            padding: 6px 0;
+            min-width: 110px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            transform: translateY(-10px);
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .lang-switcher.open .lang-dropdown {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .lang-dropdown li {
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .lang-dropdown li:hover {
+            background: rgba(230, 194, 122, 0.2);
+            color: var(--accent-gold);
+        }
+
+        .project-tag {
+            display: flex;
+            align-items: center;
+            animation: bounce 4s infinite ease-in-out;
+        }
+
+        .project-logo-img {
+            height: 68px;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 7px rgba(0, 0, 0, 0.5));
+            transition: height 0.4s ease;
+        }
+
+        header.scrolled .project-logo-img {
+            height: 56px;
+        }
+
+        .content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+            padding: 100px 20px;
+        }
+
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 1s ease, transform 1s ease;
+        }
+
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            letter-spacing: 4px;
+            color: #bbb;
+            animation: fadeIn 2s ease-out;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin: 20px 0 30px 0;
+            letter-spacing: 8px;
+            color: #fff;
+            text-shadow: 0 0 20px var(--accent-glow), 0 0 40px rgba(255,255,255,0.2);
+            animation: fadeIn 2.5s ease-out;
+        }
+
+        .launch-text {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--accent-gold);
+            letter-spacing: 6px;
+            text-shadow: 0 0 10px var(--accent-glow);
+            animation: fadeIn 3s ease-out;
+            border: 1px solid var(--accent-gold);
+            padding: 10px 30px;
+            background: rgba(6, 10, 23, 0.4);
+            backdrop-filter: blur(5px);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 10;
+        }
+
+        .launch-text:hover {
+            background: rgba(230, 194, 122, 0.2);
+            box-shadow: 0 0 20px var(--accent-glow);
+            transform: scale(1.03);
+        }
+
+        .sec-title {
+            text-align: center;
+            font-size: 2.2rem;
+            margin-bottom: 50px;
+            color: var(--accent-gold);
+            letter-spacing: 4px;
+            position: relative;
+        }
+
+        .partner-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .partner-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 25px 15px;
+            text-align: center;
+            font-weight: bold;
+            letter-spacing: 1px;
+            backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 90px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .partner-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-gold);
+        }
+
+        .partner-logo-card {
+            padding: 14px;
+            text-decoration: none;
+            color: inherit;
+        }
+        .partner-logo-card img {
+            width: 100%;
+            max-width: 175px;
+            height: auto;
+            display: block;
+            background: #fff;
+            padding: 9px 13px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
+        .partner-logo-card:hover img {
+            box-shadow: 0 4px 18px rgba(230, 194, 122, 0.55);
+        }
+
+        .to-top {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 54px;
+            height: 54px;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid var(--accent-gold);
+            border-radius: 50%;
+            color: var(--accent-gold);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            z-index: 999;
+            box-shadow: 0 0 15px var(--accent-glow);
+            transition: all 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .to-top .star-icon {
+            font-size: 1.2rem;
+            line-height: 1;
+            margin-bottom: -2px;
+        }
+
+        .to-top .to-top-text {
+            font-size: 0.65rem;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        .to-top.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .to-top:hover {
+            background: var(--accent-gold);
+            color: #060a17;
+            box-shadow: 0 0 20px var(--accent-gold);
+            transform: translateY(-4px);
+        }
+
+        footer {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(6, 10, 23, 0.95);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: 100px;
+        }
+
+        .footer-info {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+
+        .footer-info span {
+            display: inline-block;
+            margin: 0 12px;
+        }
+
+        .footer-credit {
+            font-size: 0.85rem;
+            color: #718096;
+            letter-spacing: 1px;
+            white-space: normal;
+            line-height: 1.8;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .cinema-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #000;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease;
+            overflow: hidden;
+        }
+
+        .cinema-page.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .cinema-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 2001;
+        }
+
+        .cinema-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.7) 100%);
+            z-index: 2002;
+        }
+
+        .cinema-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 2003;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .cinema-text-box {
+            position: absolute;
+            width: 90%;
+            max-width: 720px;
+            text-align: center;
+            top: 100%;
+            transform: translateY(0);
+        }
+
+        .cinema-page.active .cinema-text-box {
+            animation: movieScroll 22s linear forwards;
+        }
+
+        .cinema-text-box p {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            font-size: 1.9rem;
+            line-height: 2.4;
+            color: #fff;
+            letter-spacing: 4px;
+            text-shadow: 0 0 10px rgba(255,255,255,0.4), 0 0 20px rgba(230,194,122,0.2);
+            font-weight: 500;
+            word-break: keep-all;
+            overflow-wrap: anywhere;
+        }
+
+        .love-highlight {
+            color: var(--accent-pink);
+            font-weight: 700;
+            text-shadow: 0 0 12px rgba(255, 116, 149, 0.6);
+        }
+
+        .btn-home-back {
+            position: absolute;
+            bottom: 5%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2010;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(230, 194, 122, 0.8);
+            padding: 14px 32px;
+            color: var(--accent-gold);
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 25px rgba(0,0,0,0.6);
+            opacity: 0;
+            transition: all 0.4s ease;
+        }
+
+        .cinema-page.active .btn-home-back {
+            animation: fadeInButton 3s ease forwards;
+            animation-delay: 1.5s;
+        }
+
+        .btn-home-back:hover {
+            background: var(--accent-gold);
+            color: #000;
+            box-shadow: 0 0 15px var(--accent-gold);
+        }
+
+        @keyframes movieScroll {
+            0% { top: 100%; transform: translateY(0); }
+            100% { top: -50%; transform: translateY(0); }
+        }
+
+        @keyframes fadeInButton {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; text-shadow: 0 0 15px var(--accent-gold); } }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            header { padding: 0 20px; height: 92px; }
+            header.scrolled { height: 82px; }
+            .logo { font-size: 1.1rem; gap: 8px; }
+            .logo-icon { font-size: 1.4rem; }
+            .logo-text span { font-size: 0.75rem; letter-spacing: 1px; }
+            .nav-container { gap: 15px; }
+            nav ul { gap: 15px; }
+            nav a { font-size: 0.85rem; }
+            .lang-btn { padding: 4px 10px; font-size: 0.75rem; }
+            .project-logo-img { height: 56px; }
+            header.scrolled .project-logo-img { height: 46px; }
+            
+            .container { padding: 60px 15px; }
+            .hero h1 { font-size: 2.5rem; letter-spacing: 4px; word-break: keep-all; overflow-wrap: anywhere; margin: 15px 0 25px 0; }
+            .hero p { font-size: 1rem; letter-spacing: 2px; padding: 0 10px; }
+            .launch-text { font-size: 1.3rem; letter-spacing: 4px; padding: 8px 20px; }
+            .sec-title { font-size: 1.8rem; margin-bottom: 30px; }
+            
+            .partner-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .partner-card { padding: 15px 10px; min-height: 75px; font-size: 0.9rem; }
+            
+            .to-top { bottom: 20px; right: 20px; width: 46px; height: 46px; }
+            .to-top .star-icon { font-size: 1rem; }
+            .to-top .to-top-text { font-size: 0.55rem; }
+
+            .footer-info span { display: block; margin: 6px 0; }
+            .footer-credit { font-size: 0.75rem; letter-spacing: 0.5px; padding: 0 10px; }
+
+            .cinema-text-box p {
+                font-size: 1.35rem;
+                line-height: 2.5;
+                letter-spacing: 3px;
+                padding: 0 10px;
+            }
+            @keyframes movieScroll {
+                0% { top: 100%; }
+                100% { top: -65%; }
+            }
+            .btn-home-back { 
+                padding: 12px 26px; 
+                font-size: 0.9rem; 
+                bottom: 8%; 
+                width: auto;
+                max-width: 80%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .partner-grid { grid-template-columns: 1fr; }
+            nav ul { gap: 10px; }
+            nav a { font-size: 0.8rem; }
+            .footer-info { font-size: 0.75rem; }
+            .footer-credit { font-size: 0.65rem; }
+            header { padding: 0 10px; }
+            .nav-container { gap: 8px; }
+            .project-logo-img { height: 52px; }
+        }
+        /* ===== 今夜の星空指数 ===== */
+        .starindex-container { padding-top: 60px; padding-bottom: 20px; }
+
+        .starindex-card {
+            max-width: 540px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border: 1px solid rgba(230, 194, 122, 0.28);
+            border-radius: 22px;
+            padding: 34px 30px 26px;
+            text-align: center;
+            backdrop-filter: blur(14px);
+            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35), inset 0 0 40px rgba(123, 242, 255, 0.03);
+        }
+
+        .starindex-eyebrow {
+            font-size: 0.85rem;
+            letter-spacing: 3px;
+            color: rgba(240, 248, 255, 0.65);
+        }
+        .starindex-eyebrow .starindex-date {
+            color: var(--accent-gold);
+            margin-left: 8px;
+            letter-spacing: 1px;
+        }
+
+        .starindex-stars {
+            margin: 20px 0 8px;
+            font-size: 2.9rem;
+            line-height: 1;
+            letter-spacing: 6px;
+            min-height: 2.9rem;
+        }
+        .starindex-stars .s-on {
+            color: var(--accent-gold);
+            text-shadow: 0 0 12px var(--accent-glow), 0 0 26px rgba(230, 194, 122, 0.35);
+            animation: siTwinkle 2.6s ease-in-out infinite;
+        }
+        .starindex-stars .s-on:nth-child(2) { animation-delay: 0.4s; }
+        .starindex-stars .s-on:nth-child(3) { animation-delay: 0.8s; }
+        .starindex-stars .s-on:nth-child(4) { animation-delay: 1.2s; }
+        .starindex-stars .s-on:nth-child(5) { animation-delay: 1.6s; }
+        .starindex-stars .s-off { color: rgba(240, 248, 255, 0.18); }
+        .starindex-stars.loading {
+            font-size: 1rem;
+            letter-spacing: 2px;
+            color: rgba(240, 248, 255, 0.6);
+            animation: siPulse 1.6s ease-in-out infinite;
+        }
+
+        @keyframes siTwinkle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.55; }
+        }
+        @keyframes siPulse {
+            0%, 100% { opacity: 0.45; }
+            50% { opacity: 1; }
+        }
+
+        .starindex-level {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            color: var(--text-main);
+        }
+        .starindex-comment {
+            margin-top: 8px;
+            font-size: 0.92rem;
+            color: rgba(240, 248, 255, 0.72);
+            letter-spacing: 0.5px;
+            min-height: 1.2em;
+        }
+
+        .starindex-divider {
+            height: 1px;
+            margin: 22px auto 20px;
+            width: 70%;
+            background: linear-gradient(90deg, transparent, rgba(230, 194, 122, 0.4), transparent);
+        }
+
+        .starindex-meta {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        .starindex-chip {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            background: rgba(6, 10, 23, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 999px;
+            padding: 9px 18px;
+            font-size: 1rem;
+            letter-spacing: 1px;
+        }
+        .starindex-chip-ico { font-size: 1.2rem; }
+
+        .starindex-note {
+            margin-top: 18px;
+            font-size: 0.72rem;
+            letter-spacing: 1.5px;
+            color: rgba(240, 248, 255, 0.4);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .starindex-stars .s-on { animation: none; }
+            .starindex-stars.loading { animation: none; }
+        }
+
+        @media (max-width: 768px) {
+            .starindex-container { padding: 40px 15px 10px; }
+            .starindex-card { padding: 28px 20px 22px; border-radius: 18px; }
+            .starindex-stars { font-size: 2.3rem; min-height: 2.3rem; letter-spacing: 4px; }
+            .starindex-level { font-size: 1.3rem; }
+            .starindex-chip { font-size: 0.9rem; padding: 8px 15px; }
+        }
+    </style>
 </head>
 <body>
 
-<canvas id="bgCanvas"></canvas>
-<canvas id="gameCanvas"></canvas>
+    <video class="video-bg" autoplay loop muted playsinline id="bg-video-main">
+        <source src="5963.mp4" type="video/mp4">
+    </video>
+    <div class="overlay"></div>
 
-<div id="ui">
-  <div id="hud">
-    <div class="hud-box" id="scoreBox">SCORE <span id="scoreVal">0</span></div>
-    <div class="hud-box">LEVEL <span id="levelVal">1</span></div>
-    <div class="hud-box hud-time">TIME <span id="timeVal">30</span></div>
-    <div class="hud-box">
-      LIFE <div id="livesRow"></div>
+    <!-- 星の彗星が画面を行き来するレイヤー -->
+    <div id="comet-field" aria-hidden="true"></div>
+
+    <header id="main-header">
+        <a href="#" class="logo">
+            <div class="logo-icon">✦</div>
+            <div class="logo-text">
+                <span id="txt-sub-logo">大町温泉郷</span>
+                <span id="txt-main-logo" style="font-size:1.4rem; color:#fff; font-weight:bold; letter-spacing:0;">星空観賞会</span>
+            </div>
+        </a>
+        
+        <div class="right-nav-box">
+            <div class="nav-container">
+                <nav>
+                    <ul>
+                        <li><a href="#home" class="nav-link active" id="nav-home">Home</a></li>
+                        <li><a href="#partners" class="nav-link" id="nav-partners">Partners</a></li>
+                    </ul>
+                </nav>
+                <div class="lang-switcher" id="lang-switcher">
+                    <button class="lang-btn">🌐 <span id="current-lang">JA</span> ▼</button>
+                    <ul class="lang-dropdown">
+                        <li onclick="changeLanguage('ja')">日本語</li>
+                        <li onclick="changeLanguage('en')">English</li>
+                        <li onclick="changeLanguage('es')">Español</li>
+                        <li onclick="changeLanguage('zh')">简体中文</li>
+                        <li onclick="changeLanguage('ko')">한국어</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="project-tag">
+                <img src="星と君プロジェクト_ロゴ_透過.png" alt="星と君ぷろじぇくと" class="project-logo-img">
+            </div>
+        </div>
+    </header>
+
+    <div class="content">
+        <div id="home" class="hero">
+            <p id="txt-hero-sub">星空案内ツアーガイド最高峰の体験</p>
+            <h1 id="txt-hero-title">銀河の旅人</h1>
+            <div class="launch-text" id="btn-launch">2026年8月始動</div>
+        </div>
+
+        <div class="container starindex-container">
+            <section id="starindex" class="fade-in-up">
+                <h2 class="sec-title" data-si="title">星空指数</h2>
+                <div class="starindex-card">
+                    <div class="starindex-eyebrow">
+                        <span data-si="eyebrow">今夜20時の大町の空</span>
+                        <span class="starindex-date" id="starindex-date"></span>
+                    </div>
+                    <div class="starindex-stars loading" id="starindex-stars" aria-live="polite" data-si="loading">今夜の空を観測中…</div>
+                    <div class="starindex-level" id="starindex-level"></div>
+                    <div class="starindex-comment" id="starindex-comment"></div>
+                    <div class="starindex-divider"></div>
+                    <div class="starindex-meta">
+                        <div class="starindex-chip">
+                            <span class="starindex-chip-ico" id="starindex-wx-ico">🌙</span>
+                            <span id="starindex-wx-txt">—</span>
+                        </div>
+                        <div class="starindex-chip">
+                            <span class="starindex-chip-ico">🌡️</span>
+                            <span id="starindex-temp">—</span>
+                        </div>
+                    </div>
+                    <div class="starindex-note" id="starindex-note" data-si="note">大町市・毎日自動更新</div>
+                </div>
+            </section>
+        </div>
+
+        <div class="container">
+            <section id="partners" class="fade-in-up">
+                <h2 class="sec-title" id="txt-partner-title">PARTNERS</h2>
+                <div class="partner-grid">
+                    <a href="https://www.keisui.jp/" target="_blank" rel="noopener noreferrer" class="partner-card partner-logo-card" id="p1" aria-label="緑翠亭 景水 公式サイト（新しいタブで開きます）">
+                        <img src="keisui_logo.png" alt="緑翠亭 景水">
+                    </a>
+                    <div class="partner-card" id="p2">薬師の湯</div>
+                    <div class="partner-card">ねるだけ</div>
+                    <div class="partner-card" id="p4">大町温泉郷観光協会</div>
+                </div>
+            </section>
+        </div>
+
+        <footer>
+            <div class="footer-info">
+                <span id="txt-company">株式会社MONDOCOLO</span>
+                <span id="txt-address">〒398-0002 長野県大町市大町俵町１９０３−１</span>
+                <span>TEL: 0261-85-0131</span>
+            </div>
+            <div class="footer-credit" id="txt-credit">&copy; 株式会社MONDOCOLO. All rights reserved.</div>
+        </footer>
     </div>
-  </div>
-</div>
 
-<div id="levelBanner">STAGE CLEAR!</div>
-<div id="controlsHint">画面をスワイプして移動（オート連射）</div>
+    <a href="#" id="to-top" class="to-top">
+        <span class="star-icon">✦</span>
+        <span class="to-top-text">TOP</span>
+    </a>
 
-<div class="screen" id="titleScreen">
-  <div class="credit">製作：MONDOCOLO STUDIO</div>
-  
-  <img src="star_3_sparkle.png" class="player-img-lg" alt="プリンAスター" onerror="this.onerror=null; this.src='star_2_open.png'">
-  <div class="game-title">プリン星団を守れ！</div>
-  <div class="sub-title">プリン星団からやってきたプリンAスター</div>
-  <button class="btn" onclick="startGame()">ゲームスタート</button>
-  <button class="btn-secondary" onclick="showRanking()">🏆 ランキング</button>
+    <div id="cinema-layer" class="cinema-page">
+        <video class="cinema-video" loop muted playsinline id="cinema-video-element">
+            <source src="4989.mp4" type="video/mp4">
+        </video>
+        <div class="cinema-overlay"></div>
+        <div class="cinema-container">
+            <div class="cinema-text-box" id="cinema-text-container"></div>
+        </div>
+        <div id="btn-cinema-close" class="btn-home-back">
+            <span>✦</span> <span id="txt-cinema-back">ホームへ戻る</span>
+        </div>
+    </div>
 
-  <div id="rankPanel">
-    <div class="rank-title">🏆 TOP 10 ランキング</div>
-    <div id="rankListTitle"><div class="rank-empty">読み込み中...</div></div>
-  </div>
-</div>
+    <script>
+        const translations = {
+            ja: {
+                projectTag: "星と君ぷろじぇくと",
+                subLogo: "大町温泉郷",
+                mainLogo: "星空観賞会",
+                navHome: "Home",
+                navPartners: "Partners",
+                heroSub: "星空案内ツアーガイド最高峰の体験",
+                heroTitle: "銀河の旅人",
+                btnLaunch: "2026年8月始動",
+                partnerTitle: "PARTNERS",
+                p1: "緑翠亭 景水",
+                p2: "薬師の湯",
+                p4: "大町温泉郷観光協会",
+                company: "株式会社MONDOCOLO",
+                address: "〒398-0002 長野県大町市大町俵町１９０３−１",
+                credit: "© 株式会社MONDOCOLO. All rights reserved.",
+                cinemaBack: "ホームへ戻る",
+                cinemaText: `
+                    <p>長野県は星空の観察に適しています。</p>
+                    <p style="margin-top: 30px;">阿智村・野辺山、そして大町市で、</p>
+                    <p><span class="love-highlight">愛</span>を込めてあなたを</p>
+                    <p>宇宙の旅へお連れします。</p>
+                `
+            },
+            en: {
+                projectTag: "Hoshi to Kimi Project",
+                subLogo: "Omachi Onsen-kyo",
+                mainLogo: "Starry Sky Tour",
+                navHome: "Home",
+                navPartners: "Partners",
+                heroSub: "The Ultimate Starry Sky Guided Experience",
+                heroTitle: "Galactic Traveler",
+                btnLaunch: "Launching August 2026",
+                partnerTitle: "PARTNERS",
+                p1: "Ryosuiten Keisui",
+                p2: "Yakushi-no-yu",
+                p4: "Omachi Onsen Tourist Association",
+                company: "MONDOCOLO Inc.",
+                address: "1903-1 Omachitawara-machi, Omachi City, Nagano 398-0002",
+                credit: "© MONDOCOLO Inc. All rights reserved.",
+                cinemaBack: "Back to Home",
+                cinemaText: `
+                    <p>Nagano Prefecture is the perfect place for stargazing.</p>
+                    <p style="margin-top: 30px;">Achi Village, Nobeyama, and Omachi City</p>
+                    <p>bring you into a journey through the universe</p>
+                    <p>with all our <span class="love-highlight">Love</span>.</p>
+                `
+            },
+            es: {
+                projectTag: "Proyecto Hoshi to Kimi",
+                subLogo: "Omachi Onsen-kyo",
+                mainLogo: "Observación de Estrellas",
+                navHome: "Inicio",
+                navPartners: "Socios",
+                heroSub: "La Máxima Experiencia Guiada de Cielos Estrellados",
+                heroTitle: "Viajero Galáctico",
+                btnLaunch: "Inicio en Agosto de 2026",
+                partnerTitle: "PARTNERS",
+                p1: "Ryosuiten Keisui",
+                p2: "Yakushi-no-yu",
+                p4: "Asociación Turística de Omachi Onsen",
+                company: "MONDOCOLO Inc.",
+                address: "1903-1 Omachitawara-machi, Ciudad de Omachi, Nagano 398-0002",
+                credit: "© MONDOCOLO Inc. All rights reserved.",
+                cinemaBack: "Volver al Inicio",
+                cinemaText: `
+                    <p>La prefectura de Nagano es el lugar perfecto para observar las estrellas.</p>
+                    <p style="margin-top: 30px;">La villa de Achi, Nobeyama y la ciudad de Omachi</p>
+                    <p>te llevarán a un maravilloso viaje por el universo</p>
+                    <p>con todo nuestro <span class="love-highlight">Amor</span>.</p>
+                `
+            },
+            zh: {
+                projectTag: "星星与你企划",
+                subLogo: "大町温泉乡",
+                mainLogo: "星空观赏会",
+                navHome: "首页",
+                navPartners: "合作伙伴",
+                heroSub: "星空导游带来的顶级观星体验",
+                heroTitle: "银河旅行者",
+                btnLaunch: "2026年8月隆重登场",
+                partnerTitle: "PARTNERS",
+                p1: "绿翠亭 景水",
+                p2: "药师之汤",
+                p4: "大町温泉乡旅游协会",
+                company: "MONDOCOLO 株式会社",
+                address: "〒398-0002 长野县大町市大町俵町1903-1",
+                credit: "© MONDOCOLO Inc. All rights reserved.",
+                cinemaBack: "返回首页",
+                cinemaText: `
+                    <p>长野县是绝佳的观星圣地。</p>
+                    <p style="margin-top: 30px;">阿智村、野边山以及大町市</p>
+                    <p>将满怀<span class="love-highlight">爱</span>意，带您开启</p>
+                    <p>一场浪漫の宇宙之旅。</p>
+                `
+            },
+            ko: {
+                projectTag: "별과 당신 프로젝트",
+                subLogo: "오마치 온천향",
+                mainLogo: "별자리 감상회",
+                navHome: "홈",
+                navPartners: "파트너",
+                heroSub: "최고의 별자리 가이드 투어 체험",
+                heroTitle: "은하수의 여행자",
+                btnLaunch: "2026년 8월 시동",
+                partnerTitle: "PARTNERS",
+                p1: "료스이텐 케이스이",
+                p2: "야쿠시노유",
+                p4: "오마치 온천향 관광협회",
+                company: "주식회사 MONDOCOLO",
+                address: "우편번호 398-0002 나가노현 오마치시 오마치타와라마치 1903-1",
+                credit: "© MONDOCOLO Inc. All rights reserved.",
+                cinemaBack: "홈으로 돌아가기",
+                cinemaText: `
+                    <p>나가노현은 별을 관찰하기에 가장 좋은 곳입니다.</p>
+                    <p style="margin-top: 30px;">아치 무라, 노베야마, 그리고 오마치 시에서,</p>
+                    <p>당신을 <span class="love-highlight">사랑</span>을 담아</p>
+                    <p>우주 여행으로 안내합니다.</p>
+                `
+            }
+        };
 
-<div class="screen hidden" id="rankingScreen">
-  <div class="game-title" style="font-size:2.5rem; margin-top:20px;">🏆 ランキング</div>
-  <div id="rankPanel">
-    <div class="rank-title">TOP 10</div>
-    <div id="rankListFull"><div class="rank-empty">読み込み中...</div></div>
-  </div>
-  <button class="btn-secondary" onclick="hideRanking()" style="margin-bottom: 40px;">← 戻る</button>
-</div>
+        function changeLanguage(lang) {
+            let displayLang = lang.toUpperCase();
+            if(lang === 'es') displayLang = 'ES';
+            document.getElementById('current-lang').innerText = displayLang;
+            
+            document.getElementById('txt-sub-logo').innerText = translations[lang].subLogo;
+            document.getElementById('txt-main-logo').innerText = translations[lang].mainLogo;
+            document.getElementById('nav-home').innerText = translations[lang].navHome;
+            document.getElementById('nav-partners').innerText = translations[lang].navPartners;
+            document.getElementById('txt-hero-sub').innerText = translations[lang].heroSub;
+            document.getElementById('txt-hero-title').innerText = translations[lang].heroTitle;
+            document.getElementById('btn-launch').innerText = translations[lang].btnLaunch;
+            document.getElementById('txt-partner-title').innerText = translations[lang].partnerTitle;
+            document.getElementById('p2').innerText = translations[lang].p2;
+            document.getElementById('p4').innerText = translations[lang].p4;
+            document.getElementById('txt-company').innerText = translations[lang].company;
+            document.getElementById('txt-address').innerText = translations[lang].address;
+            document.getElementById('txt-credit').innerText = translations[lang].credit;
+            document.getElementById('txt-cinema-back').innerText = translations[lang].cinemaBack;
+            
+            document.getElementById('cinema-text-container').innerHTML = translations[lang].cinemaText;
 
-<div class="screen hidden" id="gameOverScreen">
-  <div class="game-title" style="font-size:2.8rem; color:#ff6b6b; text-shadow:0 0 30px #ff0000; margin-top:20px;">GAME OVER</div>
-  <div style="color:#aaa; margin:6px 0 2px; letter-spacing:2px; font-size:1.2rem;">YOUR SCORE</div>
-  <div class="go-score" id="finalScore">0</div>
-
-  <div id="nameEntryArea">
-    <div style="color:#ffe87a; margin-bottom:8px; font-size:1.2rem; text-align: center;">名前を入力してランキングに登録！</div>
-    <div class="name-hint">最大8文字</div>
-    <input class="name-input" id="playerNameInput" type="text" maxlength="8" placeholder="プレイヤー名" autocomplete="off">
-    <br>
-    <button class="btn" id="submitBtn" onclick="submitScore()">登録して終了</button>
-    <button class="btn-secondary" onclick="skipSubmit()">登録せずに終了</button>
-    <div id="submitMsg" style="color:#ffe87a; margin-top:8px; min-height:24px; font-size:1.2rem; text-align: center;"></div>
-  </div>
-
-  <div id="rankPanel" style="margin-bottom: 40px;">
-    <div class="rank-title">🏆 TOP 10</div>
-    <div id="rankListGO"><div class="rank-empty">読み込み中...</div></div>
-  </div>
-</div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
-<script>
-// ==========================================
-// グローバル変数の宣言
-// ==========================================
-var keys = {};
-var gameState = 'title'; 
-var score = 0;
-var lives = 3;
-var level = 1;
-var frameCount = 0;
-var lastShotFrame = 0;
-var lastEnemyFrame = 0;
-var scoreMultiplier = 1;
-var animId = null;
-
-var stageTime = 30.0;
-var lastTime = 0;
-var shakeTime = 0;
-var shakeMag = 0;
-var hitStop = 0;
-var warpFactor = 0;
-var invincibleTime = 0; // 追加：無敵時間
-
-var SUPABASE_URL = 'https://ufjojhraqyzqqzlkokwd.supabase.co';
-var SUPABASE_KEY = 'sb_publishable_ha-q_6WBEngyBT3dOLMJQQ_EZsVSGI6';
-
-var supabaseClient = null;
-try {
-  if (window.supabase) {
-    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  }
-} catch (e) {}
-
-async function loadRanking() {
-  try {
-    if (supabaseClient) {
-      const { data, error } = await supabaseClient
-        .from('purin_ranking')
-        .select('name, score')
-        .order('score', { ascending: false })
-        .limit(10);
-      if (!error && data) return data;
-    }
-  } catch(e) {}
-  
-  try {
-    const localData = localStorage.getItem("purin_ranking_v1");
-    return localData ? JSON.parse(localData) : [];
-  } catch (err) {
-    return [];
-  }
-}
-
-async function addScore(name, pts) {
-  const playerName = name.trim() || '匿名スター';
-  try {
-    if (supabaseClient) {
-      const { error } = await supabaseClient
-        .from('purin_ranking')
-        .insert([{ name: playerName, score: pts }]);
-      if (!error) return await loadRanking();
-    }
-  } catch(e) {}
-  
-  try {
-    let list = await loadRanking();
-    list.push({ name: playerName, score: pts, date: new Date().toLocaleDateString('ja-JP') });
-    list.sort((a,b) => b.score - a.score);
-    list = list.slice(0, 10);
-    localStorage.setItem("purin_ranking_v1", JSON.stringify(list));
-    return list;
-  } catch(err) {
-    return [];
-  }
-}
-
-function medal(rank) {
-  if (rank === 0) return '<span class="rank-num gold">🥇</span>';
-  if (rank === 1) return '<span class="rank-num silver">🥈</span>';
-  if (rank === 2) return '<span class="rank-num bronze">🥉</span>';
-  return `<span class="rank-num">${rank+1}</span>`;
-}
-
-function renderRanking(list, containerId) {
-  const el = document.getElementById(containerId);
-  if (!el) return;
-  if (!list || list.length === 0) {
-    el.innerHTML = '<div class="rank-empty">まだ記録がありません。<br>あなたが1位に！</div>';
-    return;
-  }
-  el.innerHTML = list.map((r, i) => `
-    <div class="rank-row">
-      ${medal(i)}
-      <span class="rank-name">${escHtml(r.name)}</span>
-      <span class="rank-score">${r.score.toLocaleString()}</span>
-    </div>`).join('');
-}
-
-function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-async function refreshRanking() {
-  try {
-    const list = await loadRanking();
-    renderRanking(list, 'rankListTitle');
-    renderRanking(list, 'rankListFull');
-    renderRanking(list, 'rankListGO');
-  } catch (e) {
-    renderRanking([], 'rankListTitle');
-    renderRanking([], 'rankListFull');
-    renderRanking([], 'rankListGO');
-  }
-}
-
-function showScreen(id) {
-  ['titleScreen','rankingScreen','gameOverScreen'].forEach(s => {
-    document.getElementById(s).classList.toggle('hidden', s !== id);
-  });
-}
-
-window.showRanking = function() { showScreen('rankingScreen'); refreshRanking(); }
-window.hideRanking = function() { showScreen('titleScreen'); }
-
-window.startGame = function() {
-  showScreen(null);
-  document.getElementById('titleScreen').classList.add('hidden');
-  document.getElementById('rankingScreen').classList.add('hidden');
-  document.getElementById('gameOverScreen').classList.add('hidden');
-
-  score = 0; lives = 3; level = 1; frameCount = 0;
-  lastShotFrame = 0; lastEnemyFrame = 0; scoreMultiplier = 1;
-  stageTime = 30.0; lastTime = 0;
-  warpFactor = 0; ambLight.color.setHex(0x8888cc); 
-  invincibleTime = 0;
-  
-  document.getElementById('scoreVal').textContent = '0';
-  document.getElementById('levelVal').textContent = '1';
-  document.getElementById('timeVal').textContent = '30';
-  updateLivesUI();
-
-  clearScene();
-  createPlayer();
-  gameState = 'playing';
-}
-
-window.submitScore = async function() {
-  const name = document.getElementById('playerNameInput').value.trim() || '匿名スター';
-  document.getElementById('submitBtn').disabled = true;
-  document.getElementById('submitMsg').textContent = '登録中...';
-  try {
-    const list = await addScore(name, score);
-    renderRanking(list, 'rankListGO');
-    document.getElementById('nameEntryArea').style.display = 'none';
-    document.getElementById('submitMsg').textContent = '✅ 登録しました！';
-    renderRanking(list, 'rankListTitle');
-  } catch(e) {
-    document.getElementById('submitMsg').textContent = '⚠️ 登録に失敗しました';
-    document.getElementById('submitBtn').disabled = false;
-  }
-}
-
-window.skipSubmit = async function() {
-  document.getElementById('nameEntryArea').style.display = 'none';
-  await refreshRanking();
-  setTimeout(() => {
-    showScreen('titleScreen');
-    refreshRanking();
-  }, 400);
-}
-
-var bgCanvas = document.getElementById('bgCanvas');
-var bgCtx = bgCanvas.getContext('2d');
-var bgStars = [];
-function initBg() {
-  bgCanvas.width = window.innerWidth;
-  bgCanvas.height = window.innerHeight;
-  bgStars = Array.from({length: 200}, () => ({
-    x: Math.random() * bgCanvas.width,
-    y: Math.random() * bgCanvas.height,
-    r: Math.random() * 1.5 + 0.3,
-    s: Math.random() * 0.3 + 0.1,
-    a: Math.random()
-  }));
-}
-
-function drawBg(t) {
-  bgCtx.fillStyle = warpFactor > 0.1 ? 'rgba(0, 0, 0, 0.3)' : '#000';
-  bgCtx.fillRect(0,0,bgCanvas.width,bgCanvas.height);
-  
-  for (const star of bgStars) {
-    star.y += (0.5 + star.s) * (1 + warpFactor * 40);
-    if (star.y > bgCanvas.height) {
-      star.y = 0;
-      star.x = Math.random() * bgCanvas.width;
-    }
-    
-    bgCtx.beginPath();
-    if (warpFactor > 0.1) {
-      bgCtx.moveTo(star.x, star.y);
-      bgCtx.lineTo(star.x, star.y - (0.5 + star.s) * warpFactor * 40);
-      bgCtx.lineWidth = star.r;
-      bgCtx.strokeStyle = `rgba(255,255,240,${star.a})`;
-      bgCtx.stroke();
-    } else {
-      star.a = 0.4 + 0.6 * (Math.sin(t * star.s + star.x) * 0.5 + 0.5);
-      bgCtx.arc(star.x, star.y, star.r, 0, Math.PI*2);
-      bgCtx.fillStyle = `rgba(255,255,240,${star.a})`;
-      bgCtx.fill();
-    }
-  }
-  if (warpFactor > 0) warpFactor *= 0.95; 
-}
-
-var items = [];
-var multiShot = 1;
-var speedBoost = 1.0;
-var multiShotTimer = 0;
-var speedTimer = 0;
-var ITEM_DURATION = 600;
-
-var canvas = document.getElementById('gameCanvas');
-var renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-renderer.setPixelRatio(window.devicePixelRatio);
-renderer.setClearColor(0x000000, 0);
-
-var scene = new THREE.Scene();
-var W = () => window.innerWidth;
-var H = () => window.innerHeight;
-
-var camera = new THREE.OrthographicCamera(-W()/2, W()/2, H()/2, -H()/2, 0.1, 2000);
-camera.position.z = 500;
-
-function resize() {
-  renderer.setSize(W(), H(), false);
-  camera.left = -W()/2; camera.right = W()/2;
-  camera.top = H()/2; camera.bottom = -H()/2;
-  camera.updateProjectionMatrix();
-  initBg();
-  if (player) {
-    player.position.y = -H()/2 + 180;
-  }
-}
-window.addEventListener('resize', resize);
-resize();
-
-var ambLight = new THREE.AmbientLight(0x8888cc, 0.8);
-scene.add(ambLight);
-var dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
-dirLight.position.set(1, 2, 3);
-scene.add(dirLight);
-var pointLight = new THREE.PointLight(0x4488ff, 1.5, 600);
-pointLight.position.set(0, 0, 200);
-scene.add(pointLight);
-
-var textureLoader = new THREE.TextureLoader();
-var starTexture  = textureLoader.load('star_2_open.png');
-var lemonTexture = textureLoader.load('item_lemon.png');
-var mintTexture  = textureLoader.load('item_mint.png');
-
-var player, playerSprite;
-
-function createPlayer() {
-  if (player) scene.remove(player);
-  const mat = new THREE.SpriteMaterial({ map: starTexture, transparent: true });
-  playerSprite = new THREE.Sprite(mat);
-  playerSprite.scale.set(70, 70, 1);
-  playerSprite.position.set(0, -H()/2 + 180, 1); 
-  scene.add(playerSprite);
-  player = playerSprite;
-}
-
-// ------------------------------------------
-// 弾（味方・敵）の設定
-// ------------------------------------------
-var bullets = [];
-var bulletGeo = new THREE.IcosahedronGeometry(4, 0); 
-var bulletMatSingle = new THREE.MeshStandardMaterial({
-  color: 0xffeebb, emissive: 0xffbb00, emissiveIntensity: 1.5, metalness: 0.2, roughness: 0.3
-});
-var bulletMatMulti = new THREE.MeshStandardMaterial({
-  color: 0x88ffee, emissive: 0x00aa88, emissiveIntensity: 1.5, metalness: 0.2, roughness: 0.3
-});
-
-var enemyBullets = [];
-var enemyBulletGeo = new THREE.SphereGeometry(6, 8, 8);
-var enemyBulletMat = new THREE.MeshStandardMaterial({
-  color: 0xff0044, emissive: 0xff0000, emissiveIntensity: 2, roughness: 0.2
-});
-
-function shoot() {
-  if (frameCount - lastShotFrame < 35) return; 
-  lastShotFrame = frameCount;
-
-  const offsets = [];
-  if (multiShot === 1) offsets.push(0);
-  else for (let k=0;k<multiShot;k++) offsets.push((k-(multiShot-1)/2)*22);
-
-  offsets.forEach(ox => {
-    const mat = multiShot > 1 ? bulletMatMulti : bulletMatSingle;
-    const mesh = new THREE.Mesh(bulletGeo, mat);
-    mesh.position.set(player.position.x + ox, player.position.y + 40, 0);
-    scene.add(mesh);
-    bullets.push({ mesh, vy: 14 + level * 0.4 });
-  });
-}
-
-function spawnEnemyBullet(x, y) {
-  var mesh = new THREE.Mesh(enemyBulletGeo, enemyBulletMat);
-  mesh.position.set(x, y - 20, 0);
-  scene.add(mesh);
-  
-  // 少しプレイヤーを狙う
-  var vx = 0;
-  var speed = 5 + level * 0.5;
-  if (player && Math.random() < 0.4) {
-     var dx = player.position.x - x;
-     var dy = player.position.y - y;
-     var dist = Math.sqrt(dx*dx + dy*dy);
-     vx = (dx / dist) * speed * 0.4;
-  }
-  enemyBullets.push({ mesh, vx: vx, vy: -speed });
-}
-
-function updateBullets() {
-  // 味方の弾
-  for (let i = bullets.length-1; i >= 0; i--) {
-    const b = bullets[i];
-    b.mesh.position.y += b.vy;
-    b.mesh.rotation.y += 0.2;
-    b.mesh.rotation.x += 0.1;
-    if (b.mesh.position.y > H()/2 + 30) {
-      scene.remove(b.mesh);
-      bullets.splice(i, 1);
-    }
-  }
-  // 敵の弾
-  for (let i = enemyBullets.length-1; i >= 0; i--) {
-    const eb = enemyBullets[i];
-    eb.mesh.position.y += eb.vy;
-    eb.mesh.position.x += eb.vx;
-    if (eb.mesh.position.y < -H()/2 - 30) {
-      scene.remove(eb.mesh);
-      enemyBullets.splice(i, 1);
-    }
-  }
-}
-
-// ------------------------------------------
-// 敵の設定
-// ------------------------------------------
-var enemies = [];
-var ENEMY_TYPES = [
-  { geo: () => new THREE.TetrahedronGeometry(1, 0),      color: 0xff2244, em: 0x880011, size:28, hp:1, pts:100, speed:1.8 },
-  { geo: () => new THREE.OctahedronGeometry(1, 0),       color: 0xff6600, em: 0x882200, size:36, hp:2, pts:200, speed:1.4 },
-  { geo: () => new THREE.IcosahedronGeometry(1, 0),      color: 0x8800ff, em: 0x440088, size:44, hp:3, pts:350, speed:1.1 },
-  { geo: () => new THREE.BoxGeometry(1,1,1),             color: 0x00aaff, em: 0x004488, size:34, hp:2, pts:250, speed:1.5 },
-  { geo: () => new THREE.CylinderGeometry(0,1,1.6,6),    color: 0xff0088, em: 0x880033, size:50, hp:4, pts:500, speed:0.9 },
-  { geo: () => new THREE.SphereGeometry(1, 6, 6),        color: 0x00ff88, em: 0x008844, size:52, hp:5, pts:700, speed:0.7 },
-  { geo: () => new THREE.TorusGeometry(1, 0.4, 6, 8),    color: 0xffcc00, em: 0x886600, size:58, hp:6, pts:900, speed:0.65 },
-];
-
-function spawnEnemy() {
-  const typePool = ENEMY_TYPES.slice(0, Math.min(2 + Math.floor(level/1.5), ENEMY_TYPES.length));
-  const t = typePool[Math.floor(Math.random() * typePool.length)];
-  const s = t.size * (0.7 + Math.random() * 0.9);
-
-  const geo = t.geo();
-  const mat = new THREE.MeshStandardMaterial({
-    color: t.color, emissive: t.em, emissiveIntensity: 1.2, metalness: 0.7, roughness: 0.2,
-    wireframe: Math.random() < 0.15
-  });
-  const mesh = new THREE.Mesh(geo, mat);
-  mesh.scale.set(s, s, s);
-  mesh.position.set((Math.random() - 0.5) * (W() - 80), H()/2 + s + 10, Math.random() * 60 - 30);
-
-  const drift = (Math.random() - 0.5) * 2.5;
-  const driftFreq = 0.02 + Math.random() * 0.03;
-  const spd = (t.speed + level * 0.15) * (0.8 + Math.random() * 0.4);
-  const shootTimer = Math.floor(Math.random() * 60) + 30; // 射撃間隔
-
-  scene.add(mesh);
-  enemies.push({ mesh, vy: -spd, drift, driftFreq, hp: t.hp, maxHp: t.hp, pts: t.pts, size: s, rx:Math.random()*0.06-0.03, ry:Math.random()*0.06-0.03, shootTimer });
-}
-
-function updateEnemies() {
-  const interval = Math.max(20, 80 - level * 5);
-  if (frameCount - lastEnemyFrame > interval) {
-    spawnEnemy();
-    if (level > 3 && Math.random() < 0.3) spawnEnemy();
-    lastEnemyFrame = frameCount;
-  }
-
-  for (let i = enemies.length-1; i >= 0; i--) {
-    const e = enemies[i];
-    e.mesh.position.y += e.vy;
-    e.mesh.position.x += Math.sin(frameCount * e.driftFreq) * e.drift;
-    e.mesh.rotation.x += e.rx;
-    e.mesh.rotation.y += e.ry;
-    
-    // 敵の射撃処理
-    e.shootTimer--;
-    if (e.shootTimer <= 0) {
-      spawnEnemyBullet(e.mesh.position.x, e.mesh.position.y);
-      e.shootTimer = Math.floor(Math.random() * 100) + 60 - Math.min(level * 5, 40);
-    }
-
-    if (e.mesh.position.y < -H()/2 - e.size - 10) {
-      scene.remove(e.mesh);
-      enemies.splice(i, 1);
-    }
-  }
-}
-
-// ------------------------------------------
-// アイテム・エフェクト関連
-// ------------------------------------------
-function spawnItem() {
-  const isLemon = Math.random() < 0.5;
-  const tex = isLemon ? lemonTexture : mintTexture;
-  const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
-  const sprite = new THREE.Sprite(mat);
-  
-  if (tex.image) {
-    sprite.scale.set(44, 44 * (tex.image.height / tex.image.width), 1);
-  } else {
-    sprite.scale.set(44, 44, 1);
-  }
-  
-  sprite.position.set((Math.random() - 0.5) * (W() - 100), H()/2 + 30, 2);
-  scene.add(sprite);
-  items.push({ sprite, type: isLemon ? 'multishot' : 'speed', vy: -(1.5 + level * 0.1) });
-}
-
-function updateItems() {
-  if (frameCount % 400 === 200 && Math.random() < 0.7) spawnItem();
-
-  for (let i = items.length-1; i >= 0; i--) {
-    const it = items[i];
-    it.sprite.position.y += it.vy;
-    it.sprite.material.rotation = Math.sin(frameCount * 0.05 + i) * 0.3;
-    if (it.sprite.position.y < -H()/2 - 40) {
-      scene.remove(it.sprite);
-      items.splice(i, 1);
-    }
-  }
-  if (multiShotTimer > 0) { multiShotTimer--; if (multiShotTimer===0) multiShot=1; }
-  if (speedTimer > 0)     { speedTimer--;      if (speedTimer===0)    speedBoost=1.0; }
-}
-
-function showItemGet(type) {
-  const overlay = document.createElement('div');
-  overlay.className = 'item-overlay';
-  const isLemon = type === 'multishot';
-  
-  overlay.innerHTML = `
-    <div class="item-popup ${isLemon ? 'item-lemon' : 'item-mint'}">
-      <img src="${isLemon ? 'item_lemon.png' : 'item_mint.png'}" class="item-popup-img" alt="">
-      <div class="item-popup-label">${isLemon ? '🍋 AROMA LEMON' : '🌿 AROMA MINT'}</div>
-      <div class="item-popup-effect">${isLemon ? '弾数 UP ×' + (multiShot) + '発！' : '速度 UP ×' + speedBoost.toFixed(1) + '！'}</div>
-    </div>`;
-  document.body.appendChild(overlay);
-  setTimeout(() => overlay.remove(), 2200);
-}
-
-function spawnDamageText(worldX, worldY, amount, color = '#fff') {
-  const el = document.createElement('div');
-  el.className = 'damage-text';
-  el.style.color = color;
-  el.textContent = amount;
-  el.style.left = (worldX + W()/2) + 'px';
-  el.style.top = (H()/2 - worldY) + 'px';
-  document.body.appendChild(el);
-  setTimeout(() => el.remove(), 800);
-}
-
-function spawnExplosion(worldX, worldY, emoji) {
-  const emojis = emoji ? [emoji] : ['✨','💫','⭐','🌟'];
-  for (let i = 0; i < 3; i++) {
-    const el = document.createElement('div');
-    el.className = 'explosion';
-    el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-    el.style.left = (worldX + W()/2 + (Math.random()-0.5)*40) + 'px';
-    el.style.top  = (H()/2 - worldY + (Math.random()-0.5)*40) + 'px';
-    document.body.appendChild(el);
-    setTimeout(() => el.remove(), 700);
-  }
-}
-
-// ------------------------------------------
-// 当たり判定・ゲーム進行
-// ------------------------------------------
-function checkCollisions() {
-  // 味方の弾 → 敵
-  for (let bi = bullets.length-1; bi >= 0; bi--) {
-    const b = bullets[bi];
-    for (let ei = enemies.length-1; ei >= 0; ei--) {
-      const e = enemies[ei];
-      const dist = Math.sqrt((b.mesh.position.x - e.mesh.position.x)**2 + (b.mesh.position.y - e.mesh.position.y)**2);
-      if (dist < e.size * 0.85) {
-        scene.remove(b.mesh);
-        bullets.splice(bi, 1);
-        e.hp--;
-        e.mesh.material.emissiveIntensity = 4;
-        setTimeout(() => { if (e.mesh.material) e.mesh.material.emissiveIntensity = 1.2; }, 80);
-
-        if (e.hp <= 0) {
-          spawnExplosion(e.mesh.position.x, e.mesh.position.y);
-          const pts = Math.floor(e.pts * scoreMultiplier);
-          addScore2(pts);
-          spawnDamageText(e.mesh.position.x, e.mesh.position.y, pts, '#ffe87a'); 
-          
-          hitStop = 2; 
-          shakeTime = 8; shakeMag = 4; 
-
-          scene.remove(e.mesh);
-          enemies.splice(ei, 1);
+            document.getElementById('lang-switcher').classList.remove('open');
+            
+            // エラー回避：プレビュー環境等でlocalStorageがブロックされても処理を止めない
+            try {
+                localStorage.setItem('selectedLang', lang);
+            } catch (e) {
+                console.warn("言語の保存がブロックされましたが、動作は続行します。");
+            }
         }
-        break;
-      }
-    }
-  }
 
-  if (!player) return;
+        const langSwitcher = document.getElementById('lang-switcher');
+        langSwitcher.querySelector('.lang-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            langSwitcher.classList.toggle('open');
+        });
+        document.addEventListener('click', () => langSwitcher.classList.remove('open'));
 
-  // プレイヤーがアイテムを取ったか
-  for (let i = items.length-1; i >= 0; i--) {
-    const it = items[i];
-    const dist = Math.sqrt((player.position.x - it.sprite.position.x)**2 + (player.position.y - it.sprite.position.y)**2);
-    if (dist < 50) {
-      scene.remove(it.sprite);
-      items.splice(i, 1);
-      if (it.type === 'multishot') { multiShot = Math.min(5, multiShot + 1); multiShotTimer = ITEM_DURATION; } 
-      else { speedBoost = Math.min(2.5, speedBoost + 0.4); speedTimer = ITEM_DURATION; }
-      spawnExplosion(it.sprite.position.x, it.sprite.position.y, '🌟');
-      showItemGet(it.type);
-    }
-  }
+        // エラー回避：プレビュー環境等でlocalStorageがブロックされても処理を止めない
+        let savedLang = 'ja';
+        try {
+            savedLang = localStorage.getItem('selectedLang') || 'ja';
+        } catch (e) {
+            console.warn("保存された言語の読み込みがブロックされました。");
+        }
+        changeLanguage(savedLang);
 
-  // 無敵中はダメージを受けない
-  if (invincibleTime <= 0) {
-    // 敵の体当たり → プレイヤー
-    for (let ei = enemies.length-1; ei >= 0; ei--) {
-      const e = enemies[ei];
-      const dist = Math.sqrt((player.position.x - e.mesh.position.x)**2 + (player.position.y - e.mesh.position.y)**2);
-      if (dist < e.size * 0.7 + 22) {
-        scene.remove(e.mesh);
-        enemies.splice(ei, 1);
-        spawnExplosion(player.position.x, player.position.y, '💥');
-        playerHit();
-        return; // 一度に複数ダメージを受けないように抜ける
-      }
-    }
+        const header = document.getElementById('main-header');
+        const toTopBtn = document.getElementById('to-top');
+        
+        const btnLaunch = document.getElementById('btn-launch');
+        const cinemaLayer = document.getElementById('cinema-layer');
+        const btnCinemaClose = document.getElementById('btn-cinema-close');
+        const cinemaVideo = document.getElementById('cinema-video-element');
 
-    // 敵のミサイル弾 → プレイヤー
-    for (let i = enemyBullets.length-1; i >= 0; i--) {
-      const eb = enemyBullets[i];
-      const dist = Math.sqrt((player.position.x - eb.mesh.position.x)**2 + (player.position.y - eb.mesh.position.y)**2);
-      if (dist < 22) {
-        scene.remove(eb.mesh);
-        enemyBullets.splice(i, 1);
-        spawnExplosion(player.position.x, player.position.y, '💥');
-        playerHit();
-        return; // 一度に複数ダメージを受けないように抜ける
-      }
-    }
-  }
-}
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
 
-function addScore2(pts) {
-  score += pts;
-  const el = document.getElementById('scoreBox');
-  document.getElementById('scoreVal').textContent = score.toLocaleString();
-  el.style.transform = 'scale(1.1)';
-  setTimeout(() => el.style.transform = 'scale(1)', 100);
-}
+            if (!cinemaLayer.classList.contains('active') && window.scrollY > 300) {
+                toTopBtn.classList.add('visible');
+            } else {
+                toTopBtn.classList.remove('visible');
+            }
+        });
 
-function showLevelBanner() {
-  const b = document.getElementById('levelBanner');
-  b.innerHTML = `STAGE CLEAR!<br><span style="font-size: 2rem;">STAGE ${level}</span>`;
-  b.classList.add('show');
-  
-  warpFactor = 1.0; 
-  ambLight.color.setHSL((level * 0.1) % 1.0, 0.8, 0.6); 
+        const observerOptions = { root: null, rootMargin: '0px', threshold: 0.15 };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
 
-  setTimeout(() => { b.classList.remove('show'); }, 2000);
-}
+        document.querySelectorAll('.fade-in-up').forEach(el => observer.observe(el));
 
-function updateLivesUI() {
-  const row = document.getElementById('livesRow');
-  row.innerHTML = '';
-  // ライフの数だけ星マーク（残機）を表示
-  for (let i = 0; i < lives; i++) {
-    const h = document.createElement('span');
-    h.className = 'heart'; h.textContent = '🌟';
-    row.appendChild(h);
-  }
-}
+        const sections = document.querySelectorAll('div[id], section[id]');
+        const navLinks = document.querySelectorAll('.nav-link');
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (window.pageYOffset >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current)) {
+                    link.classList.add('active');
+                }
+            });
+        });
 
-function playerHit() {
-  lives--;
-  updateLivesUI();
-  
-  hitStop = 15; 
-  shakeTime = 20; shakeMag = 15; 
+        btnLaunch.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.body.classList.add('no-scroll');
+            cinemaLayer.classList.add('active');
+            cinemaVideo.currentTime = 0;
+            cinemaVideo.play().catch(error => {
+                console.log("Video playback failed:", error);
+            });
+        });
 
-  if (lives <= 0) {
-    if (player) { player.material.color.set(0xff0000); }
-    setTimeout(() => { triggerGameOver(); }, 300);
-  } else {
-    // ライフが残っている場合は約2秒の無敵時間を与える
-    invincibleTime = 120;
-  }
-}
+        btnCinemaClose.addEventListener('click', () => {
+            cinemaLayer.classList.remove('active');
+            document.body.classList.remove('no-scroll');
+            cinemaVideo.pause();
+            
+            const textBox = cinemaLayer.querySelector('.cinema-text-box');
+            const newTextBox = textBox.cloneNode(true);
+            textBox.parentNode.replaceChild(newTextBox, textBox);
+        });
+    </script>
 
-function clearScene() {
-  [...enemies].forEach(e => scene.remove(e.mesh));
-  enemies.length = 0;
-  [...bullets].forEach(b => scene.remove(b.mesh));
-  bullets.length = 0;
-  [...enemyBullets].forEach(eb => scene.remove(eb.mesh));
-  enemyBullets.length = 0;
-  [...items].forEach(it => scene.remove(it.sprite));
-  items.length = 0;
-  multiShot = 1; speedBoost = 1.0;
-  multiShotTimer = 0; speedTimer = 0;
-}
+    <!-- ===== 今夜の星空指数（大町市・自動取得） ===== -->
+    <script>
+    (function () {
+        // 大町市の緯度経度
+        var LAT = 36.5029, LON = 137.8511;
 
-var PLAYER_SPEED = 6;
+        var SI = {
+            ja: {
+                title: "星空指数", eyebrow: "今夜20時の大町の空", tempLabel: "気温",
+                loading: "今夜の空を観測中…", error: "空のデータを取得できませんでした",
+                note: "大町市・毎日自動更新", locale: "ja-JP",
+                levels: ["", "難しい", "やや難", "まずまず", "良好", "絶好"],
+                comments: ["",
+                    "今夜は星空観賞に不向きです", "雲が多め。星は控えめです",
+                    "雲の隙間から星が顔を出すかも", "きれいな星空が見られそう",
+                    "満天の星が期待できます"],
+                wx: { clear:"快晴", mostlyClear:"晴れ", partlyCloudy:"薄曇り", cloudy:"くもり",
+                      fog:"霧", rain:"雨", snow:"雪", thunder:"雷雨" }
+            },
+            en: {
+                title: "STARGAZING INDEX", eyebrow: "Omachi at 8 PM tonight", tempLabel: "Temp",
+                loading: "Reading tonight's sky…", error: "Couldn't load the sky data",
+                note: "Omachi · updates daily", locale: "en-US",
+                levels: ["", "Tough", "Poor", "Fair", "Great", "Perfect"],
+                comments: ["",
+                    "Not a night for stargazing", "Cloudy — only a few stars",
+                    "Stars may peek through the clouds", "Great conditions for stargazing",
+                    "A sky full of stars awaits"],
+                wx: { clear:"Clear", mostlyClear:"Mostly clear", partlyCloudy:"Partly cloudy",
+                      cloudy:"Cloudy", fog:"Fog", rain:"Rain", snow:"Snow", thunder:"Thunderstorm" }
+            },
+            es: {
+                title: "ÍNDICE DE ESTRELLAS", eyebrow: "Omachi esta noche a las 20:00", tempLabel: "Temp.",
+                loading: "Observando el cielo…", error: "No se pudieron obtener los datos",
+                note: "Omachi · actualización diaria", locale: "es-ES",
+                levels: ["", "Difícil", "Malo", "Regular", "Bueno", "Perfecto"],
+                comments: ["",
+                    "Mala noche para observar", "Nuboso, pocas estrellas",
+                    "Puede que asomen algunas estrellas", "Buenas condiciones para observar",
+                    "Un cielo lleno de estrellas te espera"],
+                wx: { clear:"Despejado", mostlyClear:"Casi despejado", partlyCloudy:"Parcialmente nublado",
+                      cloudy:"Nublado", fog:"Niebla", rain:"Lluvia", snow:"Nieve", thunder:"Tormenta" }
+            },
+            zh: {
+                title: "观星指数", eyebrow: "今夜20点大町的星空", tempLabel: "气温",
+                loading: "正在观测今夜的天空…", error: "无法获取天空数据",
+                note: "大町市·每日自动更新", locale: "zh-CN",
+                levels: ["", "困难", "较差", "一般", "良好", "绝佳"],
+                comments: ["",
+                    "今夜不宜观星", "云较多，星光有限",
+                    "星星或从云隙间探出", "适合观星的好天气",
+                    "满天繁星值得期待"],
+                wx: { clear:"晴", mostlyClear:"大致晴朗", partlyCloudy:"局部多云", cloudy:"多云",
+                      fog:"雾", rain:"雨", snow:"雪", thunder:"雷雨" }
+            },
+            ko: {
+                title: "별하늘 지수", eyebrow: "오늘 밤 20시 오마치의 하늘", tempLabel: "기온",
+                loading: "오늘 밤 하늘 관측 중…", error: "하늘 데이터를 불러올 수 없습니다",
+                note: "오마치시 · 매일 자동 갱신", locale: "ko-KR",
+                levels: ["", "어려움", "나쁨", "보통", "좋음", "최고"],
+                comments: ["",
+                    "오늘 밤은 별 보기 어려워요", "구름이 많아 별이 적어요",
+                    "구름 사이로 별이 보일지도", "별 보기 좋은 밤이에요",
+                    "쏟아지는 별을 기대하세요"],
+                wx: { clear:"맑음", mostlyClear:"대체로 맑음", partlyCloudy:"부분적 흐림", cloudy:"흐림",
+                      fog:"안개", rain:"비", snow:"눈", thunder:"뇌우" }
+            }
+        };
 
-function gameLoop(t) {
-  animId = requestAnimationFrame(gameLoop);
-  
-  let dt = 0;
-  if (lastTime !== 0) {
-      dt = (t - lastTime) / 1000;
-      if (dt > 0.1) dt = 0.016;
-  }
-  lastTime = t;
+        // 現在の言語（保存済みがあれば反映）
+        var curLang = 'ja';
+        try { curLang = localStorage.getItem('selectedLang') || 'ja'; } catch (e) {}
 
-  frameCount++;
-  drawBg(t * 0.001);
+        // 取得結果を保持（言語切替時の再描画用）
+        var state = { status: 'loading', level: 0, wxKey: 'clear', wxIcon: '🌙', temp: null, date: null };
 
-  if (gameState !== 'playing') {
-    renderer.render(scene, camera);
-    return;
-  }
+        function wxFromCode(code) {
+            if (code === 0) return { key: 'clear', icon: '🌙' };
+            if (code === 1) return { key: 'mostlyClear', icon: '🌙' };
+            if (code === 2) return { key: 'partlyCloudy', icon: '☁️' };
+            if (code === 3) return { key: 'cloudy', icon: '☁️' };
+            if (code === 45 || code === 48) return { key: 'fog', icon: '🌫️' };
+            if (code >= 71 && code <= 77) return { key: 'snow', icon: '🌨️' };
+            if (code === 85 || code === 86) return { key: 'snow', icon: '🌨️' };
+            if (code >= 95) return { key: 'thunder', icon: '⛈️' };
+            if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) return { key: 'rain', icon: '🌧️' };
+            return { key: 'cloudy', icon: '☁️' };
+        }
 
-  if (hitStop > 0) {
-    hitStop--;
-    renderer.render(scene, camera); 
-    return;
-  }
+        function levelFromSky(avgCloud, maxPrecip) {
+            var lv;
+            if (avgCloud <= 10) lv = 5;
+            else if (avgCloud <= 25) lv = 4;
+            else if (avgCloud <= 45) lv = 3;
+            else if (avgCloud <= 70) lv = 2;
+            else lv = 1;
+            if (maxPrecip >= 60) lv = Math.min(lv, 1);
+            else if (maxPrecip >= 40) lv = Math.max(1, lv - 2);
+            else if (maxPrecip >= 25) lv = Math.max(1, lv - 1);
+            return lv;
+        }
 
-  if (shakeTime > 0) {
-    shakeTime--;
-    const dx = (Math.random() - 0.5) * shakeMag;
-    const dy = (Math.random() - 0.5) * shakeMag;
-    canvas.style.transform = `translate(${dx}px, ${dy}px)`;
-    shakeMag *= 0.9;
-  } else {
-    canvas.style.transform = 'none';
-  }
+        function render() {
+            var t = SI[curLang] || SI.ja;
+            var $ = function (id) { return document.getElementById(id); };
+            var starsEl = $('starindex-stars');
+            var titleEl = document.querySelector('[data-si="title"]');
+            var eyebrowEl = document.querySelector('[data-si="eyebrow"]');
+            var noteEl = $('starindex-note');
+            if (titleEl) titleEl.innerText = t.title;
+            if (eyebrowEl) eyebrowEl.innerText = t.eyebrow;
+            if (noteEl) noteEl.innerText = t.note;
 
-  stageTime -= dt;
-  if (stageTime <= 0) {
-    level++;
-    stageTime = 30.0;
-    scoreMultiplier = 1 + (level-1) * 0.2;
-    document.getElementById('levelVal').textContent = level;
-    showLevelBanner();
-  }
-  document.getElementById('timeVal').textContent = Math.ceil(stageTime);
+            // 日付
+            var dateEl = $('starindex-date');
+            if (dateEl) {
+                var d = state.date ? new Date(state.date + 'T00:00:00') : new Date();
+                try {
+                    dateEl.innerText = new Intl.DateTimeFormat(t.locale, { month: 'short', day: 'numeric' }).format(d);
+                } catch (e) {
+                    dateEl.innerText = (d.getMonth() + 1) + '/' + d.getDate();
+                }
+            }
 
-  // プレイヤーの無敵時間（点滅）処理
-  if (invincibleTime > 0) {
-    invincibleTime--;
-    if (player) {
-      // 10フレームごとに透明度を切り替えて点滅させる
-      player.material.opacity = (invincibleTime % 10 < 5) ? 0.2 : 1.0;
-    }
-  } else if (player) {
-    player.material.opacity = 1.0;
-  }
+            if (state.status === 'loading') {
+                starsEl.className = 'starindex-stars loading';
+                starsEl.innerText = t.loading;
+                $('starindex-level').innerText = '';
+                $('starindex-comment').innerText = '';
+                return;
+            }
+            if (state.status === 'error') {
+                starsEl.className = 'starindex-stars loading';
+                starsEl.innerText = t.error;
+                $('starindex-level').innerText = '';
+                $('starindex-comment').innerText = '';
+                $('starindex-wx-txt').innerText = '—';
+                $('starindex-temp').innerText = '—';
+                return;
+            }
 
-  if (player) {
-    const spd = (PLAYER_SPEED + level * 0.2) * speedBoost;
-    if ((keys['ArrowLeft'] || keys['a']) && player.position.x > -W()/2 + 40) player.position.x -= spd;
-    if ((keys['ArrowRight'] || keys['d']) && player.position.x < W()/2 - 40) player.position.x += spd;
+            // 星（★=点灯 / ☆=消灯）
+            starsEl.className = 'starindex-stars';
+            var html = '';
+            for (var i = 1; i <= 5; i++) {
+                html += (i <= state.level)
+                    ? '<span class="s-on">★</span>'
+                    : '<span class="s-off">☆</span>';
+            }
+            starsEl.innerHTML = html;
+            starsEl.setAttribute('aria-label', state.level + ' / 5');
 
-    shoot();
-    player.material.rotation = (keys['ArrowLeft'] ? -0.25 : keys['ArrowRight'] ? 0.25 : 0);
-  }
+            $('starindex-level').innerText = t.levels[state.level];
+            $('starindex-comment').innerText = t.comments[state.level];
+            $('starindex-wx-ico').innerText = state.wxIcon;
+            $('starindex-wx-txt').innerText = t.wx[state.wxKey] || t.wx.cloudy;
+            $('starindex-temp').innerText = (state.temp === null)
+                ? '—'
+                : t.tempLabel + ' ' + Math.round(state.temp) + '℃';
+        }
 
-  updateBullets();
-  updateEnemies();
-  updateItems();
-  checkCollisions();
+        function fetchSky() {
+            var url = 'https://api.open-meteo.com/v1/forecast'
+                + '?latitude=' + LAT + '&longitude=' + LON
+                + '&current=temperature_2m,weather_code,cloud_cover'
+                + '&hourly=cloud_cover,temperature_2m,precipitation_probability,weather_code'
+                + '&timezone=Asia%2FTokyo&forecast_days=2';
 
-  renderer.render(scene, camera);
-}
+            fetch(url)
+                .then(function (r) { if (!r.ok) throw new Error('http'); return r.json(); })
+                .then(function (data) {
+                    var h = data.hourly, now = data.current.time;
+                    var times = h.time, cc = h.cloud_cover, tp = h.temperature_2m,
+                        pp = h.precipitation_probability, wc = h.weather_code;
+                    var today = now.slice(0, 10);
 
-window.addEventListener('keydown', e => {
-  keys[e.key] = true;
-  if (e.key === ' ') e.preventDefault();
-});
-window.addEventListener('keyup', e => { keys[e.key] = false; });
+                    // 今夜20時ちょうどの予報で判定
+                    var idx = times.indexOf(today + 'T20:00');
+                    if (idx < 0) idx = times.findIndex(function (x) { return x >= today + 'T20:00'; });
+                    if (idx < 0) idx = times.findIndex(function (x) { return x >= now; });
+                    if (idx < 0) idx = 0;
 
-function handleTouchMove(e) {
-  if (gameState !== 'playing' || !player) return;
-  e.preventDefault(); 
-  
-  const touch = e.touches[0];
-  const rect = canvas.getBoundingClientRect();
-  const screenX = touch.clientX - rect.left;
-  const worldX = (screenX / rect.width) * W() - W() / 2;
-  
-  player.position.x = Math.max(-W()/2 + 40, Math.min(W()/2 - 40, worldX));
-}
-canvas.addEventListener('touchstart', handleTouchMove, { passive: false });
-canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+                    var cloud = cc[idx] != null ? cc[idx] : data.current.cloud_cover;
+                    var precip = (pp && pp[idx] != null) ? pp[idx] : 0;
 
-initBg();
-refreshRanking();
-showScreen('titleScreen');
-requestAnimationFrame(gameLoop);
-</script>
+                    var repCode = wc[idx] != null ? wc[idx] : data.current.weather_code;
+                    var wx = wxFromCode(repCode);
+                    var eveTemp = tp[idx] != null ? tp[idx] : data.current.temperature_2m;
 
+                    state.status = 'ok';
+                    state.level = levelFromSky(cloud, precip);
+                    state.wxKey = wx.key;
+                    state.wxIcon = wx.icon;
+                    state.temp = eveTemp;
+                    state.date = today;
+                    render();
+                })
+                .catch(function () {
+                    state.status = 'error';
+                    render();
+                });
+        }
+
+        // 言語切替に追従（既存の changeLanguage をラップ）
+        function hook() {
+            if (typeof window.changeLanguage === 'function' && !window.changeLanguage.__siWrapped) {
+                var orig = window.changeLanguage;
+                window.changeLanguage = function (lang) {
+                    orig(lang);
+                    curLang = lang;
+                    render();
+                };
+                window.changeLanguage.__siWrapped = true;
+            }
+        }
+
+        hook();
+        render();     // 初期表示（読み込み中）
+        fetchSky();   // 天気を取得
+    })();
+    </script>
+
+    <!-- ===== 星の彗星アニメーション ===== -->
+    <script>
+    (function () {
+        var COMETS_ENABLED = false;   // ← 星を再表示したいときは true に
+        var field = document.getElementById('comet-field');
+        if (!field || !COMETS_ENABLED) return;
+
+        var faces = [
+            'star_1_happy.png',
+            'star_2_open.png',
+            'star_3_sparkle.png',
+            'star_4_surprised.png',
+            'star_5_wink.png'
+        ];
+        var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        // 画面幅で彗星の数を調整
+        var COUNT = window.innerWidth < 768 ? 3 : 5;
+        var comets = [];
+
+        function rand(a, b) { return a + Math.random() * (b - a); }
+
+        for (var i = 0; i < COUNT; i++) {
+            var el = document.createElement('div');
+            el.className = 'comet';
+            var tail = document.createElement('div');
+            tail.className = 'comet-tail';
+            var img = document.createElement('img');
+            img.className = 'comet-star';
+            img.src = faces[i % faces.length];
+            img.alt = '';
+            img.draggable = false;
+            el.appendChild(tail);
+            el.appendChild(img);
+            field.appendChild(el);
+
+            var size = rand(38, 68);
+            img.style.width = size + 'px';
+            var speed = reduce ? rand(0.15, 0.3) : rand(0.7, 1.9);
+            var dir = Math.random() * Math.PI * 2;
+            comets.push({
+                el: el, tail: tail, img: img, size: size,
+                x: rand(size, window.innerWidth - size),
+                y: rand(size, window.innerHeight - size),
+                vx: Math.cos(dir) * speed,
+                vy: Math.sin(dir) * speed * 0.6,
+                phase: rand(0, Math.PI * 2),
+                wobble: rand(6, 12)
+            });
+        }
+
+        function frame(t) {
+            var W = window.innerWidth, H = window.innerHeight;
+            for (var i = 0; i < comets.length; i++) {
+                var c = comets[i];
+                c.x += c.vx;
+                c.y += c.vy;
+                // 画面端で反射 → 行ったり来たり
+                if (c.x < 0) { c.x = 0; c.vx = Math.abs(c.vx); }
+                else if (c.x > W) { c.x = W; c.vx = -Math.abs(c.vx); }
+                if (c.y < 0) { c.y = 0; c.vy = Math.abs(c.vy); }
+                else if (c.y > H) { c.y = H; c.vy = -Math.abs(c.vy); }
+
+                // 進行方向（尾はその反対に伸ばす）
+                var ang = Math.atan2(c.vy, c.vx) * 180 / Math.PI;
+                c.el.style.transform = 'translate(' + c.x + 'px,' + c.y + 'px)';
+                c.tail.style.transform = 'rotate(' + (ang + 180) + 'deg)';
+                // 星をふわっと揺らす
+                var w = Math.sin(t / 600 + c.phase) * c.wobble;
+                c.img.style.transform = 'translate(-50%,-50%) rotate(' + w + 'deg)';
+            }
+            requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+
+        // ウィンドウリサイズで彗星を画面内に収める
+        window.addEventListener('resize', function () {
+            var W = window.innerWidth, H = window.innerHeight;
+            for (var i = 0; i < comets.length; i++) {
+                comets[i].x = Math.min(comets[i].x, W);
+                comets[i].y = Math.min(comets[i].y, H);
+            }
+        });
+    })();
+    </script>
 </body>
 </html>
