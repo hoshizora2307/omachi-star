@@ -345,6 +345,99 @@
             transform: scale(1.03);
         }
 
+        #news-preview {
+            margin-bottom: 80px;
+        }
+        
+        .news-preview-container {
+            max-width: 650px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border: 1px solid rgba(230, 194, 122, 0.4);
+            border-radius: 12px;
+            padding: 30px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+
+        #news-preview-list {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        #news-preview-list li {
+            border-bottom: 1px dashed rgba(255,255,255,0.15);
+            padding: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        #news-preview-list li:last-child {
+            border-bottom: none;
+        }
+
+        .preview-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 170px;
+        }
+
+        .preview-date {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.85rem;
+            font-family: 'Zen Maru Gothic', sans-serif;
+        }
+
+        .preview-cat {
+            background: rgba(230, 194, 122, 0.15);
+            color: var(--accent-gold);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+        }
+
+        .preview-title {
+            font-size: 0.95rem;
+            color: #fff;
+            text-decoration: none;
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            transition: color 0.3s;
+            font-family: 'Kiwi Maru', serif;
+        }
+
+        .preview-title:hover {
+            color: var(--accent-gold);
+        }
+
+        .news-more {
+            text-align: right;
+            margin-top: 10px;
+        }
+
+        #btn-news-more {
+            color: var(--accent-gold);
+            text-decoration: none;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            transition: opacity 0.3s;
+        }
+
+        #btn-news-more:hover {
+            opacity: 0.7;
+        }
+
+        @media (max-width: 768px) {
+            .news-preview-container { padding: 20px 15px; }
+            #news-preview-list li { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .preview-title { white-space: normal; line-height: 1.4; }
+        }
+
         #moon-phase {
             margin-bottom: 80px;
         }
@@ -782,6 +875,16 @@
         </div>
 
         <div class="container">
+            <section id="news-preview" class="fade-in-up">
+                <h2 class="sec-title" id="txt-news-sec-title">NEWS</h2>
+                <div class="news-preview-container">
+                    <ul id="news-preview-list"></ul>
+                    <div class="news-more">
+                        <a href="news.html" id="btn-news-more">お知らせ一覧へ <span>▶</span></a>
+                    </div>
+                </div>
+            </section>
+
             <section id="moon-phase" class="fade-in-up">
                 <h2 class="sec-title" id="txt-moon-sec-title">TODAY'S MOON</h2>
                 <div class="moon-card">
@@ -802,7 +905,7 @@
                     </a>
                     <div class="partner-card" id="p2">薬師の湯</div>
                     <div class="partner-card">ねるだけ</div>
-                    <div class="partner-card" id="p4">大町温泉郷観光協会</div>
+                    <a href="https://www.omachionsen.jp/" target="_blank" rel="noopener noreferrer" class="partner-card" id="p4" style="text-decoration: none; color: inherit;">大町温泉郷観光協会</a>
                 </div>
             </section>
         </div>
@@ -835,6 +938,7 @@
         </div>
     </div>
 
+    <script src="newsData.js"></script>
     <script>
         const translations = {
             ja: {
@@ -862,7 +966,9 @@
                 `,
                 moonSecTitle: "TODAY'S MOON",
                 moonAgeLabel: "月齢",
-                moonPhases: ["新月", "三日月", "上弦の月", "十三夜", "満月", "居待月", "下弦の月", "二十六夜"]
+                moonPhases: ["新月", "三日月", "上弦の月", "十三夜", "満月", "居待月", "下弦の月", "二十六夜"],
+                newsSecTitle: "NEWS",
+                newsMore: "お知らせ一覧へ"
             },
             en: {
                 projectTag: "Hoshi to Kimi Project",
@@ -889,7 +995,9 @@
                 `,
                 moonSecTitle: "TODAY'S MOON",
                 moonAgeLabel: "Moon Age",
-                moonPhases: ["New Moon", "Waxing Crescent", "First Quarter", "Waxing Gibbous", "Full Moon", "Waning Gibbous", "Last Quarter", "Waning Crescent"]
+                moonPhases: ["New Moon", "Waxing Crescent", "First Quarter", "Waxing Gibbous", "Full Moon", "Waning Gibbous", "Last Quarter", "Waning Crescent"],
+                newsSecTitle: "NEWS",
+                newsMore: "More News"
             },
             es: {
                 projectTag: "Proyecto Hoshi to Kimi",
@@ -916,7 +1024,9 @@
                 `,
                 moonSecTitle: "LA LUNA DE HOY",
                 moonAgeLabel: "Edad Lunar",
-                moonPhases: ["Luna Nueva", "Luna Creciente", "Cuarto Creciente", "Luna Gibosa Creciente", "Luna Llena", "Luna Gibosa Menguante", "Cuarto Menguante", "Luna Menguante"]
+                moonPhases: ["Luna Nueva", "Luna Creciente", "Cuarto Creciente", "Luna Gibosa Creciente", "Luna Llena", "Luna Gibosa Menguante", "Cuarto Menguante", "Luna Menguante"],
+                newsSecTitle: "NOTICIAS",
+                newsMore: "Más Noticias"
             },
             zh: {
                 projectTag: "星星与你企划",
@@ -943,7 +1053,9 @@
                 `,
                 moonSecTitle: "今日月相",
                 moonAgeLabel: "月龄",
-                moonPhases: ["新月", "娥眉月", "上弦月", "盈凸月", "满月", "亏凸月", "下弦月", "残月"]
+                moonPhases: ["新月", "娥眉月", "上弦月", "盈凸月", "满月", "亏凸月", "下弦月", "残月"],
+                newsSecTitle: "最新消息",
+                newsMore: "更多消息"
             },
             ko: {
                 projectTag: "별과 당신 프로젝트",
@@ -970,7 +1082,9 @@
                 `,
                 moonSecTitle: "오늘의 달",
                 moonAgeLabel: "월령",
-                moonPhases: ["신월", "초승달", "상현달", "차오르는 달", "보름달", "이지러지는 달", "하현달", "그믐달"]
+                moonPhases: ["신월", "초승달", "상현달", "차오르는 달", "보름달", "이지러지는 달", "하현달", "그믐달"],
+                newsSecTitle: "뉴스",
+                newsMore: "뉴스 더보기"
             }
         };
 
@@ -998,6 +1112,9 @@
             document.getElementById('txt-moon-sec-title').innerText = translations[lang].moonSecTitle;
             document.getElementById('txt-moon-age-label').innerText = translations[lang].moonAgeLabel;
             
+            document.getElementById('txt-news-sec-title').innerText = translations[lang].newsSecTitle;
+            document.getElementById('btn-news-more').innerHTML = translations[lang].newsMore + ' <span>▶</span>';
+
             const currentPhaseIndex = document.getElementById('moon-visual').dataset.phaseIndex || 0;
             document.getElementById('moon-name').innerText = translations[lang].moonPhases[currentPhaseIndex];
 
@@ -1132,6 +1249,26 @@
         }
 
         document.addEventListener('DOMContentLoaded', initMoonPhase);
+
+        function initNewsPreview() {
+            const listEl = document.getElementById('news-preview-list');
+            if(!listEl || typeof newsData === 'undefined') return;
+
+            const topNews = newsData.slice(0, 2);
+            
+            topNews.forEach(news => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <div class="preview-meta">
+                        <span class="preview-date">${news.date}</span>
+                        <span class="preview-cat">${news.category}</span>
+                    </div>
+                    <a href="news.html" class="preview-title">${news.title}</a>
+                `;
+                listEl.appendChild(li);
+            });
+        }
+        document.addEventListener('DOMContentLoaded', initNewsPreview);
     </script>
 
     <script>
