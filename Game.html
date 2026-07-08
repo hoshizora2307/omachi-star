@@ -52,12 +52,14 @@
     text-shadow: 0 0 8px rgba(255,220,80,0.5);
     white-space: nowrap;
     transition: transform 0.1s;
+    display: flex;
+    align-items: center;
   }
-  .hud-box span { font-size: 1.3rem; font-weight: bold; }
+  .hud-box span { font-size: 1.3rem; font-weight: bold; margin-left: 6px; }
   .hud-time { color: #64ffb4; border-color: rgba(100,255,180,0.35); }
   .hud-time span { color: #fff; text-shadow: 0 0 8px #64ffb4; }
-  #livesRow { display: flex; gap: 4px; align-items: center; }
-  .heart { font-size: 1.2rem; }
+  #livesRow { display: flex; gap: 4px; margin-left: 8px; }
+  .heart { font-size: 1.2rem; filter: drop-shadow(0 0 4px #ffd700); }
 
   .screen {
     position: fixed; inset: 0;
@@ -251,11 +253,11 @@
 
 <div id="ui">
   <div id="hud">
-    <div class="hud-box" id="scoreBox">スコア <span id="scoreVal">0</span></div>
+    <div class="hud-box" id="scoreBox">SCORE <span id="scoreVal">0</span></div>
     <div class="hud-box">LEVEL <span id="levelVal">1</span></div>
     <div class="hud-box hud-time">TIME <span id="timeVal">30</span></div>
     <div class="hud-box">
-      <div id="livesRow"></div>
+      LIFE <div id="livesRow"></div>
     </div>
   </div>
 </div>
@@ -311,7 +313,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
 <script>
-// 古いコードと重複しないようにすべての変数を新しく定義します
+// ==========================================
+// グローバル変数の宣言
+// ==========================================
 var keys = {};
 var gameState = 'title'; 
 var score = 0;
@@ -329,6 +333,7 @@ var shakeTime = 0;
 var shakeMag = 0;
 var hitStop = 0;
 var warpFactor = 0;
+var invincibleTime = 0; // 追加：無敵時間
 
 var SUPABASE_URL = 'https://ufjojhraqyzqqzlkokwd.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_ha-q_6WBEngyBT3dOLMJQQ_EZsVSGI6';
@@ -441,6 +446,7 @@ window.startGame = function() {
   lastShotFrame = 0; lastEnemyFrame = 0; scoreMultiplier = 1;
   stageTime = 30.0; lastTime = 0;
   warpFactor = 0; ambLight.color.setHex(0x8888cc); 
+  invincibleTime = 0;
   
   document.getElementById('scoreVal').textContent = '0';
   document.getElementById('levelVal').textContent = '1';
@@ -578,6 +584,9 @@ function createPlayer() {
   player = playerSprite;
 }
 
+// ------------------------------------------
+// 弾（味方・敵）の設定
+// ------------------------------------------
 var bullets = [];
 var bulletGeo = new THREE.IcosahedronGeometry(4, 0); 
 var bulletMatSingle = new THREE.MeshStandardMaterial({
@@ -585,6 +594,12 @@ var bulletMatSingle = new THREE.MeshStandardMaterial({
 });
 var bulletMatMulti = new THREE.MeshStandardMaterial({
   color: 0x88ffee, emissive: 0x00aa88, emissiveIntensity: 1.5, metalness: 0.2, roughness: 0.3
+});
+
+var enemyBullets = [];
+var enemyBulletGeo = new THREE.SphereGeometry(6, 8, 8);
+var enemyBulletMat = new THREE.MeshStandardMaterial({
+  color: 0xff0044, emissive: 0xff0000, emissiveIntensity: 2, roughness: 0.2
 });
 
 function shoot() {
@@ -604,7 +619,25 @@ function shoot() {
   });
 }
 
+function spawnEnemyBullet(x, y) {
+  var mesh = new THREE.Mesh(enemyBulletGeo, enemyBulletMat);
+  mesh.position.set(x, y - 20, 0);
+  scene.add(mesh);
+  
+  // 少しプレイヤーを狙う
+  var vx = 0;
+  var speed = 5 + level * 0.5;
+  if (player && Math.random() < 0.4) {
+     var dx = player.position.x - x;
+     var dy = player.position.y - y;
+     var dist = Math.sqrt(dx*dx + dy*dy);
+     vx = (dx / dist) * speed * 0.4;
+  }
+  enemyBullets.push({ mesh, vx: vx, vy: -speed });
+}
+
 function updateBullets() {
+  // 味方の弾
   for (let i = bullets.length-1; i >= 0; i--) {
     const b = bullets[i];
     b.mesh.position.y += b.vy;
@@ -615,8 +648,21 @@ function updateBullets() {
       bullets.splice(i, 1);
     }
   }
+  // 敵の弾
+  for (let i = enemyBullets.length-1; i >= 0; i--) {
+    const eb = enemyBullets[i];
+    eb.mesh.position.y += eb.vy;
+    eb.mesh.position.x += eb.vx;
+    if (eb.mesh.position.y < -H()/2 - 30) {
+      scene.remove(eb.mesh);
+      enemyBullets.splice(i, 1);
+    }
+  }
 }
 
+// ------------------------------------------
+// 敵の設定
+// ------------------------------------------
 var enemies = [];
 var ENEMY_TYPES = [
   { geo: () => new THREE.TetrahedronGeometry(1, 0),      color: 0xff2244, em: 0x880011, size:28, hp:1, pts:100, speed:1.8 },
@@ -645,9 +691,10 @@ function spawnEnemy() {
   const drift = (Math.random() - 0.5) * 2.5;
   const driftFreq = 0.02 + Math.random() * 0.03;
   const spd = (t.speed + level * 0.15) * (0.8 + Math.random() * 0.4);
+  const shootTimer = Math.floor(Math.random() * 60) + 30; // 射撃間隔
 
   scene.add(mesh);
-  enemies.push({ mesh, vy: -spd, drift, driftFreq, hp: t.hp, maxHp: t.hp, pts: t.pts, size: s, rx:Math.random()*0.06-0.03, ry:Math.random()*0.06-0.03 });
+  enemies.push({ mesh, vy: -spd, drift, driftFreq, hp: t.hp, maxHp: t.hp, pts: t.pts, size: s, rx:Math.random()*0.06-0.03, ry:Math.random()*0.06-0.03, shootTimer });
 }
 
 function updateEnemies() {
@@ -664,6 +711,13 @@ function updateEnemies() {
     e.mesh.position.x += Math.sin(frameCount * e.driftFreq) * e.drift;
     e.mesh.rotation.x += e.rx;
     e.mesh.rotation.y += e.ry;
+    
+    // 敵の射撃処理
+    e.shootTimer--;
+    if (e.shootTimer <= 0) {
+      spawnEnemyBullet(e.mesh.position.x, e.mesh.position.y);
+      e.shootTimer = Math.floor(Math.random() * 100) + 60 - Math.min(level * 5, 40);
+    }
 
     if (e.mesh.position.y < -H()/2 - e.size - 10) {
       scene.remove(e.mesh);
@@ -672,6 +726,9 @@ function updateEnemies() {
   }
 }
 
+// ------------------------------------------
+// アイテム・エフェクト関連
+// ------------------------------------------
 function spawnItem() {
   const isLemon = Math.random() < 0.5;
   const tex = isLemon ? lemonTexture : mintTexture;
@@ -731,7 +788,24 @@ function spawnDamageText(worldX, worldY, amount, color = '#fff') {
   setTimeout(() => el.remove(), 800);
 }
 
+function spawnExplosion(worldX, worldY, emoji) {
+  const emojis = emoji ? [emoji] : ['✨','💫','⭐','🌟'];
+  for (let i = 0; i < 3; i++) {
+    const el = document.createElement('div');
+    el.className = 'explosion';
+    el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    el.style.left = (worldX + W()/2 + (Math.random()-0.5)*40) + 'px';
+    el.style.top  = (H()/2 - worldY + (Math.random()-0.5)*40) + 'px';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 700);
+  }
+}
+
+// ------------------------------------------
+// 当たり判定・ゲーム進行
+// ------------------------------------------
 function checkCollisions() {
+  // 味方の弾 → 敵
   for (let bi = bullets.length-1; bi >= 0; bi--) {
     const b = bullets[bi];
     for (let ei = enemies.length-1; ei >= 0; ei--) {
@@ -761,44 +835,49 @@ function checkCollisions() {
     }
   }
 
-  if (player) {
-    for (let i = items.length-1; i >= 0; i--) {
-      const it = items[i];
-      const dist = Math.sqrt((player.position.x - it.sprite.position.x)**2 + (player.position.y - it.sprite.position.y)**2);
-      if (dist < 50) {
-        scene.remove(it.sprite);
-        items.splice(i, 1);
-        if (it.type === 'multishot') { multiShot = Math.min(5, multiShot + 1); multiShotTimer = ITEM_DURATION; } 
-        else { speedBoost = Math.min(2.5, speedBoost + 0.4); speedTimer = ITEM_DURATION; }
-        spawnExplosion(it.sprite.position.x, it.sprite.position.y, '🌟');
-        showItemGet(it.type);
+  if (!player) return;
+
+  // プレイヤーがアイテムを取ったか
+  for (let i = items.length-1; i >= 0; i--) {
+    const it = items[i];
+    const dist = Math.sqrt((player.position.x - it.sprite.position.x)**2 + (player.position.y - it.sprite.position.y)**2);
+    if (dist < 50) {
+      scene.remove(it.sprite);
+      items.splice(i, 1);
+      if (it.type === 'multishot') { multiShot = Math.min(5, multiShot + 1); multiShotTimer = ITEM_DURATION; } 
+      else { speedBoost = Math.min(2.5, speedBoost + 0.4); speedTimer = ITEM_DURATION; }
+      spawnExplosion(it.sprite.position.x, it.sprite.position.y, '🌟');
+      showItemGet(it.type);
+    }
+  }
+
+  // 無敵中はダメージを受けない
+  if (invincibleTime <= 0) {
+    // 敵の体当たり → プレイヤー
+    for (let ei = enemies.length-1; ei >= 0; ei--) {
+      const e = enemies[ei];
+      const dist = Math.sqrt((player.position.x - e.mesh.position.x)**2 + (player.position.y - e.mesh.position.y)**2);
+      if (dist < e.size * 0.7 + 22) {
+        scene.remove(e.mesh);
+        enemies.splice(ei, 1);
+        spawnExplosion(player.position.x, player.position.y, '💥');
+        playerHit();
+        return; // 一度に複数ダメージを受けないように抜ける
       }
     }
-  }
 
-  if (!player) return;
-  for (let ei = enemies.length-1; ei >= 0; ei--) {
-    const e = enemies[ei];
-    const dist = Math.sqrt((player.position.x - e.mesh.position.x)**2 + (player.position.y - e.mesh.position.y)**2);
-    if (dist < e.size * 0.7 + 22) {
-      scene.remove(e.mesh);
-      enemies.splice(ei, 1);
-      spawnExplosion(player.position.x, player.position.y, '💥');
-      playerHit();
+    // 敵のミサイル弾 → プレイヤー
+    for (let i = enemyBullets.length-1; i >= 0; i--) {
+      const eb = enemyBullets[i];
+      const dist = Math.sqrt((player.position.x - eb.mesh.position.x)**2 + (player.position.y - eb.mesh.position.y)**2);
+      if (dist < 22) {
+        scene.remove(eb.mesh);
+        enemyBullets.splice(i, 1);
+        spawnExplosion(player.position.x, player.position.y, '💥');
+        playerHit();
+        return; // 一度に複数ダメージを受けないように抜ける
+      }
     }
-  }
-}
-
-function spawnExplosion(worldX, worldY, emoji) {
-  const emojis = emoji ? [emoji] : ['✨','💫','⭐','🌟'];
-  for (let i = 0; i < 3; i++) {
-    const el = document.createElement('div');
-    el.className = 'explosion';
-    el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-    el.style.left = (worldX + W()/2 + (Math.random()-0.5)*40) + 'px';
-    el.style.top  = (H()/2 - worldY + (Math.random()-0.5)*40) + 'px';
-    document.body.appendChild(el);
-    setTimeout(() => el.remove(), 700);
   }
 }
 
@@ -824,9 +903,10 @@ function showLevelBanner() {
 function updateLivesUI() {
   const row = document.getElementById('livesRow');
   row.innerHTML = '';
+  // ライフの数だけ星マーク（残機）を表示
   for (let i = 0; i < lives; i++) {
     const h = document.createElement('span');
-    h.className = 'heart'; h.textContent = '⭐';
+    h.className = 'heart'; h.textContent = '🌟';
     row.appendChild(h);
   }
 }
@@ -838,11 +918,26 @@ function playerHit() {
   hitStop = 15; 
   shakeTime = 20; shakeMag = 15; 
 
-  if (player) {
-    player.material.color.set(0xff0000);
-    setTimeout(() => { if (player) player.material.color.set(0xffffff); }, 300);
+  if (lives <= 0) {
+    if (player) { player.material.color.set(0xff0000); }
+    setTimeout(() => { triggerGameOver(); }, 300);
+  } else {
+    // ライフが残っている場合は約2秒の無敵時間を与える
+    invincibleTime = 120;
   }
-  if (lives <= 0) triggerGameOver();
+}
+
+function clearScene() {
+  [...enemies].forEach(e => scene.remove(e.mesh));
+  enemies.length = 0;
+  [...bullets].forEach(b => scene.remove(b.mesh));
+  bullets.length = 0;
+  [...enemyBullets].forEach(eb => scene.remove(eb.mesh));
+  enemyBullets.length = 0;
+  [...items].forEach(it => scene.remove(it.sprite));
+  items.length = 0;
+  multiShot = 1; speedBoost = 1.0;
+  multiShotTimer = 0; speedTimer = 0;
 }
 
 var PLAYER_SPEED = 6;
@@ -891,6 +986,17 @@ function gameLoop(t) {
   }
   document.getElementById('timeVal').textContent = Math.ceil(stageTime);
 
+  // プレイヤーの無敵時間（点滅）処理
+  if (invincibleTime > 0) {
+    invincibleTime--;
+    if (player) {
+      // 10フレームごとに透明度を切り替えて点滅させる
+      player.material.opacity = (invincibleTime % 10 < 5) ? 0.2 : 1.0;
+    }
+  } else if (player) {
+    player.material.opacity = 1.0;
+  }
+
   if (player) {
     const spd = (PLAYER_SPEED + level * 0.2) * speedBoost;
     if ((keys['ArrowLeft'] || keys['a']) && player.position.x > -W()/2 + 40) player.position.x -= spd;
@@ -906,17 +1012,6 @@ function gameLoop(t) {
   checkCollisions();
 
   renderer.render(scene, camera);
-}
-
-function clearScene() {
-  [...enemies].forEach(e => scene.remove(e.mesh));
-  enemies.length = 0;
-  [...bullets].forEach(b => scene.remove(b.mesh));
-  bullets.length = 0;
-  [...items].forEach(it => scene.remove(it.sprite));
-  items.length = 0;
-  multiShot = 1; speedBoost = 1.0;
-  multiShotTimer = 0; speedTimer = 0;
 }
 
 window.addEventListener('keydown', e => {
