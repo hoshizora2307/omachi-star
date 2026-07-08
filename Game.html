@@ -676,7 +676,6 @@
             .nav-container { gap: 8px; }
             .project-logo-img { height: 52px; }
         }
-        /* ===== 今夜の星空指数 ===== */
         .starindex-container { padding-top: 60px; padding-bottom: 20px; }
 
         .starindex-card {
@@ -1161,10 +1160,8 @@
         });
     </script>
 
-    <!-- ===== 今夜の星空指数（大町市・自動取得） ===== -->
     <script>
     (function () {
-        // 大町市の緯度経度
         var LAT = 36.5029, LON = 137.8511;
 
         var SI = {
@@ -1230,11 +1227,9 @@
             }
         };
 
-        // 現在の言語（保存済みがあれば反映）
         var curLang = 'ja';
         try { curLang = localStorage.getItem('selectedLang') || 'ja'; } catch (e) {}
 
-        // 取得結果を保持（言語切替時の再描画用）
         var state = { status: 'loading', level: 0, wxKey: 'clear', wxIcon: '🌙', temp: null, date: null };
 
         function wxFromCode(code) {
@@ -1274,7 +1269,6 @@
             if (eyebrowEl) eyebrowEl.innerText = t.eyebrow;
             if (noteEl) noteEl.innerText = t.note;
 
-            // 日付
             var dateEl = $('starindex-date');
             if (dateEl) {
                 var d = state.date ? new Date(state.date + 'T00:00:00') : new Date();
@@ -1302,7 +1296,6 @@
                 return;
             }
 
-            // 星（★=点灯 / ☆=消灯）
             starsEl.className = 'starindex-stars';
             var html = '';
             for (var i = 1; i <= 5; i++) {
@@ -1332,12 +1325,12 @@
             fetch(url)
                 .then(function (r) { if (!r.ok) throw new Error('http'); return r.json(); })
                 .then(function (data) {
+                    if (!data || !data.hourly || !data.current) throw new Error('bad-data');
                     var h = data.hourly, now = data.current.time;
                     var times = h.time, cc = h.cloud_cover, tp = h.temperature_2m,
                         pp = h.precipitation_probability, wc = h.weather_code;
                     var today = now.slice(0, 10);
 
-                    // 今夜20時ちょうどの予報で判定
                     var idx = times.indexOf(today + 'T20:00');
                     if (idx < 0) idx = times.findIndex(function (x) { return x >= today + 'T20:00'; });
                     if (idx < 0) idx = times.findIndex(function (x) { return x >= now; });
@@ -1358,13 +1351,13 @@
                     state.date = today;
                     render();
                 })
-                .catch(function () {
+                .catch(function (err) {
+                    console.error('[starindex] weather fetch failed:', err);
                     state.status = 'error';
                     render();
                 });
         }
 
-        // 言語切替に追従（既存の changeLanguage をラップ）
         function hook() {
             if (typeof window.changeLanguage === 'function' && !window.changeLanguage.__siWrapped) {
                 var orig = window.changeLanguage;
@@ -1377,9 +1370,25 @@
             }
         }
 
+        function reveal() {
+            var sec = document.getElementById('starindex');
+            if (!sec) return;
+            if ('IntersectionObserver' in window) {
+                var io = new IntersectionObserver(function (entries) {
+                    entries.forEach(function (e) {
+                        if (e.isIntersecting) { sec.classList.add('visible'); io.disconnect(); }
+                    });
+                }, { threshold: 0.1 });
+                io.observe(sec);
+            }
+            // 保険：監視が効かない環境でも必ず表示する
+            setTimeout(function () { sec.classList.add('visible'); }, 1000);
+        }
+
         hook();
-        render();     // 初期表示（読み込み中）
-        fetchSky();   // 天気を取得
+        reveal();
+        render();
+        fetchSky();
     })();
     </script>
 
