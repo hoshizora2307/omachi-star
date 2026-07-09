@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>大町温泉郷 星空観賞会 ～銀河の旅人～</title>
-    <!-- ▼ 提供いただいた画像（fabi_2.pngベースのimage_7.png）をファビコンに設定 ▼ -->
-    <link rel="icon" href="fabi_2.png" type="image/png">
+    <!-- ▼ ご指定いただいたファビコン設定を反映 ▼ -->
+    <link rel="icon" href="fabi.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@500&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -58,48 +58,6 @@
             height: 100vh;
             background: radial-gradient(circle at center, transparent 20%, var(--bg-overlay) 80%);
             z-index: -1;
-        }
-
-        #comet-field {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            overflow: hidden;
-            pointer-events: none;
-        }
-        .comet {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 0;
-            height: 0;
-            will-change: transform;
-        }
-        .comet-tail {
-            position: absolute;
-            left: 0;
-            top: -4px;
-            width: 190px;
-            height: 8px;
-            transform-origin: 0 50%;
-            border-radius: 8px;
-            filter: blur(2.5px);
-            background: linear-gradient(90deg,
-                rgba(255, 244, 214, 0.95) 0%,
-                rgba(230, 194, 122, 0.55) 22%,
-                rgba(123, 242, 255, 0.22) 55%,
-                rgba(123, 242, 255, 0) 100%);
-        }
-        .comet-star {
-            position: absolute;
-            left: 0;
-            top: 0;
-            transform: translate(-50%, -50%);
-            filter: drop-shadow(0 0 7px rgba(230, 194, 122, 0.65))
-                    drop-shadow(0 0 15px rgba(123, 242, 255, 0.35));
-        }
-        @media (max-width: 768px) {
-            .comet-tail { width: 130px; height: 6px; }
         }
 
         header {
@@ -873,6 +831,85 @@
             letter-spacing: 4px;
             font-family: 'Kiwi Maru', serif;
         }
+        
+        /* ▼ ガイドキャラクター用の追加スタイル ▼ */
+        .grid-10 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .grid-10 .partner-card {
+            font-size: 0.8rem;
+            padding: 10px;
+            text-align: left;
+            justify-content: flex-start;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .grid-10 .char-id {
+            color: #718096;
+            font-size: 0.7rem;
+            margin-bottom: 4px;
+        }
+        .grid-10 .char-name {
+            color: #fff;
+            font-weight: bold;
+            font-size: 1rem;
+            margin-bottom: 6px;
+        }
+        .grid-10 .char-desc {
+            color: #cbd5e1;
+            font-size: 0.75rem;
+            line-height: 1.4;
+        }
+        
+        /* ▼ 新しい友達（ミルキースター）用のスタイル ▼ */
+        .new-friend-entry {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: var(--card-bg);
+            border: 1px solid var(--accent-gold);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+        .new-friend-entry img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-gold);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+        .new-friend-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .new-friend-label {
+            color: var(--kids-cyan);
+            font-size: 0.8rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+        .new-friend-name {
+            color: #fff;
+            font-size: 1.4rem;
+            font-weight: bold;
+            font-family: 'Kiwi Maru', serif;
+        }
+        .new-friend-desc {
+            color: #cbd5e1;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 480px) {
+            .grid-10 { grid-template-columns: 1fr; }
+            .new-friend-entry { flex-direction: column; text-align: center; }
+            .new-friend-info { align-items: center; }
+        }
     </style>
 </head>
 <body>
@@ -881,8 +918,6 @@
         <source src="5963.mp4" type="video/mp4">
     </video>
     <div class="overlay"></div>
-
-    <div id="comet-field" aria-hidden="true"></div>
 
     <header id="main-header">
         <a href="#" class="logo">
@@ -964,8 +999,33 @@
 
             <section id="partners" class="fade-in-up">
                 <h2 class="sec-title" id="txt-partner-title">PARTNERS</h2>
-                <div class="partner-grid">
-                    <a href="https://www.keisui.jp/" target="_blank" rel="noopener noreferrer" class="partner-card partner-logo-card" id="p1" aria-label="緑翠亭 景水 公式サイト（新しいタブで開きます）">
+                
+                <!-- ▼ ガイドキャラクター 10人 ▼ -->
+                <div class="partner-grid grid-10" style="margin-bottom: 40px;">
+                    <div class="partner-card"><div class="char-id">A001</div><div class="char-name">星野 アカリ</div><div class="char-desc">星空のソムリエ。</div></div>
+                    <div class="partner-card"><div class="char-id">B002</div><div class="char-name">月読 タクト</div><div class="char-desc">ギリシャ神話の語り部。</div></div>
+                    <div class="partner-card"><div class="char-id">C003</div><div class="char-name">宙太</div><div class="char-desc">宇宙人、日本語を勉強中。</div></div>
+                    <div class="partner-card"><div class="char-id">D004</div><div class="char-name">銀河 レイ</div><div class="char-desc">最新天文学の伝道師。</div></div>
+                    <div class="partner-card"><div class="char-id">E005</div><div class="char-name">カペラ</div><div class="char-desc">星の妖精、歌が好き。</div></div>
+                    <div class="partner-card"><div class="char-id">F006</div><div class="char-name">彗星 ソラ</div><div class="char-desc">天体写真家、撮影のプロ。</div></div>
+                    <div class="partner-card"><div class="char-id">G007</div><div class="char-name">アルタイル</div><div class="char-desc">織姫の声を届ける。</div></div>
+                    <div class="partner-card"><div class="char-id">H008</div><div class="char-name">ベガ</div><div class="char-desc">彦星の声を届ける。</div></div>
+                    <div class="partner-card"><div class="char-id">I009</div><div class="char-name">アンドロメダ</div><div class="char-desc">遥か彼方の銀河から。</div></div>
+                    <div class="partner-card"><div class="char-id">J010</div><div class="char-name">オリオン</div><div class="char-desc">冬の空を案内する。</div></div>
+                </div>
+
+                <!-- ▼ 新しい友達（ミルキースター）▼ -->
+                <div class="new-friend-entry fade-in-up">
+                    <img src="fabi.png" alt="ミルキースター">
+                    <div class="new-friend-info">
+                        <div class="new-friend-label">NEW FRIEND</div>
+                        <div class="new-friend-name">ミルキースター</div>
+                        <div class="new-friend-desc">ミルクが大好きな元気な星。大きな瞳と照れ屋な頬がチャームポイント。特別なミルクボトルをいつも持っている。</div>
+                    </div>
+                </div>
+                
+                <div class="partner-grid" style="margin-top: 40px;">
+                    <a href="https://www.keisui.jp/" target="_blank" rel="noopener noreferrer" class="partner-card partner-logo-card" aria-label="緑翠亭 景水 公式サイト（新しいタブで開きます）">
                         <img src="keisui_logo.png" alt="緑翠亭 景水">
                     </a>
                     <a href="https://o-yakushinoyu.com/" target="_blank" rel="noopener noreferrer" class="partner-card partner-logo-card" aria-label="湯けむり屋敷 薬師の湯 公式サイト（新しいタブで開きます）">
@@ -974,7 +1034,7 @@
                     <a href="https://neru-dake.com/" target="_blank" rel="noopener noreferrer" class="partner-card partner-logo-card" aria-label="大町温泉 ねるだけ 公式サイト（新しいタブで開きます）">
                         <img src="nerudake_logo.JPG" alt="大町温泉 ねるだけ">
                     </a>
-                    <div class="partner-card" id="p4">大町温泉郷観光協会</div>
+                    <div class="partner-card">大町温泉郷観光協会</div>
                 </div>
             </section>
         </div>
@@ -1011,7 +1071,6 @@
     <script>
         const translations = {
             ja: {
-                projectTag: "星と君ぷろじぇくと",
                 subLogo: "大町温泉郷",
                 mainLogo: "星空観賞会",
                 navHome: "Home",
@@ -1020,8 +1079,6 @@
                 heroTitle: "銀河の旅人",
                 btnLaunch: "2026年8月始動",
                 partnerTitle: "PARTNERS",
-                p1: "緑翠亭 景水",
-                p4: "大町温泉郷観光協会",
                 company: "株式会社MONDOCOLO",
                 address: "〒398-0002 長野県大町市大町俵町１９０３−１",
                 credit: "© 株式会社MONDOCOLO. All rights reserved.",
@@ -1042,7 +1099,6 @@
                 newsMore: "お知らせ一覧へ"
             },
             en: {
-                projectTag: "Hoshi to Kimi Project",
                 subLogo: "Omachi Onsen-kyo",
                 mainLogo: "Starry Sky Tour",
                 navHome: "Home",
@@ -1051,8 +1107,6 @@
                 heroTitle: "Galactic Traveler",
                 btnLaunch: "Launching August 2026",
                 partnerTitle: "PARTNERS",
-                p1: "Ryosuiten Keisui",
-                p4: "Omachi Onsen Tourist Association",
                 company: "MONDOCOLO Inc.",
                 address: "1903-1 Omachitawara-machi, Omachi City, Nagano 398-0002",
                 credit: "© MONDOCOLO Inc. All rights reserved.",
@@ -1073,7 +1127,6 @@
                 newsMore: "More News"
             },
             es: {
-                projectTag: "Proyecto Hoshi to Kimi",
                 subLogo: "Omachi Onsen-kyo",
                 mainLogo: "Observación de Estrellas",
                 navHome: "Inicio",
@@ -1082,8 +1135,6 @@
                 heroTitle: "Viajero Galáctico",
                 btnLaunch: "Inicio en Agosto de 2026",
                 partnerTitle: "PARTNERS",
-                p1: "Ryosuiten Keisui",
-                p4: "Asociación Turística de Omachi Onsen",
                 company: "MONDOCOLO Inc.",
                 address: "1903-1 Omachitawara-machi, Ciudad de Omachi, Nagano 398-0002",
                 credit: "© MONDOCOLO Inc. All rights reserved.",
@@ -1104,17 +1155,14 @@
                 newsMore: "Más Noticias"
             },
             zh: {
-                projectTag: "星星与你企划",
                 subLogo: "大町温泉乡",
                 mainLogo: "星空观賞会",
                 navHome: "首页",
                 navPartners: "合作伙伴",
-                heroSub: "星空导游带来的顶级观星体験",
+                heroSub: "星空导游带来的顶级观星體驗",
                 heroTitle: "银河旅行者",
                 btnLaunch: "2026年8月隆重登场",
                 partnerTitle: "PARTNERS",
-                p1: "绿翠亭 景水",
-                p4: "大町温泉乡旅游协会",
                 company: "MONDOCOLO 株式会社",
                 address: "〒398-0002 长野县大町市大町俵町1903-1",
                 credit: "© MONDOCOLO Inc. All rights reserved.",
@@ -1135,7 +1183,6 @@
                 newsMore: "更多消息"
             },
             ko: {
-                projectTag: "별과 당신 프로젝트",
                 subLogo: "오마치 온천향",
                 mainLogo: "별자리 감상회",
                 navHome: "홈",
@@ -1144,14 +1191,12 @@
                 heroTitle: "은하수의 여행자",
                 btnLaunch: "2026년 8월 시동",
                 partnerTitle: "PARTNERS",
-                p1: "료스이텐 케이스이",
-                p4: "오마치 온천향 관광협회",
                 company: "주식회사 MONDOCOLO",
                 address: "우편번호 398-0002 나가ノ현 오마치시 오마치타와라마치 1903-1",
                 credit: "© MONDOCOLO Inc. All rights reserved.",
                 cinemaBack: "홈으로 돌아가기",
                 cinemaText: `
-                    <p>나가노현은 별을 관찰하기에 가장 좋은 곳입니다.</p>
+                    <p>나가ノ현은 별을 관찰하기에 가장 좋은 곳입니다.</p>
                     <p style="margin-top: 30px;">아치 무라, 노베야マ, 그리고 오마치 시で,</p>
                     <p>당신を <span class="love-highlight">사랑</span>を 담아</p>
                     <p>우주 여행で 안내합니다.</p>
@@ -1181,7 +1226,6 @@
             document.getElementById('btn-launch').innerText = translations[lang].btnLaunch;
             document.getElementById('txt-partner-title').innerText = translations[lang].partnerTitle;
             
-            document.getElementById('p4').innerText = translations[lang].p4;
             document.getElementById('txt-company').innerText = translations[lang].company;
             document.getElementById('txt-address').innerText = translations[lang].address;
             document.getElementById('txt-credit').innerText = translations[lang].credit;
