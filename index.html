@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>大町温泉郷 星空観賞会 ～銀河の旅人～</title>
-    <link rel="icon" href="star_favicon.png" type="image/png">
+    <!-- ▼ ご指定いただいたファビコン設定を反映 ▼ -->
+    <link rel="icon" href="fabi.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@500&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -830,6 +831,85 @@
             letter-spacing: 4px;
             font-family: 'Kiwi Maru', serif;
         }
+        
+        /* ▼ ガイドキャラクター用の追加スタイル ▼ */
+        .grid-10 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .grid-10 .partner-card {
+            font-size: 0.8rem;
+            padding: 10px;
+            text-align: left;
+            justify-content: flex-start;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .grid-10 .char-id {
+            color: #718096;
+            font-size: 0.7rem;
+            margin-bottom: 4px;
+        }
+        .grid-10 .char-name {
+            color: #fff;
+            font-weight: bold;
+            font-size: 1rem;
+            margin-bottom: 6px;
+        }
+        .grid-10 .char-desc {
+            color: #cbd5e1;
+            font-size: 0.75rem;
+            line-height: 1.4;
+        }
+        
+        /* ▼ 新しい友達（ミルキースター）用のスタイル ▼ */
+        .new-friend-entry {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: var(--card-bg);
+            border: 1px solid var(--accent-gold);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+        .new-friend-entry img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-gold);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+        .new-friend-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .new-friend-label {
+            color: var(--kids-cyan);
+            font-size: 0.8rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+        .new-friend-name {
+            color: #fff;
+            font-size: 1.4rem;
+            font-weight: bold;
+            font-family: 'Kiwi Maru', serif;
+        }
+        .new-friend-desc {
+            color: #cbd5e1;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 480px) {
+            .grid-10 { grid-template-columns: 1fr; }
+            .new-friend-entry { flex-direction: column; text-align: center; }
+            .new-friend-info { align-items: center; }
+        }
     </style>
 </head>
 <body>
@@ -886,12 +966,13 @@
                 <h2 class="sec-title" id="txt-news-sec-title">NEWS</h2>
                 <div class="news-preview-container">
                     <ul id="news-preview-list">
-                        </ul>
+                    </ul>
                     <div class="news-more">
                         <a href="news.html" id="btn-news-more">お知らせ一覧へ <span>▶</span></a>
                     </div>
                 </div>
             </section>
+
             <section id="moon-phase" class="fade-in-up">
                 <h2 class="sec-title" id="txt-moon-sec-title">TODAY'S MOON</h2>
                 <div class="moon-card">
@@ -903,6 +984,7 @@
                     </div>
                 </div>
             </section>
+
             <section id="starry-index" class="fade-in-up">
                 <h2 class="sec-title" id="txt-starry-title">STARRY INDEX</h2>
                 <div class="starry-card">
@@ -914,23 +996,45 @@
                     </div>
                 </div>
             </section>
+
             <section id="partners" class="fade-in-up">
                 <h2 class="sec-title" id="txt-partner-title">PARTNERS</h2>
                 
-                <div id="reordered-partners-list">
+                <!-- ▼ ガイドキャラクター 10人 ▼ -->
+                <div class="partner-grid grid-10" style="margin-bottom: 40px;">
+                    <div class="partner-card"><div class="char-id">A001</div><div class="char-name">星野 アカリ</div><div class="char-desc">星空のソムリエ。</div></div>
+                    <div class="partner-card"><div class="char-id">B002</div><div class="char-name">月読 タクト</div><div class="char-desc">ギリシャ神話の語り部。</div></div>
+                    <div class="partner-card"><div class="char-id">C003</div><div class="char-name">宙太</div><div class="char-desc">宇宙人、日本語を勉強中。</div></div>
+                    <div class="partner-card"><div class="char-id">D004</div><div class="char-name">銀河 レイ</div><div class="char-desc">最新天文学の伝道師。</div></div>
+                    <div class="partner-card"><div class="char-id">E005</div><div class="char-name">カペラ</div><div class="char-desc">星の妖精、歌が好き。</div></div>
+                    <div class="partner-card"><div class="char-id">F006</div><div class="char-name">彗星 ソラ</div><div class="char-desc">天体写真家、撮影のプロ。</div></div>
+                    <div class="partner-card"><div class="char-id">G007</div><div class="char-name">アルタイル</div><div class="char-desc">織姫の声を届ける。</div></div>
+                    <div class="partner-card"><div class="char-id">H008</div><div class="char-name">ベガ</div><div class="char-desc">彦星の声を届ける。</div></div>
+                    <div class="partner-card"><div class="char-id">I009</div><div class="char-name">アンドロメダ</div><div class="char-desc">遥か彼方の銀河から。</div></div>
+                    <div class="partner-card"><div class="char-id">J010</div><div class="char-name">オリオン</div><div class="char-desc">冬の空を案内する。</div></div>
+                </div>
+
+                <!-- ▼ 新しい友達（ミルキースター）▼ -->
+                <div class="new-friend-entry fade-in-up">
+                    <img src="fabi.png" alt="ミルキースター">
+                    <div class="new-friend-info">
+                        <div class="new-friend-label">NEW FRIEND</div>
+                        <div class="new-friend-name">ミルキースター</div>
+                        <div class="new-friend-desc">ミルクが大好きな元気な星。大きな瞳と照れ屋な頬がチャームポイント。特別なミルクボトルをいつも持っている。</div>
                     </div>
+                </div>
                 
-                <div class="partner-grid">
-                    <a href="https://www.keisui.jp/" target="_blank" rel="noopener noreferrer" class="partner-card partner-logo-card" id="p1" aria-label="緑翠亭 景水 公式サイト（新しいタブで開きます）">
+                <div class="partner-grid" style="margin-top: 40px;">
+                    <a href="https://www.keisui.jp/" target="_blank" rel="noopener noreferrer" class="partner-card partner-logo-card" aria-label="緑翠亭 景水 公式サイト（新しいタブで開きます）">
                         <img src="keisui_logo.png" alt="緑翠亭 景水">
                     </a>
-                    <a href="https://o-yakushinoyu.com/" target="_blank" rel="noopener noreferrer" class="partner-card partner-logo-card" id="p2" aria-label="湯けむり屋敷 薬師の湯 公式サイト（新しいタブで開きます）">
+                    <a href="https://o-yakushinoyu.com/" target="_blank" rel="noopener noreferrer" class="partner-card partner-logo-card" aria-label="湯けむり屋敷 薬師の湯 公式サイト（新しいタブで開きます）">
                         <img src="yakushi_logo.JPG" alt="湯けむり屋敷 薬師の湯">
                     </a>
                     <a href="https://neru-dake.com/" target="_blank" rel="noopener noreferrer" class="partner-card partner-logo-card" aria-label="大町温泉 ねるだけ 公式サイト（新しいタブで開きます）">
                         <img src="nerudake_logo.JPG" alt="大町温泉 ねるだけ">
                     </a>
-                    <div class="partner-card" id="p4">大町温泉郷観光協会</div>
+                    <div class="partner-card">大町温泉郷観光協会</div>
                 </div>
             </section>
         </div>
@@ -967,7 +1071,6 @@
     <script>
         const translations = {
             ja: {
-                projectTag: "星と君ぷろじぇくと",
                 subLogo: "大町温泉郷",
                 mainLogo: "星空観賞会",
                 navHome: "Home",
@@ -976,9 +1079,6 @@
                 heroTitle: "銀河の旅人",
                 btnLaunch: "2026年8月始動",
                 partnerTitle: "PARTNERS",
-                p1: "緑翠亭 景水",
-                // p2: "薬師の湯",  // ← 画像にしたためID外しの修正
-                p4: "大町温泉郷観光協会",
                 company: "株式会社MONDOCOLO",
                 address: "〒398-0002 長野県大町市大町俵町１９０３−１",
                 credit: "© 株式会社MONDOCOLO. All rights reserved.",
@@ -989,7 +1089,6 @@
                     <p><span class="love-highlight">愛</span>を込めてあなたを</p>
                     <p>宇宙の旅へお連れします。</p>
                 `,
-                // ▼ 翻訳データを追加 ▼
                 moonSecTitle: "TODAY'S MOON",
                 moonAgeLabel: "月齢",
                 moonPhases: ["新月", "三日月", "上弦の月", "十三夜", "満月", "居待月", "下弦の月", "二十六夜"],
@@ -1000,7 +1099,6 @@
                 newsMore: "お知らせ一覧へ"
             },
             en: {
-                projectTag: "Hoshi to Kimi Project",
                 subLogo: "Omachi Onsen-kyo",
                 mainLogo: "Starry Sky Tour",
                 navHome: "Home",
@@ -1009,9 +1107,6 @@
                 heroTitle: "Galactic Traveler",
                 btnLaunch: "Launching August 2026",
                 partnerTitle: "PARTNERS",
-                p1: "Ryosuiten Keisui",
-                // p2: "Yakushi-no-yu",  // ← 画像にしたためID外しの修正
-                p4: "Omachi Onsen Tourist Association",
                 company: "MONDOCOLO Inc.",
                 address: "1903-1 Omachitawara-machi, Omachi City, Nagano 398-0002",
                 credit: "© MONDOCOLO Inc. All rights reserved.",
@@ -1022,7 +1117,6 @@
                     <p>bring you into a journey through the universe</p>
                     <p>with all our <span class="love-highlight">Love</span>.</p>
                 `,
-                // ▼ 翻訳データを追加 ▼
                 moonSecTitle: "TODAY'S MOON",
                 moonAgeLabel: "Moon Age",
                 moonPhases: ["New Moon", "Waxing Crescent", "First Quarter", "Waxing Gibbous", "Full Moon", "Waning Gibbous", "Last Quarter", "Waning Crescent"],
@@ -1033,7 +1127,6 @@
                 newsMore: "More News"
             },
             es: {
-                projectTag: "Proyecto Hoshi to Kimi",
                 subLogo: "Omachi Onsen-kyo",
                 mainLogo: "Observación de Estrellas",
                 navHome: "Inicio",
@@ -1042,9 +1135,6 @@
                 heroTitle: "Viajero Galáctico",
                 btnLaunch: "Inicio en Agosto de 2026",
                 partnerTitle: "PARTNERS",
-                p1: "Ryosuiten Keisui",
-                // p2: "Yakushi-no-yu",  // ← 画像にしたためID外しの修正
-                p4: "Asociación Turística de Omachi Onsen",
                 company: "MONDOCOLO Inc.",
                 address: "1903-1 Omachitawara-machi, Ciudad de Omachi, Nagano 398-0002",
                 credit: "© MONDOCOLO Inc. All rights reserved.",
@@ -1055,7 +1145,6 @@
                     <p>te llevarán a un maravilloso viaje por el universe</p>
                     <p>with all our <span class="love-highlight">Love</span>.</p>
                 `,
-                // ▼ 翻訳データを追加 ▼
                 moonSecTitle: "LA LUNA DE HOY",
                 moonAgeLabel: "Edad Lunar",
                 moonPhases: ["Luna Nueva", "Luna Creciente", "Cuarto Creciente", "Luna Gibosa Creciente", "Luna Llena", "Luna Gibosa Menguante", "Cuarto Menguante", "Luna Menguante"],
@@ -1066,18 +1155,14 @@
                 newsMore: "Más Noticias"
             },
             zh: {
-                projectTag: "星星与你企划",
                 subLogo: "大町温泉乡",
                 mainLogo: "星空观賞会",
                 navHome: "首页",
                 navPartners: "合作伙伴",
-                heroSub: "星空导游带来的顶级观星体験",
+                heroSub: "星空导游带来的顶级观星體驗",
                 heroTitle: "银河旅行者",
                 btnLaunch: "2026年8月隆重登场",
                 partnerTitle: "PARTNERS",
-                p1: "绿翠亭 景水",
-                // p2: "药师之湯",  // ← 画像にしたためID外しの修正
-                p4: "大町温泉乡旅游协会",
                 company: "MONDOCOLO 株式会社",
                 address: "〒398-0002 长野县大町市大町俵町1903-1",
                 credit: "© MONDOCOLO Inc. All rights reserved.",
@@ -1088,9 +1173,8 @@
                     <p>将满怀<span class="love-highlight">爱</span>意，带您开启</p>
                     <p>一场浪漫の宇宙之旅。</p>
                 `,
-                // ▼ 翻訳データを追加 ▼
                 moonSecTitle: "今日月相",
-                moonAgeLabel: "月齢",
+                moonAgeLabel: "月龄",
                 moonPhases: ["新月", "娥眉月", "上弦月", "盈凸月", "满月", "亏凸月", "下弦月", "残月"],
                 starrySecTitle: "星空指数",
                 starryScoreLabel: "星空观赏指数",
@@ -1099,7 +1183,6 @@
                 newsMore: "更多消息"
             },
             ko: {
-                projectTag: "별과 당신 프로젝트",
                 subLogo: "오마치 온천향",
                 mainLogo: "별자리 감상회",
                 navHome: "홈",
@@ -1108,25 +1191,21 @@
                 heroTitle: "은하수의 여행자",
                 btnLaunch: "2026년 8월 시동",
                 partnerTitle: "PARTNERS",
-                p1: "료스이텐 케이스이",
-                // p2: "야쿠시노유",  // ← 画像にしたためID外しの修正
-                p4: "오마치 온천향 관광협회",
                 company: "주식회사 MONDOCOLO",
                 address: "우편번호 398-0002 나가ノ현 오마치시 오마치타와라마치 1903-1",
                 credit: "© MONDOCOLO Inc. All rights reserved.",
                 cinemaBack: "홈으로 돌아가기",
                 cinemaText: `
-                    <p>나가노현은 별을 관찰하기에 가장 좋은 곳입니다.</p>
+                    <p>나가ノ현은 별을 관찰하기에 가장 좋은 곳입니다.</p>
                     <p style="margin-top: 30px;">아치 무라, 노베야マ, 그리고 오마치 시で,</p>
-                    <p>당신を <span class="love-highlight">사랑</span>을 담아</p>
+                    <p>당신を <span class="love-highlight">사랑</span>を 담아</p>
                     <p>우주 여행で 안내합니다.</p>
                 `,
-                // ▼ 翻訳データを追加 ▼
                 moonSecTitle: "오늘の 달",
                 moonAgeLabel: "월령",
                 moonPhases: ["신월", "초승달", "상현달", "차오르는 달", "보름달", "이지러지는 달", "하현달", "그믐달"],
-                starrySecTitle: "별자리 지数",
-                starryScoreLabel: "별자리 관측 지数",
+                starrySecTitle: "별자리 지수",
+                starryScoreLabel: "별자리 관측 지수",
                 starryConditions: ["최고", "좋음", "보통", "나쁨", "최악"],
                 newsSecTitle: "ニュース",
                 newsMore: "ニュース 더보기"
@@ -1147,10 +1226,6 @@
             document.getElementById('btn-launch').innerText = translations[lang].btnLaunch;
             document.getElementById('txt-partner-title').innerText = translations[lang].partnerTitle;
             
-            // 重要：ID 'p2' は画像リンクに変更されたため、テキスト翻訳処理から外します
-            // document.getElementById('p2').innerText = translations[lang].p2;
-            
-            document.getElementById('p4').innerText = translations[lang].p4;
             document.getElementById('txt-company').innerText = translations[lang].company;
             document.getElementById('txt-address').innerText = translations[lang].address;
             document.getElementById('txt-credit').innerText = translations[lang].credit;
@@ -1158,7 +1233,6 @@
             
             document.getElementById('cinema-text-container').innerHTML = translations[lang].cinemaText;
 
-            // NEWSセクションの翻訳連動
             document.getElementById('txt-news-sec-title').innerText = translations[lang].newsSecTitle;
             document.getElementById('btn-news-more').innerHTML = translations[lang].newsMore + ' <span>▶</span>';
 
@@ -1167,11 +1241,7 @@
             try {
                 localStorage.setItem('selectedLang', lang);
             } catch (e) {
-                console.warn("言語の保存がブロックされましたが、動作は続行します。");
             }
-
-            // プリンスターの翻訳を更新 (動的なのでchangeLanguage内で呼ぶ)
-            renderReorderedPartners(lang);
         }
 
         const langSwitcher = document.getElementById('lang-switcher');
@@ -1185,7 +1255,6 @@
         try {
             savedLang = localStorage.getItem('selectedLang') || 'ja';
         } catch (e) {
-            console.warn("保存された言語の読み込みがブロックされました。");
         }
         changeLanguage(savedLang);
 
@@ -1246,7 +1315,6 @@
             cinemaLayer.classList.add('active');
             cinemaVideo.currentTime = 0;
             cinemaVideo.play().catch(error => {
-                console.log("Video playback failed:", error);
             });
         });
 
@@ -1260,12 +1328,10 @@
             textBox.parentNode.replaceChild(newTextBox, textBox);
         });
 
-        // ===== NEWS 最新2件の表示 =====
         function initNewsPreview() {
             const listEl = document.getElementById('news-preview-list');
             if(!listEl || typeof newsData === 'undefined') return;
 
-            // 最新の2件だけを取得
             const topNews = newsData.slice(0, 2);
             
             topNews.forEach(news => {
@@ -1281,18 +1347,14 @@
             });
         }
 
-        // ===== 月齢カレンダーの表示 =====
         function initMoonPhase() {
             const today = new Date();
             
-            // 日付表示
             const y = today.getFullYear();
             const m = String(today.getMonth() + 1).padStart(2, '0');
             const d = String(today.getDate()).padStart(2, '0');
             document.getElementById('moon-date').innerText = `${y}.${m}.${d}`;
 
-            // 簡易月齢計算（簡易的なもので正確ではありません）
-            // 2000年1月6日18時14分が新月
             const knownNewMoon = new Date(Date.UTC(2000, 0, 6, 18, 14)).getTime();
             const lunarCycle = 29.530588853 * 24 * 60 * 60 * 1000;
             const now = today.getTime();
@@ -1303,8 +1365,7 @@
             const age = ageMs / (1000 * 60 * 60 * 24);
             document.getElementById('moon-age-number').innerText = age.toFixed(1);
 
-            // 月相の判定とビジュアル・名前の更新
-            let phaseIndex = 0; // 0:新月, 1:三日月, ...
+            let phaseIndex = 0; 
             let moonEmoji = "🌑";
 
             if (age < 1.8)      { phaseIndex = 0; moonEmoji = "🌑"; }
@@ -1319,114 +1380,42 @@
 
             const visualEl = document.getElementById('moon-visual');
             visualEl.innerText = moonEmoji;
-            visualEl.dataset.phaseIndex = phaseIndex; // 翻訳用にインデックスを保存
+            visualEl.dataset.phaseIndex = phaseIndex; 
             
-            // 現在の言語設定に合わせて月相名を表示
             const lang = localStorage.getItem('selectedLang') || 'ja';
             document.getElementById('moon-name').innerText = translations[lang].moonPhases[phaseIndex];
         }
 
-        // ===== 星空指数の表示 =====
         function initStarryIndex() {
             const today = new Date();
             
-            // 日付表示
             const y = today.getFullYear();
             const m = String(today.getMonth() + 1).padStart(2, '0');
             const d = String(today.getDate()).padStart(2, '0');
             document.getElementById('starry-date').innerText = `${y}.${m}.${d}`;
 
-            // 簡易的な星空指数計算（ランダム、実際には天気API等を使用）
-            const score = Math.floor(Math.random() * 101); // 0〜100
+            const score = Math.floor(Math.random() * 101); 
             document.getElementById('starry-score-number').innerText = score;
 
-            // 星空指数の判定とコンディションの更新
-            let conditionIndex = 0; // 0:最高, 1:良い, ...
+            let conditionIndex = 0; 
             
-            if (score >= 90)     { conditionIndex = 0; } // 最高
-            else if (score >= 70) { conditionIndex = 1; } // 良い
-            else if (score >= 50) { conditionIndex = 2; } // 普通
-            else if (score >= 30) { conditionIndex = 3; } // 悪い
-            else                 { conditionIndex = 4; } // 最悪
+            if (score >= 90)     { conditionIndex = 0; } 
+            else if (score >= 70) { conditionIndex = 1; } 
+            else if (score >= 50) { conditionIndex = 2; } 
+            else if (score >= 30) { conditionIndex = 3; } 
+            else                 { conditionIndex = 4; } 
 
             const visualEl = document.getElementById('starry-visual');
-            visualEl.dataset.conditionIndex = conditionIndex; // 翻訳用にインデックスを保存
+            visualEl.dataset.conditionIndex = conditionIndex; 
             
-            // 現在の言語設定に合わせてコンディションを表示
             const lang = localStorage.getItem('selectedLang') || 'ja';
             document.getElementById('starry-condition').innerText = translations[lang].starryConditions[conditionIndex];
         }
 
-        // ===== パートナーセクションの再配置と動的レンダリング =====
-        function renderReorderedPartners(lang) {
-            const container = document.getElementById('reordered-partners-list');
-            if(!container) return;
-            container.innerHTML = ''; // クリア
-
-            // キャラクターデータ
-            const characters = [
-                { id: "A001", name: "星野 アカリ", desc: "星空のソムリエ。" },
-                { id: "B002", name: "月読 タクト", desc: "ギリシャ神話の語り部。" },
-                { id: "C003", name: "宙太", desc: "宇宙人、日本語を勉強中。" },
-                { id: "D004", name: "銀河 レイ", desc: "最新天文学の伝道師。" },
-                { id: "E005", name: "カペラ", desc: "星の妖精、歌が好き。" },
-                { id: "F006", name: "彗星 ソラ", desc: "天体写真家、撮影のプロ。" },
-                { id: "G007", name: "アルタイル", desc: "織姫の声を届ける。" },
-                { id: "H008", name: "ベガ", desc: "彦星の声を届ける。" },
-                { id: "I009", name: "アンドロメダ", desc: "遥か彼方の銀河から。" },
-                { id: "J010", name: "オリオン", desc: "冬の空を案内する。" }
-            ];
-
-            // プリンスターの翻訳
-            const prinsterData = {
-                ja: { label: "NEW FRIEND", name: "プリンスター", desc: "信州プリンが大好きな元気な星。大きな瞳と照れ屋な頬がチャームポイント。モンドコロのプリンをいつも持っている。" },
-                en: { label: "NEW FRIEND", name: "Prinster", desc: "A cheerful star who loves Shinshu pudding. His big eyes and blushing cheeks are his charming points. He always carries Mondocolo's pudding." },
-                es: { label: "NEW FRIEND", name: "Prínster", desc: "Una estrella alegre que ama el pudín de Shinshu. Sus grandes ojos y mejillas sonrojadas son sus puntos encantadores. Siempre lleva el pudín de Mondocolo." },
-                zh: { label: "NEW FRIEND", name: "布丁星", desc: "一颗喜欢信州布丁的活力星星。大眼睛和害羞的脸颊是他的魅力点。总是带着Mondocolo的布丁。" },
-                ko: { label: "NEW FRIEND", name: "푸딩스타", desc: "신슈 푸딩을 사랑하는 활기찬 별. 큰 눈과 수줍은 볼이 매력 포인트. 몬도코로의 푸딩을 항상 가지고 있다." }
-            };
-
-            // HTML構築
-            let html = `
-                <div class="new-friend-entry fade-in-up">
-                    <img src="prince_favicon.png" alt="プリンスター">
-                    <div class="new-friend-info">
-                        <div class="new-friend-label">${prinsterData[lang].label}</div>
-                        <div class="new-friend-name">${prinsterData[lang].name}</div>
-                        <div class="new-friend-desc">${prinsterData[lang].desc}</div>
-                    </div>
-                </div>
-
-                <div class="partner-grid grid-10">
-            `;
-
-            characters.forEach(char => {
-                html += `
-                    <div class="partner-card">
-                        <div class="char-id">${char.id}</div>
-                        <div class="char-name">${char.name}</div>
-                        <div class="char-desc">${char.desc}</div>
-                    </div>
-                `;
-            });
-
-            html += `</div>`; // .partner-grid 閉じ
-
-            container.innerHTML = html;
-
-            // フェードインアニメーションの再トリガー
-            const newFadeElements = container.querySelectorAll('.fade-in-up');
-            if (typeof observer !== 'undefined') {
-                newFadeElements.forEach(el => observer.observe(el));
-            }
-        }
-
-        // ページ読み込み時に実行
         document.addEventListener('DOMContentLoaded', () => {
             initNewsPreview();
             initMoonPhase();
             initStarryIndex();
-            // renderReorderedPartners は changeLanguage から呼ばれる
         });
     </script>
 </body>
