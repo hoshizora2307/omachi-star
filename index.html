@@ -59,7 +59,6 @@
             z-index: -1;
         }
 
-        /* ===== 星の彗星 ===== */
         #comet-field {
             position: fixed;
             inset: 0;
@@ -318,7 +317,7 @@
             margin: 20px 0 30px 0;
             letter-spacing: 8px;
             color: #fff;
-            text-shadow: 0 0 20px var(--accent-glow), 0 0 40px rgba(255,255,255,0.2);
+            text-shadow: 0 0 20px var(--accent-gold), 0 0 40px rgba(255,255,255,0.2);
             animation: fadeIn 2.5s ease-out;
         }
 
@@ -342,7 +341,7 @@
 
         .launch-text:hover {
             background: rgba(230, 194, 122, 0.2);
-            box-shadow: 0 0 20px var(--accent-glow);
+            box-shadow: 0 0 20px var(--accent-gold);
             transform: scale(1.03);
         }
 
@@ -664,6 +663,10 @@
                 max-width: 80%;
                 justify-content: center;
             }
+
+            .news-preview-container { padding: 20px 15px; }
+            #news-preview-list li { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .preview-title { white-space: normal; line-height: 1.4; }
         }
 
         @media (max-width: 480px) {
@@ -675,6 +678,199 @@
             header { padding: 0 10px; }
             .nav-container { gap: 8px; }
             .project-logo-img { height: 52px; }
+        }
+
+        #news-preview {
+            margin-bottom: 80px;
+        }
+        
+        .news-preview-container {
+            max-width: 650px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border: 1px solid rgba(230, 194, 122, 0.4);
+            border-radius: 12px;
+            padding: 30px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+
+        #news-preview-list {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        #news-preview-list li {
+            border-bottom: 1px dashed rgba(255,255,255,0.15);
+            padding: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        #news-preview-list li:last-child {
+            border-bottom: none;
+        }
+
+        .preview-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 170px;
+        }
+
+        .preview-date {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.85rem;
+            font-family: 'Zen Maru Gothic', sans-serif;
+        }
+
+        .preview-cat {
+            background: rgba(230, 194, 122, 0.15);
+            color: var(--accent-gold);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+        }
+
+        .preview-title {
+            font-size: 0.95rem;
+            color: #fff;
+            text-decoration: none;
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            transition: color 0.3s;
+            font-family: 'Kiwi Maru', serif;
+        }
+
+        .preview-title:hover {
+            color: var(--accent-gold);
+        }
+
+        .news-more {
+            text-align: right;
+            margin-top: 10px;
+        }
+
+        #btn-news-more {
+            color: var(--accent-gold);
+            text-decoration: none;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            transition: opacity 0.3s;
+        }
+
+        #btn-news-more:hover {
+            opacity: 0.7;
+        }
+
+        #moon-phase {
+            margin-bottom: 80px;
+        }
+        
+        .moon-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(230, 194, 122, 0.4);
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            backdrop-filter: blur(15px);
+            max-width: 380px;
+            margin: 0 auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .moon-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px var(--accent-glow);
+        }
+
+        .moon-visual {
+            font-size: 6.5rem;
+            line-height: 1;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.5));
+            animation: pulse 4s infinite ease-in-out;
+        }
+
+        .moon-date {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+            letter-spacing: 3px;
+            margin-bottom: 12px;
+            font-family: 'Zen Maru Gothic', sans-serif;
+        }
+
+        .moon-age-text {
+            font-size: 1.5rem;
+            color: var(--accent-gold);
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+
+        .moon-name {
+            font-size: 1.2rem;
+            color: var(--text-main);
+            letter-spacing: 4px;
+            font-family: 'Kiwi Maru', serif;
+        }
+
+        #starry-index {
+            margin-bottom: 80px;
+        }
+        
+        .starry-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(230, 194, 122, 0.4);
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            backdrop-filter: blur(15px);
+            max-width: 380px;
+            margin: 0 auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .starry-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px var(--accent-glow);
+        }
+
+        .starry-visual {
+            font-size: 6.5rem;
+            line-height: 1;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.5));
+            animation: pulse 4s infinite ease-in-out;
+        }
+
+        .starry-date {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+            letter-spacing: 3px;
+            margin-bottom: 12px;
+            font-family: 'Zen Maru Gothic', sans-serif;
+        }
+
+        .starry-score-text {
+            font-size: 1.5rem;
+            color: var(--accent-gold);
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+
+        .starry-condition {
+            font-size: 1.2rem;
+            color: var(--text-main);
+            letter-spacing: 4px;
+            font-family: 'Kiwi Maru', serif;
         }
     </style>
 </head>
@@ -734,12 +930,37 @@
                 <h2 class="sec-title" id="txt-news-sec-title">NEWS</h2>
                 <div class="news-preview-container">
                     <ul id="news-preview-list">
-                        </ul>
+                    </ul>
                     <div class="news-more">
                         <a href="news.html" id="btn-news-more">お知らせ一覧へ <span>▶</span></a>
                     </div>
                 </div>
             </section>
+
+            <section id="moon-phase" class="fade-in-up">
+                <h2 class="sec-title" id="txt-moon-sec-title">TODAY'S MOON</h2>
+                <div class="moon-card">
+                    <div class="moon-visual" id="moon-visual">🌕</div>
+                    <div class="moon-info">
+                        <div class="moon-date" id="moon-date"></div>
+                        <div class="moon-age-text"><span id="txt-moon-age-label">月齢</span>: <span id="moon-age-number"></span></div>
+                        <div class="moon-name" id="moon-name"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="starry-index" class="fade-in-up">
+                <h2 class="sec-title" id="txt-starry-title">STARRY INDEX</h2>
+                <div class="starry-card">
+                    <div class="starry-visual" id="starry-visual">✨</div>
+                    <div class="starry-info">
+                        <div class="starry-date" id="starry-date"></div>
+                        <div class="starry-score-text"><span id="txt-starry-score-label">星空指数</span>: <span id="starry-score-number"></span></div>
+                        <div class="starry-condition" id="starry-condition"></div>
+                    </div>
+                </div>
+            </section>
+
             <section id="partners" class="fade-in-up">
                 <h2 class="sec-title" id="txt-partner-title">PARTNERS</h2>
                 <div class="partner-grid">
@@ -810,6 +1031,12 @@
                     <p><span class="love-highlight">愛</span>を込めてあなたを</p>
                     <p>宇宙の旅へお連れします。</p>
                 `,
+                moonSecTitle: "TODAY'S MOON",
+                moonAgeLabel: "月齢",
+                moonPhases: ["新月", "三日月", "上弦の月", "十三夜", "満月", "居待月", "下弦の月", "二十六夜"],
+                starrySecTitle: "STARRY INDEX",
+                starryScoreLabel: "星空指数",
+                starryConditions: ["最高", "良い", "普通", "悪い", "最悪"],
                 newsSecTitle: "NEWS",
                 newsMore: "お知らせ一覧へ"
             },
@@ -835,6 +1062,12 @@
                     <p>bring you into a journey through the universe</p>
                     <p>with all our <span class="love-highlight">Love</span>.</p>
                 `,
+                moonSecTitle: "TODAY'S MOON",
+                moonAgeLabel: "Moon Age",
+                moonPhases: ["New Moon", "Waxing Crescent", "First Quarter", "Waxing Gibbous", "Full Moon", "Waning Gibbous", "Last Quarter", "Waning Crescent"],
+                starrySecTitle: "STARRY INDEX",
+                starryScoreLabel: "Stargazing Index",
+                starryConditions: ["Excellent", "Good", "Fair", "Poor", "Very Poor"],
                 newsSecTitle: "NEWS",
                 newsMore: "More News"
             },
@@ -858,15 +1091,21 @@
                     <p>La prefectura de Nagano es el lugar perfecto para observar las estrellas.</p>
                     <p style="margin-top: 30px;">La villa de Achi, Nobeyama y la ciudad de Omachi</p>
                     <p>te llevarán a un maravilloso viaje por el universe</p>
-                    <p>con todo nuestro <span class="love-highlight">Amor</span>.</p>
+                    <p>with all our <span class="love-highlight">Love</span>.</p>
                 `,
+                moonSecTitle: "LA LUNA DE HOY",
+                moonAgeLabel: "Edad Lunar",
+                moonPhases: ["Luna Nueva", "Luna Creciente", "Cuarto Creciente", "Luna Gibosa Creciente", "Luna Llena", "Luna Gibosa Menguante", "Cuarto Menguante", "Luna Menguante"],
+                starrySecTitle: "ÍNDICE DE ESTRELLAS",
+                starryScoreLabel: "Índice de Observación",
+                starryConditions: ["Excelente", "Bueno", "Regular", "Pobre", "Muy Pobre"],
                 newsSecTitle: "NOTICIAS",
                 newsMore: "Más Noticias"
             },
             zh: {
                 projectTag: "星星与你企划",
                 subLogo: "大町温泉乡",
-                mainLogo: "星空观赏会",
+                mainLogo: "星空观賞会",
                 navHome: "首页",
                 navPartners: "合作伙伴",
                 heroSub: "星空导游带来的顶级观星体验",
@@ -885,6 +1124,12 @@
                     <p>将满怀<span class="love-highlight">爱</span>意，带您开启</p>
                     <p>一场浪漫の宇宙之旅。</p>
                 `,
+                moonSecTitle: "今日月相",
+                moonAgeLabel: "月龄",
+                moonPhases: ["新月", "娥眉月", "上弦月", "盈凸月", "满月", "亏凸月", "下弦月", "残月"],
+                starrySecTitle: "星空指数",
+                starryScoreLabel: "星空观赏指数",
+                starryConditions: ["最高", "好", "普通", "坏", "最坏"],
                 newsSecTitle: "最新消息",
                 newsMore: "更多消息"
             },
@@ -894,7 +1139,7 @@
                 mainLogo: "별자리 감상회",
                 navHome: "홈",
                 navPartners: "파트너",
-                heroSub: "최고의 별자리 가이드 투어 체험",
+                heroSub: "최고의 별자리 가イド 투어 체험",
                 heroTitle: "은하수의 여행자",
                 btnLaunch: "2026년 8월 시동",
                 partnerTitle: "PARTNERS",
@@ -910,8 +1155,14 @@
                     <p>당신을 <span class="love-highlight">사랑</span>을 담아</p>
                     <p>우주 여행으로 안내합니다.</p>
                 `,
-                newsSecTitle: "뉴스",
-                newsMore: "뉴스 더보기"
+                moonSecTitle: "오늘의 달",
+                moonAgeLabel: "월령",
+                moonPhases: ["신월", "초승달", "상현달", "차오르는 달", "보름달", "이지러지는 달", "하현달", "그믐달"],
+                starrySecTitle: "별자리 지수",
+                starryScoreLabel: "별자리 관측 지수",
+                starryConditions: ["최고", "좋음", "보통", "나쁨", "최악"],
+                newsSecTitle: "ニュース",
+                newsMore: "ニュース 더보기"
             }
         };
 
@@ -929,9 +1180,6 @@
             document.getElementById('btn-launch').innerText = translations[lang].btnLaunch;
             document.getElementById('txt-partner-title').innerText = translations[lang].partnerTitle;
             
-            // 重要：ID 'p2' は画像リンクに変更されたため、テキスト翻訳処理から外します
-            // document.getElementById('p2').innerText = translations[lang].p2;
-            
             document.getElementById('p4').innerText = translations[lang].p4;
             document.getElementById('txt-company').innerText = translations[lang].company;
             document.getElementById('txt-address').innerText = translations[lang].address;
@@ -940,7 +1188,6 @@
             
             document.getElementById('cinema-text-container').innerHTML = translations[lang].cinemaText;
 
-            // NEWSセクションの翻訳連動
             document.getElementById('txt-news-sec-title').innerText = translations[lang].newsSecTitle;
             document.getElementById('btn-news-more').innerHTML = translations[lang].newsMore + ' <span>▶</span>';
 
@@ -949,7 +1196,6 @@
             try {
                 localStorage.setItem('selectedLang', lang);
             } catch (e) {
-                console.warn("言語の保存がブロックされましたが、動作は続行します。");
             }
         }
 
@@ -964,7 +1210,6 @@
         try {
             savedLang = localStorage.getItem('selectedLang') || 'ja';
         } catch (e) {
-            console.warn("保存された言語の読み込みがブロックされました。");
         }
         changeLanguage(savedLang);
 
@@ -1025,7 +1270,6 @@
             cinemaLayer.classList.add('active');
             cinemaVideo.currentTime = 0;
             cinemaVideo.play().catch(error => {
-                console.log("Video playback failed:", error);
             });
         });
 
@@ -1039,7 +1283,6 @@
             textBox.parentNode.replaceChild(newTextBox, textBox);
         });
 
-        // ===== NEWS 最新2件の表示 =====
         function initNewsPreview() {
             const listEl = document.getElementById('news-preview-list');
             if(!listEl || typeof newsData === 'undefined') return;
@@ -1058,7 +1301,77 @@
                 listEl.appendChild(li);
             });
         }
-        document.addEventListener('DOMContentLoaded', initNewsPreview);
+
+        function initMoonPhase() {
+            const today = new Date();
+            
+            const y = today.getFullYear();
+            const m = String(today.getMonth() + 1).padStart(2, '0');
+            const d = String(today.getDate()).padStart(2, '0');
+            document.getElementById('moon-date').innerText = `${y}.${m}.${d}`;
+
+            const knownNewMoon = new Date(Date.UTC(2000, 0, 6, 18, 14)).getTime();
+            const lunarCycle = 29.530588853 * 24 * 60 * 60 * 1000;
+            const now = today.getTime();
+            
+            let ageMs = (now - knownNewMoon) % lunarCycle;
+            if (ageMs < 0) ageMs += lunarCycle;
+            
+            const age = ageMs / (1000 * 60 * 60 * 24);
+            document.getElementById('moon-age-number').innerText = age.toFixed(1);
+
+            let phaseIndex = 0; 
+            let moonEmoji = "🌑";
+
+            if (age < 1.8)      { phaseIndex = 0; moonEmoji = "🌑"; }
+            else if (age < 5.5)  { phaseIndex = 1; moonEmoji = "🌒"; }
+            else if (age < 9.2)  { phaseIndex = 2; moonEmoji = "🌓"; }
+            else if (age < 12.9) { phaseIndex = 3; moonEmoji = "🌔"; }
+            else if (age < 16.6) { phaseIndex = 4; moonEmoji = "🌕"; }
+            else if (age < 20.3) { phaseIndex = 5; moonEmoji = "🌖"; }
+            else if (age < 24.0) { phaseIndex = 6; moonEmoji = "🌗"; }
+            else if (age < 27.7) { phaseIndex = 7; moonEmoji = "🌘"; }
+            else                 { phaseIndex = 0; moonEmoji = "🌑"; }
+
+            const visualEl = document.getElementById('moon-visual');
+            visualEl.innerText = moonEmoji;
+            visualEl.dataset.phaseIndex = phaseIndex; 
+            
+            const lang = localStorage.getItem('selectedLang') || 'ja';
+            document.getElementById('moon-name').innerText = translations[lang].moonPhases[phaseIndex];
+        }
+
+        function initStarryIndex() {
+            const today = new Date();
+            
+            const y = today.getFullYear();
+            const m = String(today.getMonth() + 1).padStart(2, '0');
+            const d = String(today.getDate()).padStart(2, '0');
+            document.getElementById('starry-date').innerText = `${y}.${m}.${d}`;
+
+            const score = Math.floor(Math.random() * 101); 
+            document.getElementById('starry-score-number').innerText = score;
+
+            let conditionIndex = 0; 
+            
+            if (score >= 90)     { conditionIndex = 0; } 
+            else if (score >= 70) { conditionIndex = 1; } 
+            else if (score >= 50) { conditionIndex = 2; } 
+            else if (score >= 30) { conditionIndex = 3; } 
+            else                 { conditionIndex = 4; } 
+
+            const visualEl = document.getElementById('starry-visual');
+            visualEl.dataset.conditionIndex = conditionIndex; 
+            
+            const lang = localStorage.getItem('selectedLang') || 'ja';
+            document.getElementById('starry-condition').innerText = translations[lang].starryConditions[conditionIndex];
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initNewsPreview();
+            initMoonPhase();
+            initStarryIndex();
+        });
     </script>
 
     <script>
