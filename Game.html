@@ -356,7 +356,6 @@ var warpFactor = 0;
 var invincibleTime = 0; 
 var puddingEnergy = 0;
 var laserTime = 0;
-
 var SUPABASE_URL = 'https://ufjojhraqyzqqzlkokwd.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_ha-q_6WBEngyBT3dOLMJQQ_EZsVSGI6';
 var supabaseClient = null;
@@ -365,7 +364,6 @@ try {
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   }
 } catch (e) {}
-
 async function loadRanking() {
   try {
     if (supabaseClient) {
@@ -384,7 +382,6 @@ async function loadRanking() {
     return [];
   }
 }
-
 async function addScore(name, pts) {
   const playerName = name.trim() || '匿名スター';
   try {
@@ -406,14 +403,12 @@ async function addScore(name, pts) {
     return [];
   }
 }
-
 function medal(rank) {
   if (rank === 0) return '<span class="rank-num gold">🥇</span>';
   if (rank === 1) return '<span class="rank-num silver">🥈</span>';
   if (rank === 2) return '<span class="rank-num bronze">🥉</span>';
   return `<span class="rank-num">${rank+1}</span>`;
 }
-
 function renderRanking(list, containerId) {
   const el = document.getElementById(containerId);
   if (!el) return;
@@ -428,11 +423,9 @@ function renderRanking(list, containerId) {
       <span class="rank-score">${r.score.toLocaleString()}</span>
     </div>`).join('');
 }
-
 function escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
-
 async function refreshRanking() {
   try {
     const list = await loadRanking();
@@ -445,22 +438,18 @@ async function refreshRanking() {
     renderRanking([], 'rankListGO');
   }
 }
-
 function showScreen(id) {
   ['titleScreen','rankingScreen','gameOverScreen'].forEach(s => {
     document.getElementById(s).classList.toggle('hidden', s !== id);
   });
 }
-
 window.showRanking = function() { showScreen('rankingScreen'); refreshRanking(); }
 window.hideRanking = function() { showScreen('titleScreen'); }
-
 window.startGame = function() {
   showScreen(null);
   document.getElementById('titleScreen').classList.add('hidden');
   document.getElementById('rankingScreen').classList.add('hidden');
   document.getElementById('gameOverScreen').classList.add('hidden');
-
   score = 0; 
   lives = maxLives;
   level = 1; frameCount = 0;
@@ -470,18 +459,15 @@ window.startGame = function() {
   invincibleTime = 0;
   puddingEnergy = 0;
   laserTime = 0;
-  
   document.getElementById('scoreVal').textContent = '0';
   document.getElementById('levelVal').textContent = '1';
   document.getElementById('timeVal').textContent = '30';
   document.getElementById('energyBar').style.width = '0%';
   updateLivesUI();
-
   clearScene();
   createPlayer();
   gameState = 'playing';
 }
-
 window.submitScore = async function() {
   const name = document.getElementById('playerNameInput').value.trim() || '匿名スター';
   document.getElementById('submitBtn').disabled = true;
@@ -500,14 +486,12 @@ window.submitScore = async function() {
     document.getElementById('skipBtn').disabled = false;
   }
 }
-
 window.skipSubmit = async function() {
   document.getElementById('nameInputWrapper').style.display = 'none';
   document.getElementById('submitMsg').textContent = '';
   document.getElementById('postSubmitArea').style.display = 'block';
   await refreshRanking();
 }
-
 var bgCanvas = document.getElementById('bgCanvas');
 var bgCtx = bgCanvas.getContext('2d');
 var bgStars = [];
@@ -522,7 +506,6 @@ function initBg() {
     a: Math.random()
   }));
 }
-
 function drawBg(t) {
   bgCtx.fillStyle = warpFactor > 0.1 ? 'rgba(0, 0, 0, 0.3)' : '#000';
   bgCtx.fillRect(0,0,bgCanvas.width,bgCanvas.height);
@@ -548,25 +531,21 @@ function drawBg(t) {
   }
   if (warpFactor > 0) warpFactor *= 0.95; 
 }
-
 var items = [];
 var multiShot = 1;
 var speedBoost = 1.0;
 var multiShotTimer = 0;
 var speedTimer = 0;
 var ITEM_DURATION = 600;
-
 var canvas = document.getElementById('gameCanvas');
 var renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setClearColor(0x000000, 0);
-
 var scene = new THREE.Scene();
 var W = () => window.innerWidth;
 var H = () => window.innerHeight;
 var camera = new THREE.OrthographicCamera(-W()/2, W()/2, H()/2, -H()/2, 0.1, 2000);
 camera.position.z = 500;
-
 function resize() {
   renderer.setSize(W(), H(), false);
   camera.left = -W()/2; camera.right = W()/2;
@@ -579,7 +558,6 @@ function resize() {
 }
 window.addEventListener('resize', resize);
 resize();
-
 var ambLight = new THREE.AmbientLight(0x8888cc, 0.8);
 scene.add(ambLight);
 var dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
@@ -588,16 +566,13 @@ scene.add(dirLight);
 var pointLight = new THREE.PointLight(0x4488ff, 1.5, 600);
 pointLight.position.set(0, 0, 200);
 scene.add(pointLight);
-
 var textureLoader = new THREE.TextureLoader();
 var starTexture  = textureLoader.load('star_2_open.png');
 var lemonTexture = textureLoader.load('item_lemon.png');
 var mintTexture  = textureLoader.load('item_mint.png');
 var ccTexture    = textureLoader.load('cc.jpg');
 var purinTexture = textureLoader.load('purin.jpg');
-
 var player, playerSprite;
-
 function createPlayer() {
   if (player) scene.remove(player);
   const mat = new THREE.SpriteMaterial({ map: starTexture, transparent: true });
@@ -607,7 +582,6 @@ function createPlayer() {
   scene.add(playerSprite);
   player = playerSprite;
 }
-
 var bullets = [];
 var bulletGeo = new THREE.IcosahedronGeometry(4, 0); 
 var bulletMatSingle = new THREE.MeshStandardMaterial({
@@ -620,13 +594,11 @@ var laserGeo = new THREE.CylinderGeometry(8, 8, 120, 8);
 var laserMat = new THREE.MeshStandardMaterial({
   color: 0xffaaff, emissive: 0xff00aa, emissiveIntensity: 2, roughness: 0.2
 });
-
 var enemyBullets = [];
 var enemyBulletGeo = new THREE.SphereGeometry(6, 8, 8);
 var enemyBulletMat = new THREE.MeshStandardMaterial({
   color: 0xff0044, emissive: 0xff0000, emissiveIntensity: 2, roughness: 0.2
 });
-
 function shoot() {
   if (laserTime > 0) {
     if (frameCount % 4 === 0) {
@@ -650,7 +622,6 @@ function shoot() {
     });
   }
 }
-
 function spawnEnemyBullet(x, y) {
   var mesh = new THREE.Mesh(enemyBulletGeo, enemyBulletMat);
   mesh.position.set(x, y - 20, 0);
@@ -665,7 +636,6 @@ function spawnEnemyBullet(x, y) {
   }
   enemyBullets.push({ mesh, vx: vx, vy: -speed });
 }
-
 function updateBullets() {
   for (var i = bullets.length-1; i >= 0; i--) {
     var b = bullets[i];
@@ -689,7 +659,6 @@ function updateBullets() {
     }
   }
 }
-
 var enemies = [];
 var ENEMY_TYPES = [
   { geo: () => new THREE.TetrahedronGeometry(1, 0),      color: 0xff2244, em: 0x880011, size:28, hp:1, pts:100, speed:1.8 },
@@ -700,7 +669,6 @@ var ENEMY_TYPES = [
   { geo: () => new THREE.SphereGeometry(1, 6, 6),        color: 0x00ff88, em: 0x008844, size:52, hp:5, pts:700, speed:0.7 },
   { geo: () => new THREE.TorusGeometry(1, 0.4, 6, 8),    color: 0xffcc00, em: 0x886600, size:58, hp:6, pts:900, speed:0.65 },
 ];
-
 function spawnEnemy() {
   const typePool = ENEMY_TYPES.slice(0, Math.min(2 + Math.floor(level/1.5), ENEMY_TYPES.length));
   const t = typePool[Math.floor(Math.random() * typePool.length)];
@@ -720,7 +688,6 @@ function spawnEnemy() {
   scene.add(mesh);
   enemies.push({ mesh, vy: -spd, drift, driftFreq, hp: t.hp, maxHp: t.hp, pts: t.pts, size: s, rx:Math.random()*0.06-0.03, ry:Math.random()*0.06-0.03, shootTimer });
 }
-
 function updateEnemies() {
   const interval = Math.max(20, 80 - level * 5);
   if (frameCount - lastEnemyFrame > interval) {
@@ -745,15 +712,14 @@ function updateEnemies() {
     }
   }
 }
-
 function spawnItem() {
   var r = Math.random();
   var tex, type;
-  if (r < 0.5) {
+  if (r < 0.65) {
     tex = purinTexture; type = 'purin';
-  } else if (r < 0.6) {
+  } else if (r < 0.85) {
     tex = ccTexture; type = 'cc';
-  } else if (r < 0.8) {
+  } else if (r < 0.92) {
     tex = lemonTexture; type = 'multishot';
   } else {
     tex = mintTexture; type = 'speed';
@@ -769,9 +735,8 @@ function spawnItem() {
   scene.add(sprite);
   items.push({ sprite: sprite, type: type, vy: -(1.5 + level * 0.1) });
 }
-
 function updateItems() {
-  if (frameCount % 200 === 100 && Math.random() < 0.8) spawnItem();
+  if (frameCount % 120 === 0 && Math.random() < 0.9) spawnItem();
   for (var i = items.length-1; i >= 0; i--) {
     var it = items[i];
     it.sprite.position.y += it.vy;
@@ -784,7 +749,6 @@ function updateItems() {
   if (multiShotTimer > 0) { multiShotTimer--; if (multiShotTimer===0) multiShot=1; }
   if (speedTimer > 0)     { speedTimer--;      if (speedTimer===0)    speedBoost=1.0; }
 }
-
 function showItemGet(type) {
   var overlay = document.createElement('div');
   overlay.className = 'item-overlay';
@@ -827,7 +791,6 @@ function showItemGet(type) {
   document.body.appendChild(overlay);
   setTimeout(() => overlay.remove(), 2200);
 }
-
 function spawnDamageText(worldX, worldY, amount, color = '#fff') {
   var el = document.createElement('div');
   el.className = 'damage-text';
@@ -838,7 +801,6 @@ function spawnDamageText(worldX, worldY, amount, color = '#fff') {
   document.body.appendChild(el);
   setTimeout(() => el.remove(), 800);
 }
-
 function spawnExplosion(worldX, worldY, emoji) {
   var emojis = emoji ? [emoji] : ['✨','💫','⭐','🌟'];
   for (var i = 0; i < 3; i++) {
@@ -851,7 +813,6 @@ function spawnExplosion(worldX, worldY, emoji) {
     setTimeout(() => el.remove(), 700);
   }
 }
-
 function triggerBomb() {
   for (var i = enemies.length - 1; i >= 0; i--) {
     var e = enemies[i];
@@ -870,7 +831,6 @@ function triggerBomb() {
   shakeTime = 30;
   shakeMag = 20;
 }
-
 function checkCollisions() {
   for (var bi = bullets.length-1; bi >= 0; bi--) {
     var b = bullets[bi];
@@ -888,7 +848,6 @@ function checkCollisions() {
         e.hp -= b.isLaser ? 5 : 1;
         e.mesh.material.emissiveIntensity = 4;
         setTimeout(() => { if (e.mesh.material) e.mesh.material.emissiveIntensity = 1.2; }, 80);
-
         if (e.hp <= 0) {
           spawnExplosion(e.mesh.position.x, e.mesh.position.y);
           var pts = Math.floor(e.pts * scoreMultiplier);
@@ -904,16 +863,13 @@ function checkCollisions() {
       }
     }
   }
-
   if (!player) return;
-
   for (var i = items.length-1; i >= 0; i--) {
     var it = items[i];
     var dist = Math.sqrt((player.position.x - it.sprite.position.x)**2 + (player.position.y - it.sprite.position.y)**2);
     if (dist < 50) {
       scene.remove(it.sprite);
       items.splice(i, 1);
-      
       if (it.type === 'purin') {
         if (laserTime <= 0) {
           puddingEnergy = Math.min(100, puddingEnergy + 25);
@@ -942,7 +898,6 @@ function checkCollisions() {
       spawnExplosion(it.sprite.position.x, it.sprite.position.y, '🌟');
     }
   }
-
   if (invincibleTime <= 0) {
     for (var ei = enemies.length-1; ei >= 0; ei--) {
       var e = enemies[ei];
@@ -968,7 +923,6 @@ function checkCollisions() {
     }
   }
 }
-
 function addScore2(pts) {
   score += pts;
   var el = document.getElementById('scoreBox');
@@ -976,7 +930,6 @@ function addScore2(pts) {
   el.style.transform = 'scale(1.1)';
   setTimeout(() => el.style.transform = 'scale(1)', 100);
 }
-
 function showLevelBanner() {
   var b = document.getElementById('levelBanner');
   b.innerHTML = `STAGE CLEAR!<br><span style="font-size: 2rem;">STAGE ${level}</span>`;
@@ -985,7 +938,6 @@ function showLevelBanner() {
   ambLight.color.setHSL((level * 0.1) % 1.0, 0.8, 0.6); 
   setTimeout(() => { b.classList.remove('show'); }, 2000);
 }
-
 function updateLivesUI() {
   var bar = document.getElementById('lifeBar');
   if (!bar) return;
@@ -1002,7 +954,6 @@ function updateLivesUI() {
     bar.style.boxShadow = '0 0 8px rgba(255,0,0,0.8)';
   }
 }
-
 function playerHit() {
   lives--;
   updateLivesUI();
@@ -1015,7 +966,6 @@ function playerHit() {
     invincibleTime = 120;
   }
 }
-
 async function triggerGameOver() {
   gameState = 'gameover';
   clearScene();
@@ -1023,18 +973,14 @@ async function triggerGameOver() {
   document.getElementById('finalScore').textContent = score.toLocaleString();
   document.getElementById('playerNameInput').value = '';
   document.getElementById('submitMsg').textContent = '';
-  
   document.getElementById('submitBtn').disabled = false;
   document.getElementById('skipBtn').disabled = false;
-  
   document.getElementById('nameEntryArea').style.display = 'block';
   document.getElementById('nameInputWrapper').style.display = 'block';
   document.getElementById('postSubmitArea').style.display = 'none';
-
   await refreshRanking();
   showScreen('gameOverScreen');
 }
-
 function clearScene() {
   [...enemies].forEach(e => scene.remove(e.mesh));
   enemies.length = 0;
@@ -1047,9 +993,7 @@ function clearScene() {
   multiShot = 1; speedBoost = 1.0;
   multiShotTimer = 0; speedTimer = 0;
 }
-
 var PLAYER_SPEED = 6;
-
 function gameLoop(t) {
   animId = requestAnimationFrame(gameLoop);
   var dt = 0;
@@ -1087,13 +1031,11 @@ function gameLoop(t) {
     showLevelBanner();
   }
   document.getElementById('timeVal').textContent = Math.ceil(stageTime);
-
   if (laserTime > 0) {
     laserTime--;
     puddingEnergy = (laserTime / 1200) * 100;
     document.getElementById('energyBar').style.width = puddingEnergy + '%';
   }
-
   if (invincibleTime > 0) {
     invincibleTime--;
     if (player) {
@@ -1102,7 +1044,6 @@ function gameLoop(t) {
   } else if (player) {
     player.material.opacity = 1.0;
   }
-
   if (player) {
     var spd = (PLAYER_SPEED + level * 0.2) * speedBoost;
     if ((keys['ArrowLeft'] || keys['a']) && player.position.x > -W()/2 + 40) player.position.x -= spd;
@@ -1110,14 +1051,12 @@ function gameLoop(t) {
     shoot();
     player.material.rotation = (keys['ArrowLeft'] ? -0.25 : keys['ArrowRight'] ? 0.25 : 0);
   }
-
   updateBullets();
   updateEnemies();
   updateItems();
   checkCollisions();
   renderer.render(scene, camera);
 }
-
 window.addEventListener('keydown', e => {
   keys[e.key] = true;
   if (e.key === ' ') e.preventDefault();
