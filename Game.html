@@ -314,13 +314,20 @@
   <div style="color:#aaa; margin:6px 0 2px; letter-spacing:2px; font-size:1.2rem;">YOUR SCORE</div>
   <div class="go-score" id="finalScore">0</div>
   <div id="nameEntryArea">
-    <div style="color:#ffe87a; margin-bottom:8px; font-size:1.2rem; text-align: center;">名前を入力してランキングに登録！</div>
-    <div class="name-hint">最大8文字</div>
-    <input class="name-input" id="playerNameInput" type="text" maxlength="8" placeholder="プレイヤー名" autocomplete="off">
-    <br>
-    <button class="btn" id="submitBtn" onclick="submitScore()">登録して終了</button>
-    <button class="btn-secondary" onclick="skipSubmit()">登録せずに終了</button>
+    <div id="nameInputWrapper">
+      <div style="color:#ffe87a; margin-bottom:8px; font-size:1.2rem; text-align: center;">名前を入力してランキングに登録！</div>
+      <div class="name-hint">最大8文字</div>
+      <input class="name-input" id="playerNameInput" type="text" maxlength="8" placeholder="プレイヤー名" autocomplete="off">
+      <br>
+      <button class="btn" id="submitBtn" onclick="submitScore()">登録する</button>
+      <button class="btn-secondary" id="skipBtn" onclick="skipSubmit()">登録しない</button>
+    </div>
     <div id="submitMsg" style="color:#ffe87a; margin-top:8px; min-height:24px; font-size:1.2rem; text-align: center;"></div>
+  </div>
+  <div id="postSubmitArea" style="display: none; margin-top: 10px; text-align: center;">
+    <button class="btn" onclick="startGame()">もう一度プレイ</button>
+    <br>
+    <button class="btn-secondary" onclick="hideRanking()">タイトルへ戻る</button>
   </div>
   <div id="rankPanel" style="margin-bottom: 40px;">
     <div class="rank-title">🏆 TOP 10</div>
@@ -478,26 +485,27 @@ window.startGame = function() {
 window.submitScore = async function() {
   const name = document.getElementById('playerNameInput').value.trim() || '匿名スター';
   document.getElementById('submitBtn').disabled = true;
+  document.getElementById('skipBtn').disabled = true;
   document.getElementById('submitMsg').textContent = '登録中...';
   try {
     const list = await addScore(name, score);
     renderRanking(list, 'rankListGO');
-    document.getElementById('nameEntryArea').style.display = 'none';
+    document.getElementById('nameInputWrapper').style.display = 'none';
     document.getElementById('submitMsg').textContent = '✅ 登録しました！';
+    document.getElementById('postSubmitArea').style.display = 'block';
     renderRanking(list, 'rankListTitle');
   } catch(e) {
     document.getElementById('submitMsg').textContent = '⚠️ 登録に失敗しました';
     document.getElementById('submitBtn').disabled = false;
+    document.getElementById('skipBtn').disabled = false;
   }
 }
 
 window.skipSubmit = async function() {
-  document.getElementById('nameEntryArea').style.display = 'none';
+  document.getElementById('nameInputWrapper').style.display = 'none';
+  document.getElementById('submitMsg').textContent = '';
+  document.getElementById('postSubmitArea').style.display = 'block';
   await refreshRanking();
-  setTimeout(() => {
-    showScreen('titleScreen');
-    refreshRanking();
-  }, 400);
 }
 
 var bgCanvas = document.getElementById('bgCanvas');
@@ -784,7 +792,6 @@ function showItemGet(type) {
   var effect = '';
   var img = '';
   var colorClass = '';
-
   if (type === 'cc') {
     label = '🍰 安曇野からの贈り物';
     effect = '全敵消滅！';
@@ -811,7 +818,6 @@ function showItemGet(type) {
     img = 'item_mint.png';
     colorClass = 'item-mint';
   }
-
   overlay.innerHTML = `
     <div class="item-popup ${colorClass}">
       <img src="${img}" class="item-popup-img" alt="">
@@ -1017,8 +1023,14 @@ async function triggerGameOver() {
   document.getElementById('finalScore').textContent = score.toLocaleString();
   document.getElementById('playerNameInput').value = '';
   document.getElementById('submitMsg').textContent = '';
+  
   document.getElementById('submitBtn').disabled = false;
+  document.getElementById('skipBtn').disabled = false;
+  
   document.getElementById('nameEntryArea').style.display = 'block';
+  document.getElementById('nameInputWrapper').style.display = 'block';
+  document.getElementById('postSubmitArea').style.display = 'none';
+
   await refreshRanking();
   showScreen('gameOverScreen');
 }
