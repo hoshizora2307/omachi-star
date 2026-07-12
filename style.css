@@ -1,0 +1,83 @@
+:root {
+    --bg-color: #0c0f1a;
+    --card-color: rgba(28, 32, 51, 0.7);
+    --text-color: #e0e0e0;
+    --accent-color: #f0c43d;
+    --highlight-color: #a0c0ff;
+    --font-jp: 'Noto Sans JP', sans-serif;
+    --font-title: 'Kiwi Maru', serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background-color: var(--bg-color); color: var(--text-color); font-family: var(--font-jp); overflow: hidden; }
+
+/* ▼▼▼ ここから背景アニメーションの変更点 ▼▼▼ */
+#stars, #stars2, #stars3 {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 200%;
+    height: 200%;
+    z-index: -1;
+    /* 変更点: 星のサイズを大きく (1px -> 2px, 2px -> 3px) */
+    background-image: radial-gradient(2px 2px at 50px 50px, white, transparent),
+                      radial-gradient(2px 2px at 100px 150px, white, transparent),
+                      radial-gradient(3px 3px at 200px 50px, white, transparent);
+    background-repeat: repeat;
+}
+
+#stars {
+    /* 変更点: 密度を高く(300px -> 150px)、速度を速く(50s -> 30s) */
+    background-size: 150px 150px;
+    animation: zoom 30s alternate infinite;
+}
+#stars2 {
+    /* 変更点: 密度を高く(500px -> 250px)、速度を速く(70s -> 45s) */
+    background-size: 250px 250px;
+    animation: zoom 45s alternate-reverse infinite;
+}
+#stars3 {
+    /* 変更点: 密度を高く(700px -> 350px)、速度を速く(90s -> 60s) */
+    background-size: 350px 350px;
+    animation: zoom 60s alternate infinite;
+}
+/* ▲▲▲ ここまで背景アニメーションの変更点 ▲▲▲ */
+
+@keyframes zoom { from { transform: scale(1); } to { transform: scale(1.5); } }
+
+.shooting-star { position: fixed; top: -10px; left: 50%; width: 2px; height: 150px; background: linear-gradient(to top, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.6)); transform-origin: top left; transform: rotate(-45deg); animation: shooting-star-animation 10s ease-in-out infinite; z-index: -1; }
+.shooting-star:nth-child(2) { top: 20%; left: -50px; animation-delay: 3s; animation-duration: 8s; }
+.shooting-star:nth-child(3) { top: -10px; left: 80%; animation-delay: 5.5s; animation-duration: 12s; }
+@keyframes shooting-star-animation { 0% { opacity: 0; transform: rotate(-45deg) translateX(0); } 10% { opacity: 1; } 90% { opacity: 1; } 100% { opacity: 0; transform: rotate(-45deg) translateX(150vw); } }
+
+#splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--bg-color); z-index: 1000; display: flex; justify-content: center; align-items: center; text-align: center; transition: opacity 1s ease-out, visibility 1s ease-out; }
+#splash-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+.splash-content h1 { font-family: var(--font-title); color: var(--accent-color); font-size: 2.5rem; margin-bottom: 2rem; opacity: 0; transform: translateY(20px); transition: opacity 1s ease, transform 1s ease; text-shadow: 0 0 10px rgba(255, 215, 0, 0.7); }
+#splash-screen .credits p { font-size: 0.8rem; color: #a0a0a0; line-height: 1.8; opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease, transform 0.8s ease; }
+.splash-content h1.visible { opacity: 1; transform: translateY(0); }
+#splash-screen .credits.visible p:nth-child(1) { transition-delay: 0.2s; opacity: 1; transform: translateY(0); }
+#splash-screen .credits.visible p:nth-child(2) { transition-delay: 0.4s; opacity: 1; transform: translateY(0); }
+#splash-screen .credits.visible p:nth-child(3) { transition-delay: 0.6s; opacity: 1; transform: translateY(0); }
+
+#app-container { opacity: 1; transition: opacity 1s ease-in; height: 100vh; overflow-y: auto; }
+#app-container.hidden { opacity: 0; pointer-events: none; }
+header { text-align: center; padding: 20px; position: sticky; top: 0; z-index: 10; background: rgba(12, 15, 26, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+header h1 { font-family: var(--font-title); color: var(--highlight-color); font-size: 2.2rem; margin-bottom: 8px; text-shadow: 0 0 8px rgba(160, 192, 255, 0.6); }
+header p { color: #a0a0a0; }
+main { padding: 20px; max-width: 1200px; margin: 0 auto; }
+.grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; }
+.constellation-card { background-color: var(--card-color); border: 1px solid rgba(160, 192, 255, 0.2); border-radius: 12px; padding: 20px 15px; text-align: center; font-weight: 500; font-size: 1.1rem; cursor: pointer; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease, transform 0.5s ease, background-color 0.3s ease, box-shadow 0.3s ease; }
+.constellation-card.visible { opacity: 1; transform: translateY(0); }
+.constellation-card:hover { background-color: rgba(160, 192, 255, 0.2); transform: translateY(-5px) scale(1.05); box-shadow: 0 0 20px rgba(160, 192, 255, 0.5); }
+.app-footer { text-align: center; margin-top: 40px; padding: 20px; border-top: 1px solid rgba(160, 192, 255, 0.2); }
+.app-footer p { font-size: 0.75rem; color: #a0a0a0; line-height: 1.7; }
+
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: flex; justify-content: center; align-items: center; padding: 20px; z-index: 1001; opacity: 1; visibility: visible; transition: opacity 0.3s, visibility 0.3s; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.modal-overlay.hidden { opacity: 0; visibility: hidden; }
+.modal-content { background-color: var(--bg-color); border: 1px solid var(--highlight-color); padding: 30px; border-radius: 15px; max-width: 600px; width: 100%; position: relative; box-shadow: 0 0 30px rgba(160, 192, 255, 0.5); max-height: 90vh; overflow-y: auto; transform: scale(0.95); transition: transform 0.3s; }
+.modal-overlay:not(.hidden) .modal-content { transform: scale(1); }
+.close-button { position: absolute; top: 15px; right: 25px; background: none; border: none; color: var(--text-color); font-size: 2.5rem; cursor: pointer; }
+.modal-body { display: block; }
+.modal-info h2 { font-family: var(--font-title); color: var(--accent-color); font-size: 2.2rem; }
+.en-name { font-style: italic; color: #a0a0a0; margin-bottom: 20px; display: block; }
+#modal-description-container h4 { color: var(--highlight-color); margin-top: 1em; margin-bottom: 0.5em; border-bottom: 1px solid rgba(160, 192, 255, 0.3); padding-bottom: 0.3em; }
+#modal-description-container p { line-height: 1.8; margin-bottom: 10px; }

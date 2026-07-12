@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>88星座図鑑</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@400;500&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div id="stars"></div>
+    <div id="stars2"></div>
+    <div id="stars3"></div>
+    <div class="shooting-star"></div>
+    <div class="shooting-star"></div>
+    <div class="shooting-star"></div>
+
+    <div id="splash-screen">
+        <div class="splash-content">
+            <h1 class="splash-title">88星座図鑑</h1>
+            <div class="credits">
+                <p>製作：MONDOCOLO STUDIO.</p>
+                
+                <p>©株式会社MONDOCOLO</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-container" class="hidden">
+        <header>
+            <h1>88星座図鑑</h1>
+            <p>気になる星座をタップしてください</p>
+        </header>
+        <main id="constellation-grid" class="grid-container"></main>
+        <footer class="app-footer">
+            <p>製作：MONDOCOLO STUDIO.</p>
+            
+            <p>2026 株式会社MONDOCOLO</p>
+            <p>「星と君ぷろじぇくと」実行委員会</p>
+        </footer>
+    </div>
+
+    <div id="modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button id="close-button" class="close-button">&times;</button>
+            <div class="modal-body">
+                <div class="modal-info">
+                    <h2 id="modal-name-jp">星座名</h2>
+                    <p id="modal-name-en" class="en-name">English Name</p>
+                    <div class="modal-details">
+                        <p><strong>見頃の季節:</strong> <span id="modal-season"></span></p>
+                        <p><strong>有名な星:</strong> <span id="modal-star"></span></p>
+                        <div id="modal-description-container"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
