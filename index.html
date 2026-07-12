@@ -932,6 +932,7 @@
                     <ul>
                         <li><a href="#home" class="nav-link active" id="nav-home">Home</a></li>
                         <li><a href="#partners" class="nav-link" id="nav-partners">Partners</a></li>
+                        <li><a href="seiza88.html" class="nav-link" id="nav-guide">Guide</a></li>
                     </ul>
                 </nav>
                 <div class="lang-switcher" id="lang-switcher">
@@ -992,6 +993,16 @@
                         <div class="starry-score-text"><span id="txt-starry-score-label">星空指数</span>: <span id="starry-score-number"></span></div>
                         <div class="starry-condition" id="starry-condition"></div>
                     </div>
+                </div>
+            </section>
+
+            <section id="constellation-guide" class="fade-in-up" style="margin-bottom: 80px; text-align: center;">
+                <h2 class="sec-title" id="txt-guide-title" style="margin-bottom: 30px;">CONSTELLATION GUIDE</h2>
+                <div class="guide-banner" style="max-width: 650px; margin: 0 auto; background: var(--card-bg); border: 1px solid rgba(230, 194, 122, 0.4); border-radius: 12px; padding: 40px 20px; backdrop-filter: blur(15px); box-shadow: 0 10px 30px rgba(0,0,0,0.4);">
+                    <p id="txt-guide-desc" style="margin-bottom: 20px; font-size: 1.1rem; letter-spacing: 2px;">全88星座の神話や見つけ方を網羅した完全ガイド</p>
+                    <a href="seiza88.html" id="btn-guide-link" class="launch-text" style="display: inline-block; text-decoration: none; font-size: 1.2rem; padding: 12px 40px; margin-top: 10px;">
+                        <span id="txt-guide-btn">88星座図鑑を開く</span> <span>✦</span>
+                    </a>
                 </div>
             </section>
 
@@ -1058,9 +1069,13 @@
                 mainLogo: "星空観賞会",
                 navHome: "Home",
                 navPartners: "Partners",
+                navGuide: "Guide",
                 heroSub: "星空案内ツアーガイド最高峰の体験",
                 heroTitle: "銀河の旅人",
                 btnLaunch: "2026年8月始動",
+                guideTitle: "CONSTELLATION GUIDE",
+                guideDesc: "全88星座の神話や見つけ方を網羅した完全ガイド",
+                guideBtn: "88星座図鑑を開く",
                 partnerTitle: "PARTNERS",
                 company: "株式会社MONDOCOLO",
                 address: "〒398-0002 長野県大町市大町俵町１９０３−１",
@@ -1087,9 +1102,13 @@
                 mainLogo: "Starry Sky Tour",
                 navHome: "Home",
                 navPartners: "Partners",
+                navGuide: "Guide",
                 heroSub: "The Ultimate Starry Sky Guided Experience",
                 heroTitle: "Galactic Traveler",
                 btnLaunch: "Launching August 2026",
+                guideTitle: "CONSTELLATION GUIDE",
+                guideDesc: "A complete guide to the myths and locations of all 88 constellations",
+                guideBtn: "Open 88 Constellations Guide",
                 partnerTitle: "PARTNERS",
                 company: "MONDOCOLO Inc.",
                 address: "1903-1 Omachitawara-machi, Omachi City, Nagano 398-0002",
@@ -1116,9 +1135,13 @@
                 mainLogo: "Observación de Estrellas",
                 navHome: "Inicio",
                 navPartners: "Socios",
+                navGuide: "Guía",
                 heroSub: "La Máxima Experiencia Guiada de Cielos Estrellados",
                 heroTitle: "Viajero Galáctico",
                 btnLaunch: "Inicio en Agosto de 2026",
+                guideTitle: "GUÍA DE CONSTELACIONES",
+                guideDesc: "Una guía completa sobre los mitos y la ubicación de las 88 constelaciones.",
+                guideBtn: "Abrir Guía de Constelaciones",
                 partnerTitle: "PARTNERS",
                 company: "MONDOCOLO Inc.",
                 address: "1903-1 Omachitawara-machi, Ciudad de Omachi, Nagano 398-0002",
@@ -1145,9 +1168,13 @@
                 mainLogo: "星空观賞会",
                 navHome: "首页",
                 navPartners: "合作伙伴",
+                navGuide: "指南",
                 heroSub: "星空导游带来的顶级观星體驗",
                 heroTitle: "银河旅行者",
                 btnLaunch: "2026年8月隆重登场",
+                guideTitle: "星座指南",
+                guideDesc: "全面收录88个星座神话与寻找方法的完整指南",
+                guideBtn: "打开88星座图鉴",
                 partnerTitle: "PARTNERS",
                 company: "MONDOCOLO 株式会社",
                 address: "〒398-0002 长野县大町市大町俵町1903-1",
@@ -1174,9 +1201,13 @@
                 mainLogo: "별자리 감상회",
                 navHome: "홈",
                 navPartners: "파트너",
+                navGuide: "가이드",
                 heroSub: "최고の 별자리 가이드 투어 체험",
                 heroTitle: "은하수의 여행자",
                 btnLaunch: "2026년 8월 시동",
+                guideTitle: "별자리 가이드",
+                guideDesc: "88개 별자리의 신화와 찾는 법을 망라한 완전한 가이드",
+                guideBtn: "88 별자리 도감 열기",
                 partnerTitle: "PARTNERS",
                 company: "주식회사 MONDOCOLO",
                 address: "우편번호 398-0002 나가ノ현 오마치시 오마치타와라마치 1903-1",
@@ -1209,9 +1240,15 @@
             document.getElementById('txt-main-logo').innerText = translations[lang].mainLogo;
             document.getElementById('nav-home').innerText = translations[lang].navHome;
             document.getElementById('nav-partners').innerText = translations[lang].navPartners;
+            document.getElementById('nav-guide').innerText = translations[lang].navGuide;
             document.getElementById('txt-hero-sub').innerText = translations[lang].heroSub;
             document.getElementById('txt-hero-title').innerText = translations[lang].heroTitle;
             document.getElementById('btn-launch').innerText = translations[lang].btnLaunch;
+            
+            document.getElementById('txt-guide-title').innerText = translations[lang].guideTitle;
+            document.getElementById('txt-guide-desc').innerText = translations[lang].guideDesc;
+            document.getElementById('txt-guide-btn').innerText = translations[lang].guideBtn;
+
             document.getElementById('txt-partner-title').innerText = translations[lang].partnerTitle;
             
             document.getElementById('txt-company').innerText = translations[lang].company;
