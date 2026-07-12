@@ -99,11 +99,23 @@
             animation: pulse 3s infinite ease-in-out;
         }
 
+        .logo-text {
+            white-space: nowrap; /* テキストの折り返しを防止 */
+        }
+
         .logo-text span {
             color: var(--accent-gold);
             font-size: 0.85rem;
             display: block;
             letter-spacing: 2px;
+        }
+
+        /* ▼ メインタイトル用のクラスを追加 ▼ */
+        .main-logo-text {
+            font-size: 1.4rem;
+            color: #fff;
+            font-weight: bold;
+            letter-spacing: 0;
         }
 
         .right-nav-box {
@@ -581,6 +593,10 @@
             .logo { font-size: 1.1rem; gap: 8px; }
             .logo-icon { font-size: 1.4rem; }
             .logo-text span { font-size: 0.75rem; letter-spacing: 1px; }
+            
+            /* ▼ スマホサイズの時にメインタイトルを少し小さくする ▼ */
+            .main-logo-text { font-size: 1.1rem; }
+
             .nav-container { gap: 15px; }
             nav ul { gap: 15px; }
             nav a { font-size: 0.85rem; }
@@ -629,6 +645,9 @@
         }
 
         @media (max-width: 480px) {
+            /* ▼ さらに小さいスマホ画面の時にタイトルを微調整 ▼ */
+            .main-logo-text { font-size: 0.95rem; }
+
             .partner-grid { grid-template-columns: 1fr; }
             nav ul { gap: 10px; }
             nav a { font-size: 0.8rem; }
@@ -922,7 +941,8 @@
             <div class="logo-icon">✦</div>
             <div class="logo-text">
                 <span id="txt-sub-logo">大町温泉郷</span>
-                <span id="txt-main-logo" style="font-size:1.4rem; color:#fff; font-weight:bold; letter-spacing:0;">星空観賞会</span>
+                <!-- ▼ インラインのstyleを削除し、クラスを追加しました ▼ -->
+                <span id="txt-main-logo" class="main-logo-text">星空観賞会</span>
             </div>
         </a>
         
@@ -1216,7 +1236,7 @@
                 cinemaText: `
                     <p>나가ノ현은 별을 관찰하기에 가장 좋은 곳입니다.</p>
                     <p style="margin-top: 30px;">아치 무라, 노베야マ, 그리고 오마치 시で,</p>
-                    <p>당신を <span class="love-highlight">사랑</span>を 담아</p>
+                    <p>당신を <span class="love-highlight">사랑</span>를 담아</p>
                     <p>우주 여행で 안내합니다.</p>
                     <p style="margin-top: 30px;">만약 날이 맑다면, <span class="love-highlight">만나러</span> 와주세요!</p>
                 `,
