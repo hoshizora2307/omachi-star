@@ -100,7 +100,7 @@
         }
 
         .logo-text {
-            white-space: nowrap; /* テキストの折り返しを防止 */
+            white-space: nowrap;
         }
 
         .logo-text span {
@@ -110,7 +110,6 @@
             letter-spacing: 2px;
         }
 
-        /* ▼ メインタイトル用のクラスを追加 ▼ */
         .main-logo-text {
             font-size: 1.4rem;
             color: #fff;
@@ -510,7 +509,7 @@
         }
 
         .cinema-page.active .cinema-text-box {
-            animation: movieScroll 22s linear forwards;
+            animation: movieScroll 30s linear forwards;
         }
 
         .cinema-text-box p {
@@ -567,7 +566,7 @@
 
         @keyframes movieScroll {
             0% { top: 100%; transform: translateY(0); }
-            100% { top: -50%; transform: translateY(0); }
+            100% { top: -85%; transform: translateY(0); }
         }
 
         @keyframes fadeInButton {
@@ -594,13 +593,14 @@
             .logo-icon { font-size: 1.4rem; }
             .logo-text span { font-size: 0.75rem; letter-spacing: 1px; }
             
-            /* ▼ スマホサイズの時にメインタイトルを少し小さくする ▼ */
             .main-logo-text { font-size: 1.1rem; }
 
             .nav-container { gap: 15px; }
             nav ul { gap: 15px; }
             nav a { font-size: 0.85rem; }
             .lang-btn { padding: 4px 10px; font-size: 0.75rem; }
+            .lang-dropdown { top: 165%; min-width: 140px; padding: 8px 0; }
+            .lang-dropdown li { padding: 14px 20px; font-size: 1rem; min-height: 48px; display: flex; align-items: center; }
             .project-logo-img { height: 56px; }
             header.scrolled .project-logo-img { height: 46px; }
             
@@ -628,7 +628,7 @@
             }
             @keyframes movieScroll {
                 0% { top: 100%; }
-                100% { top: -65%; }
+                100% { top: -110%; }
             }
             .btn-home-back { 
                 padding: 12px 26px; 
@@ -645,7 +645,6 @@
         }
 
         @media (max-width: 480px) {
-            /* ▼ さらに小さいスマホ画面の時にタイトルを微調整 ▼ */
             .main-logo-text { font-size: 0.95rem; }
 
             .partner-grid { grid-template-columns: 1fr; }
@@ -941,7 +940,6 @@
             <div class="logo-icon">✦</div>
             <div class="logo-text">
                 <span id="txt-sub-logo">大町温泉郷</span>
-                <!-- ▼ インラインのstyleを削除し、クラスを追加しました ▼ -->
                 <span id="txt-main-logo" class="main-logo-text">星空観賞会</span>
             </div>
         </a>
@@ -1107,6 +1105,10 @@
                     <p><span class="love-highlight">愛</span>を込めてあなたを</p>
                     <p>宇宙の旅へお連れします。</p>
                     <p style="margin-top: 30px;">もし晴れたら、<span class="love-highlight">逢い</span>に来て！</p>
+                    <p style="margin-top: 50px;">星が夢を<span class="love-highlight">叶</span>えることもあります。</p>
+                    <p><span class="love-highlight">子</span>供たちの目の輝きは、</p>
+                    <p>どんな星よりもまばゆい光を放ちます。</p>
+                    <p style="margin-top: 30px;">みんなで宇宙を探求しよう！</p>
                 `,
                 moonSecTitle: "TODAY'S MOON",
                 moonAgeLabel: "月齢",
@@ -1140,6 +1142,10 @@
                     <p>bring you into a journey through the universe</p>
                     <p>with all our <span class="love-highlight">Love</span>.</p>
                     <p style="margin-top: 30px;">If the sky is clear, come <span class="love-highlight">see</span> me!</p>
+                    <p style="margin-top: 50px;">Stars can even make dreams <span class="love-highlight">come true</span>.</p>
+                    <p>The sparkle in <span class="love-highlight">children</span>'s eyes</p>
+                    <p>shines brighter than any star.</p>
+                    <p style="margin-top: 30px;">Let's explore the universe together!</p>
                 `,
                 moonSecTitle: "TODAY'S MOON",
                 moonAgeLabel: "Moon Age",
@@ -1173,6 +1179,10 @@
                     <p>te llevarán a un maravilloso viaje por el universe</p>
                     <p>with all our <span class="love-highlight">Love</span>.</p>
                     <p style="margin-top: 30px;">Si el cielo está despejado, ¡ven a <span class="love-highlight">verme</span>!</p>
+                    <p style="margin-top: 50px;">Las estrellas también pueden <span class="love-highlight">cumplir</span> los sueños.</p>
+                    <p>El brillo en los ojos de los <span class="love-highlight">niños</span></p>
+                    <p>resplandece más que cualquier estrella.</p>
+                    <p style="margin-top: 30px;">¡Exploremos el universo juntos!</p>
                 `,
                 moonSecTitle: "LA LUNA DE HOY",
                 moonAgeLabel: "Edad Lunar",
@@ -1206,6 +1216,10 @@
                     <p>将满怀<span class="love-highlight">爱</span>意，带您开启</p>
                     <p>一场浪漫の宇宙之旅。</p>
                     <p style="margin-top: 30px;">如果天晴，请来<span class="love-highlight">相见</span>吧！</p>
+                    <p style="margin-top: 50px;">星星有时也能<span class="love-highlight">实现</span>梦想。</p>
+                    <p><span class="love-highlight">孩子</span>们眼中的光芒，</p>
+                    <p>比任何星星都更加耀眼。</p>
+                    <p style="margin-top: 30px;">让我们一起探索宇宙吧！</p>
                 `,
                 moonSecTitle: "今日月相",
                 moonAgeLabel: "月龄",
@@ -1239,6 +1253,10 @@
                     <p>당신を <span class="love-highlight">사랑</span>를 담아</p>
                     <p>우주 여행で 안내합니다.</p>
                     <p style="margin-top: 30px;">만약 날이 맑다면, <span class="love-highlight">만나러</span> 와주세요!</p>
+                    <p style="margin-top: 50px;">별은 때때로 꿈을 <span class="love-highlight">이루어</span> 주기도 합니다.</p>
+                    <p><span class="love-highlight">아이들</span>의 눈빛은,</p>
+                    <p>그 어떤 별보다 눈부시게 빛납니다.</p>
+                    <p style="margin-top: 30px;">다 함께 우주를 탐험해요!</p>
                 `,
                 moonSecTitle: "오늘の 달",
                 moonAgeLabel: "월령",
