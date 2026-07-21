@@ -117,6 +117,13 @@
     box-shadow: 0 0 12px rgba(255,60,120,0.9);
     transition: width 0.15s linear;
   }
+  .ach-group {
+    color: #8de0ff; font-size: 0.95rem; letter-spacing: 2px;
+    margin: 18px 0 4px; padding-bottom: 4px;
+    border-bottom: 1px solid rgba(140,220,255,0.25);
+    display: flex; justify-content: space-between; align-items: baseline;
+  }
+  .ach-group-val { color: #fff; font-size: 1.05rem; font-weight: bold; }
   .ach-row {
     display: flex; align-items: center; gap: 12px;
     padding: 10px 4px; border-bottom: 1px solid rgba(255,255,255,0.07);
@@ -310,27 +317,27 @@
   }
   #levelBanner.show { opacity: 1; transform: translate(-50%,-50%) scale(1); }
   .item-overlay {
-    position: fixed; inset: 0;
-    display: flex; align-items: center; justify-content: center;
+    position: fixed; left: 10px; top: 74px;
     z-index: 50; pointer-events: none;
-    animation: overlayFade 2.2s forwards;
+    animation: overlayFade 1.5s forwards;
   }
-  @keyframes overlayFade { 0% { opacity: 0; } 15% { opacity: 1; } 75% { opacity: 1; } 100% { opacity: 0; } }
+  @keyframes overlayFade { 0% { opacity: 0; } 12% { opacity: 1; } 78% { opacity: 1; } 100% { opacity: 0; } }
   .item-popup {
-    display: flex; flex-direction: column; align-items: center;
-    background: rgba(5,5,20,0.88); border-radius: 22px; padding: 24px 36px 20px;
-    box-shadow: 0 0 60px rgba(255,255,255,0.15); animation: popupZoom 2.2s forwards;
+    display: flex; flex-direction: row; align-items: center; gap: 10px;
+    background: rgba(5,5,20,0.72); border-radius: 12px; padding: 7px 14px 7px 9px;
+    box-shadow: 0 0 24px rgba(0,0,0,0.5); animation: popupZoom 1.5s forwards;
   }
-  @keyframes popupZoom { 0% { transform: scale(0.3) rotate(-25deg); } 20% { transform: scale(1.18) rotate(8deg); } 35% { transform: scale(0.97) rotate(-3deg); } 50% { transform: scale(1.04) rotate(1deg); } 65% { transform: scale(1) rotate(0deg); } 85% { transform: scale(1) rotate(0deg); } 100% { transform: scale(0.7) rotate(15deg); } }
+  @keyframes popupZoom { 0% { transform: translateX(-24px) scale(0.85); } 14% { transform: translateX(0) scale(1); } 84% { transform: translateX(0) scale(1); } 100% { transform: translateX(-18px) scale(0.92); } }
   .item-lemon { border: 2px solid rgba(255,230,80,0.7); }
   .item-mint  { border: 2px solid rgba(100,255,180,0.7); }
-  .item-popup-img { height: 160px; width: auto; filter: drop-shadow(0 0 20px rgba(255,255,255,0.4)); animation: imgSpin 2.2s forwards; }
-  @keyframes imgSpin { 0% { transform: rotate(-30deg) scale(0.4); } 30% { transform: rotate(15deg) scale(1.15); } 55% { transform: rotate(-5deg) scale(1); } 80% { transform: rotate(0deg) scale(1); } 100%{ transform: rotate(20deg) scale(0.5); } }
-  .item-popup-fallback { font-size: 7rem; line-height: 1; animation: imgSpin 2.2s forwards; }
-  .item-popup-label { font-size: 1.5rem; font-weight: 900; letter-spacing: 2px; margin-top: 10px; }
+  .item-popup-img { height: 42px; width: auto; filter: drop-shadow(0 0 8px rgba(255,255,255,0.35)); }
+
+  .item-popup-fallback { font-size: 2.1rem; line-height: 1; }
+  .item-popup-label { font-size: 0.85rem; font-weight: 700; letter-spacing: 1px; }
+  .item-popup-text { text-align: left; }
   .item-lemon .item-popup-label { color: #ffe840; text-shadow: 0 0 12px #ffe840; }
   .item-mint  .item-popup-label { color: #64ffb4; text-shadow: 0 0 12px #64ffb4; }
-  .item-popup-effect { font-size: 1.8rem; font-weight: 900; color: #fff; text-shadow: 0 0 20px rgba(255,255,255,0.8); margin: 6px 0 4px; letter-spacing: 2px; }
+  .item-popup-effect { font-size: 1.05rem; font-weight: 900; color: #fff; text-shadow: 0 0 12px rgba(255,255,255,0.7); letter-spacing: 1px; }
   #bgCanvas { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
   .explosion {
     position: fixed; pointer-events: none; z-index: 8;
@@ -539,7 +546,7 @@ function grantCoupon() {
   saveCoupons();
   runCoupons[kind] += gained;
   showCouponToast(kind, gained, after);
-  checkCouponAch();
+  checkAch();
 }
 function showCouponToast(kind, gained, total) {
   var t = COUPON_TYPES[kind];
@@ -570,44 +577,94 @@ function renderCoupons() {
   if (el) el.innerHTML = couponCardHtml('purin') + couponCardHtml('cc');
 }
 window.showCoupons = function() { renderCoupons(); showScreen('couponScreen'); }
-var ACH_KEY = 'shinshu_marche_ach_v1';
-var ACHIEVEMENTS = [
-  { id: 'first_flight', icon: '🚀', name: '初出撃',           desc: 'プリンAスターで出撃する' },
-  { id: 'shot_max',     icon: '🍮', name: 'プリンマスター',   desc: '弾数を9発まで増やす' },
-  { id: 'combo_20',     icon: '🔥', name: '連鎖の星',         desc: '20コンボを達成する' },
-  { id: 'combo_50',     icon: '💥', name: '止まらない流星',   desc: '50コンボを達成する' },
-  { id: 'combo_100',    icon: '☄️', name: '銀河一の連撃',     desc: '100コンボを達成する' },
-  { id: 'bomb_8',       icon: '🧀', name: '一網打尽',         desc: 'チーズケーキで8体以上を同時撃破' },
-  { id: 'boss_1',       icon: '👾', name: '初ボス撃破',       desc: 'ボスを1体倒す' },
-  { id: 'boss_5',       icon: '⚔️', name: 'ボスハンター',     desc: 'ボスを通算5体倒す' },
-  { id: 'boss_20',      icon: '🛡', name: '星団の守護者',     desc: 'ボスを通算20体倒す' },
-  { id: 'stage_10',     icon: '🔟', name: '深宙域到達',       desc: 'ステージ10に到達する' },
-  { id: 'stage_20',     icon: '🌌', name: '果ての宙域',       desc: 'ステージ20に到達する' },
-  { id: 'perfect_1',    icon: '✨', name: '完全防衛',         desc: '突破0でステージをクリアする' },
-  { id: 'perfect_5',    icon: '🧱', name: '鉄壁の防衛線',     desc: '完全防衛を通算5回達成する' },
-  { id: 'score_100k',   icon: '💯', name: '10万点突破',       desc: '1プレイで100,000点を出す' },
-  { id: 'score_500k',   icon: '🏅', name: '50万点突破',       desc: '1プレイで500,000点を出す' },
-  { id: 'coupon_max',   icon: '🎟', name: 'クーポンコンプ',   desc: '両方の割引券を20%にする' }
+var ACH_KEY = 'shinshu_marche_ach_v2';
+var ACH_GROUPS = [
+  { key: 'plays', icon: '🚀', title: '出撃回数', unit: '回', tiers: [
+    [1, '初出撃'], [10, '常連パイロット'], [30, '通いのスター'],
+    [100, '皆勤の星'], [300, '星団の主'], [1000, '永遠の航海者'] ] },
+  { key: 'kills', icon: '💥', title: '通算撃破', unit: '体', tiers: [
+    [50, '初仕事'], [500, '掃討開始'], [2000, '撃墜王'],
+    [10000, '宙域の掃除屋'], [50000, '殲滅の権化'], [200000, '銀河の伝説'] ] },
+  { key: 'maxStage', icon: '🌌', title: '到達ステージ', unit: '', tiers: [
+    [5, '第一防衛線'], [10, '深宙域到達'], [20, '果ての宙域'],
+    [30, '未知の暗黒'], [50, '銀河の縁'], [99, '宇宙の果て'] ] },
+  { key: 'maxCombo', icon: '🔥', title: '最大コンボ', unit: '', tiers: [
+    [20, '連鎖の星'], [50, '止まらない流星'], [100, '銀河一の連撃'],
+    [200, '超新星'], [500, '時空をつなぐ者'] ] },
+  { key: 'maxScore', icon: '🏅', title: 'ハイスコア', unit: '点', tiers: [
+    [10000, '初スコア'], [100000, '10万点突破'], [500000, '50万点突破'],
+    [1000000, 'ミリオンスター'], [5000000, '500万の輝き'], [10000000, '不可能への挑戦'] ] },
+  { key: 'bossKills', icon: '👾', title: 'ボス撃破', unit: '体', tiers: [
+    [1, '初ボス撃破'], [5, 'ボスハンター'], [20, '星団の守護者'],
+    [50, 'ボスキラー'], [100, '覇王の証'] ] },
+  { key: 'perfectStages', icon: '🧱', title: '完全防衛', unit: '回', tiers: [
+    [1, '完全防衛'], [5, '鉄壁の防衛線'], [25, '難攻不落'], [100, '絶対防壁'] ] },
+  { key: 'purin', icon: '🍮', title: '信州プリン取得', unit: '個', tiers: [
+    [10, 'プリン好き'], [100, 'プリン党'], [500, 'プリン職人'], [2000, 'プリンの化身'] ] },
+  { key: 'cc', icon: '🧀', title: '安曇野バスクチーズケーキ取得', unit: '個', tiers: [
+    [10, 'チーズ好き'], [100, 'チーズ党'], [500, '安曇野の使者'], [2000, 'チーズケーキ大帝'] ] },
+  { key: 'maxBomb', icon: '🌠', title: '同時殲滅', unit: '体', tiers: [
+    [8, '一網打尽'], [15, '大掃除'], [25, '宙域リセット'] ] },
+  { key: 'couponTotal', icon: '🎟', title: '獲得割引の合計', unit: '%', tiers: [
+    [1, '初クーポン'], [20, '常連の割引'], [40, 'クーポンコンプ'] ] },
+  { key: 'minutes', icon: '⏱', title: '総プレイ時間', unit: '分', tiers: [
+    [10, 'ひと休み'], [60, '1時間の旅'], [300, '5時間の航海'], [1440, '24時間の守護'] ] }
+];
+var ACH_SPECIALS = [
+  { id: 'sp_shot_max',     icon: '✨', name: 'プリンマスター',   desc: '弾数を9発まで増やす' },
+  { id: 'sp_maxshot_boss', icon: '🍮', name: 'プリンの全力',     desc: '弾数9発の状態でボスを撃破' },
+  { id: 'sp_boss_perfect', icon: '🛡', name: '完璧な決戦',       desc: '突破0のままボスを撃破' },
+  { id: 'sp_triple_boss',  icon: '⚔️', name: '三連撃破',         desc: '1プレイでボスを3体倒す' },
+  { id: 'sp_flawless10',   icon: '💎', name: '無傷の航海',       desc: '一度も被弾せずステージ10へ到達' },
+  { id: 'sp_no_item',      icon: '🕊', name: '素手の勇者',       desc: 'アイテムを取らずステージ5をクリア' },
+  { id: 'sp_comeback',     icon: '🔁', name: '瀬戸際の反撃',     desc: '突破19の状態でステージをクリア' },
+  { id: 'sp_night',        icon: '🌙', name: '夜更かしスター',   desc: '深夜0時〜4時に出撃する' }
 ];
 var RANK_TITLES = [
   { min: 0,  name: '見習い星' },
-  { min: 3,  name: 'プリン運搬係' },
-  { min: 6,  name: '星団防衛隊員' },
-  { min: 9,  name: '防衛隊 隊長' },
-  { min: 12, name: 'エースパイロット' },
-  { min: 15, name: 'プリン星団の英雄' }
+  { min: 5,  name: 'プリン運搬係' },
+  { min: 12, name: '星団防衛隊員' },
+  { min: 20, name: '防衛隊 分隊長' },
+  { min: 28, name: '防衛隊 隊長' },
+  { min: 36, name: 'エースパイロット' },
+  { min: 44, name: '星団の英雄' },
+  { min: 52, name: '伝説の守護星' },
+  { min: 60, name: 'プリン星団の神話' }
 ];
+var ACH_INDEX = (function() {
+  var list = [];
+  ACH_GROUPS.forEach(function(g) {
+    g.tiers.forEach(function(t) {
+      list.push({ id: g.key + '_' + t[0], icon: g.icon, name: t[1],
+        desc: g.title + ' ' + t[0].toLocaleString() + g.unit, group: g.key, need: t[0] });
+    });
+  });
+  ACH_SPECIALS.forEach(function(a) { list.push(a); });
+  return list;
+})();
+function achTotal() { return ACH_INDEX.length; }
 var achData = loadAch();
 function loadAch() {
-  var base = { unlocked: {}, bossKills: 0, perfectStages: 0, plays: 0 };
+  var base = { unlocked: {}, stats: {
+    plays: 0, kills: 0, maxStage: 1, maxCombo: 0, maxScore: 0, bossKills: 0,
+    perfectStages: 0, purin: 0, cc: 0, maxBomb: 0, couponTotal: 0, minutes: 0, seconds: 0
+  } };
   try {
     var raw = localStorage.getItem(ACH_KEY);
     if (raw) {
-      var s = JSON.parse(raw);
-      base.unlocked = s.unlocked || {};
-      base.bossKills = Number(s.bossKills) || 0;
-      base.perfectStages = Number(s.perfectStages) || 0;
-      base.plays = Number(s.plays) || 0;
+      var d = JSON.parse(raw);
+      base.unlocked = d.unlocked || {};
+      Object.keys(base.stats).forEach(function(k) {
+        if (d.stats && typeof d.stats[k] !== 'undefined') base.stats[k] = Number(d.stats[k]) || 0;
+      });
+      return base;
+    }
+    var old = localStorage.getItem('shinshu_marche_ach_v1');
+    if (old) {
+      var o = JSON.parse(old);
+      base.stats.plays = Number(o.plays) || 0;
+      base.stats.bossKills = Number(o.bossKills) || 0;
+      base.stats.perfectStages = Number(o.perfectStages) || 0;
     }
   } catch (e) {}
   return base;
@@ -615,17 +672,33 @@ function loadAch() {
 function saveAch() {
   try { localStorage.setItem(ACH_KEY, JSON.stringify(achData)); } catch (e) {}
 }
+function bumpStat(key, n) {
+  achData.stats[key] = (achData.stats[key] || 0) + (n || 1);
+}
+function raiseStat(key, v) {
+  if (v > (achData.stats[key] || 0)) achData.stats[key] = v;
+}
 var achQueue = [];
 var achToastBusy = false;
 function unlockAch(id) {
   if (achData.unlocked[id]) return;
-  var a = ACHIEVEMENTS.find(function(x) { return x.id === id; });
+  var a = ACH_INDEX.find(function(x) { return x.id === id; });
   if (!a) return;
   achData.unlocked[id] = true;
-  saveAch();
   achQueue.push(a);
   pumpAchToast();
   updateRankBadge();
+}
+function checkAch() {
+  achData.stats.couponTotal = coupons.purin.rate + coupons.cc.rate;
+  achData.stats.minutes = Math.floor((achData.stats.seconds || 0) / 60);
+  ACH_GROUPS.forEach(function(g) {
+    var v = achData.stats[g.key] || 0;
+    g.tiers.forEach(function(t) {
+      if (v >= t[0]) unlockAch(g.key + '_' + t[0]);
+    });
+  });
+  saveAch();
 }
 function pumpAchToast() {
   if (achToastBusy || achQueue.length === 0) return;
@@ -636,11 +709,11 @@ function pumpAchToast() {
   el.classList.add('show');
   setTimeout(function() {
     el.classList.remove('show');
-    setTimeout(function() { achToastBusy = false; pumpAchToast(); }, 350);
-  }, 1900);
+    setTimeout(function() { achToastBusy = false; pumpAchToast(); }, 300);
+  }, 1600);
 }
 function achCount() {
-  return ACHIEVEMENTS.filter(function(a) { return achData.unlocked[a.id]; }).length;
+  return ACH_INDEX.filter(function(a) { return achData.unlocked[a.id]; }).length;
 }
 function rankTitle() {
   var n = achCount();
@@ -650,25 +723,41 @@ function rankTitle() {
 }
 function updateRankBadge() {
   var el = document.getElementById('titleRankBadge');
-  if (el) el.textContent = rankTitle() + '　🎖' + achCount() + '/' + ACHIEVEMENTS.length;
+  if (el) el.textContent = rankTitle() + '　🎖' + achCount() + '/' + achTotal();
+}
+function achRowHtml(a, progress) {
+  var got = !!achData.unlocked[a.id];
+  return '<div class="ach-row' + (got ? '' : ' locked') + '">' +
+    '<div class="ach-icon">' + (got ? a.icon : '🔒') + '</div>' +
+    '<div class="ach-body"><div class="ach-name">' + a.name + '</div>' +
+    '<div class="ach-desc">' + a.desc + (progress ? '　<span style="color:#7fb2c9;">' + progress + '</span>' : '') +
+    '</div></div></div>';
 }
 function renderAchievements() {
   var el = document.getElementById('achList');
   if (!el) return;
-  el.innerHTML = ACHIEVEMENTS.map(function(a) {
-    var got = !!achData.unlocked[a.id];
-    return '<div class="ach-row' + (got ? '' : ' locked') + '">' +
-      '<div class="ach-icon">' + (got ? a.icon : '🔒') + '</div>' +
-      '<div class="ach-body"><div class="ach-name">' + a.name + '</div>' +
-      '<div class="ach-desc">' + a.desc + '</div></div></div>';
-  }).join('');
+  achData.stats.couponTotal = coupons.purin.rate + coupons.cc.rate;
+  achData.stats.minutes = Math.floor((achData.stats.seconds || 0) / 60);
+  var html = '';
+  ACH_GROUPS.forEach(function(g) {
+    var v = achData.stats[g.key] || 0;
+    html += '<div class="ach-group">' + g.icon + ' ' + g.title +
+      '<span class="ach-group-val">' + v.toLocaleString() + g.unit + '</span></div>';
+    g.tiers.forEach(function(t) {
+      var a = ACH_INDEX.find(function(x) { return x.id === g.key + '_' + t[0]; });
+      var prog = achData.unlocked[a.id] ? '' : '(' + Math.min(v, t[0]).toLocaleString() + ' / ' + t[0].toLocaleString() + ')';
+      html += achRowHtml(a, prog);
+    });
+  });
+  html += '<div class="ach-group">🏆 特殊実績</div>';
+  ACH_SPECIALS.forEach(function(a) { html += achRowHtml(a, ''); });
+  el.innerHTML = html;
   document.getElementById('achProgress').textContent =
-    achCount() + ' / ' + ACHIEVEMENTS.length + ' 解除　—　' + rankTitle();
+    achCount() + ' / ' + achTotal() + ' 解除　—　' + rankTitle();
 }
 window.showAchievements = function() { renderAchievements(); showScreen('achScreen'); }
-function checkCouponAch() {
-  if (coupons.purin.rate >= COUPON_MAX && coupons.cc.rate >= COUPON_MAX) unlockAch('coupon_max');
-}
+var runBossKills = 0;
+var runItems = 0;
 var combo = 0;
 var comboTimer = 0;
 var COMBO_WINDOW = 150;
@@ -680,9 +769,7 @@ function addCombo(n) {
   combo += (n || 1);
   comboTimer = COMBO_WINDOW;
   if (combo > maxComboThisRun) maxComboThisRun = combo;
-  if (combo >= 20) unlockAch('combo_20');
-  if (combo >= 50) unlockAch('combo_50');
-  if (combo >= 100) unlockAch('combo_100');
+  raiseStat('maxCombo', combo);
   updateComboUI(true);
 }
 function breakCombo() {
@@ -817,9 +904,12 @@ window.startGame = function() {
   combo = 0; comboTimer = 0; maxComboThisRun = 0;
   bossStage = false;
   updateComboUI(false);
-  achData.plays++;
-  saveAch();
-  unlockAch('first_flight');
+  runBossKills = 0;
+  runItems = 0;
+  bumpStat('plays', 1);
+  var hr = new Date().getHours();
+  if (hr >= 0 && hr < 4) unlockAch('sp_night');
+  checkAch();
   document.getElementById('scoreVal').textContent = '0';
   document.getElementById('levelVal').textContent = '1';
   document.getElementById('timeVal').textContent = '30';
@@ -954,7 +1044,7 @@ var enemyBulletMat = new THREE.MeshStandardMaterial({
   color: 0xff0044, emissive: 0xff0000, emissiveIntensity: 2, roughness: 0.2
 });
 function shoot() {
-  var interval = Math.max(14, 35 - (multiShot - 1) * 2);
+  var interval = Math.max(11, 30 - (multiShot - 1) * 2);
   if (frameCount - lastShotFrame < interval) return;
   lastShotFrame = frameCount;
   var offsets = [];
@@ -1005,13 +1095,13 @@ function updateBullets() {
 }
 var enemies = [];
 var ENEMY_TYPES = [
-  { geo: () => new THREE.TetrahedronGeometry(1, 0),      color: 0xff2244, em: 0x880011, size:28, hp:1, pts:100, speed:1.8 },
-  { geo: () => new THREE.OctahedronGeometry(1, 0),       color: 0xff6600, em: 0x882200, size:36, hp:2, pts:200, speed:1.4 },
-  { geo: () => new THREE.IcosahedronGeometry(1, 0),      color: 0x8800ff, em: 0x440088, size:44, hp:3, pts:350, speed:1.1 },
-  { geo: () => new THREE.BoxGeometry(1,1,1),             color: 0x00aaff, em: 0x004488, size:34, hp:2, pts:250, speed:1.5 },
-  { geo: () => new THREE.CylinderGeometry(0,1,1.6,6),    color: 0xff0088, em: 0x880033, size:50, hp:4, pts:500, speed:0.9 },
-  { geo: () => new THREE.SphereGeometry(1, 6, 6),        color: 0x00ff88, em: 0x008844, size:52, hp:5, pts:700, speed:0.7 },
-  { geo: () => new THREE.TorusGeometry(1, 0.4, 6, 8),    color: 0xffcc00, em: 0x886600, size:58, hp:6, pts:900, speed:0.65 },
+  { geo: () => new THREE.TetrahedronGeometry(1, 0),      color: 0xff2244, em: 0x880011, size:28, hp:2,  pts:140,  speed:1.8 },
+  { geo: () => new THREE.OctahedronGeometry(1, 0),       color: 0xff6600, em: 0x882200, size:36, hp:3,  pts:280,  speed:1.4 },
+  { geo: () => new THREE.IcosahedronGeometry(1, 0),      color: 0x8800ff, em: 0x440088, size:44, hp:5,  pts:520,  speed:1.1 },
+  { geo: () => new THREE.BoxGeometry(1,1,1),             color: 0x00aaff, em: 0x004488, size:34, hp:4,  pts:400,  speed:1.5 },
+  { geo: () => new THREE.CylinderGeometry(0,1,1.6,6),    color: 0xff0088, em: 0x880033, size:50, hp:7,  pts:800,  speed:0.9 },
+  { geo: () => new THREE.SphereGeometry(1, 6, 6),        color: 0x00ff88, em: 0x008844, size:52, hp:9,  pts:1100, speed:0.7 },
+  { geo: () => new THREE.TorusGeometry(1, 0.4, 6, 8),    color: 0xffcc00, em: 0x886600, size:58, hp:12, pts:1500, speed:0.65 },
 ];
 function spawnEnemy() {
   const typePool = ENEMY_TYPES.slice(0, Math.min(2 + Math.floor(level/1.5), ENEMY_TYPES.length));
@@ -1030,7 +1120,8 @@ function spawnEnemy() {
   const spd = (t.speed + level * 0.15) * (0.8 + Math.random() * 0.4);
   const shootTimer = Math.floor(Math.random() * 60) + 30; 
   scene.add(mesh);
-  enemies.push({ mesh, vy: -spd, drift, driftFreq, hp: t.hp, maxHp: t.hp, pts: t.pts, size: s, rx:Math.random()*0.06-0.03, ry:Math.random()*0.06-0.03, shootTimer });
+  var hp = t.hp + Math.floor(level / 5);
+  enemies.push({ mesh, vy: -spd, drift, driftFreq, hp: hp, maxHp: hp, pts: t.pts, size: s, rx:Math.random()*0.06-0.03, ry:Math.random()*0.06-0.03, shootTimer });
 }
 function updateEnemies() {
   const interval = Math.max(20, 80 - level * 5);
@@ -1149,11 +1240,12 @@ function defeatBoss() {
   bossStage = false;
   document.getElementById('bossBarWrap').classList.remove('show');
   shakeTime = 40; shakeMag = 24;
-  achData.bossKills++;
-  saveAch();
-  unlockAch('boss_1');
-  if (achData.bossKills >= 5) unlockAch('boss_5');
-  if (achData.bossKills >= 20) unlockAch('boss_20');
+  bumpStat('bossKills', 1);
+  runBossKills++;
+  if (multiShot >= MAX_SHOT) unlockAch('sp_maxshot_boss');
+  if (breaches === 0) unlockAch('sp_boss_perfect');
+  if (runBossKills >= 3) unlockAch('sp_triple_boss');
+  checkAch();
   setTimeout(function() { if (gameState === 'playing') grantCoupon(); }, 400);
   onStageClear();
 }
@@ -1207,11 +1299,13 @@ function showItemGet(type) {
   overlay.innerHTML = `
     <div class="item-popup ${colorClass}">
       <img src="${img}" class="item-popup-img" alt="" onerror="this.outerHTML='<div class=&quot;item-popup-fallback&quot;>${fallback}</div>'">
-      <div class="item-popup-label">${label}</div>
-      <div class="item-popup-effect">${effect}</div>
+      <div class="item-popup-text">
+        <div class="item-popup-label">${label}</div>
+        <div class="item-popup-effect">${effect}</div>
+      </div>
     </div>`;
   document.body.appendChild(overlay);
-  setTimeout(() => overlay.remove(), 2200);
+  setTimeout(() => overlay.remove(), 1500);
 }
 function spawnDamageText(worldX, worldY, amount, color = '#fff') {
   var el = document.createElement('div');
@@ -1237,7 +1331,8 @@ function spawnExplosion(worldX, worldY, emoji) {
 }
 function triggerBomb() {
   var killed = enemies.length;
-  if (killed >= 8) unlockAch('bomb_8');
+  raiseStat('maxBomb', killed);
+  bumpStat('kills', killed);
   if (killed > 0) addCombo(killed);
   if (bossActive) damageBoss(Math.floor((boss ? boss.maxHp : 0) * 0.18));
   for (var i = enemies.length - 1; i >= 0; i--) {
@@ -1287,6 +1382,7 @@ function checkCollisions() {
         if (e.hp <= 0) {
           spawnExplosion(e.mesh.position.x, e.mesh.position.y);
           addCombo(1);
+          bumpStat('kills', 1);
           var pts = Math.floor(e.pts * scoreMultiplier * comboMultiplier());
           addScore2(pts);
           spawnDamageText(e.mesh.position.x, e.mesh.position.y, pts, '#ffe87a'); 
@@ -1307,11 +1403,13 @@ function checkCollisions() {
     if (dist < 50) {
       scene.remove(it.sprite);
       items.splice(i, 1);
+      runItems++;
+      bumpStat(it.type === 'purin' ? 'purin' : 'cc', 1);
       if (it.type === 'purin') {
         if (multiShot < MAX_SHOT) {
           multiShot++;
           updateShotUI();
-          if (multiShot >= MAX_SHOT) unlockAch('shot_max');
+          if (multiShot >= MAX_SHOT) unlockAch('sp_shot_max');
         } else {
           addScore2(300);
         }
@@ -1358,8 +1456,7 @@ function checkCollisions() {
 }
 function addScore2(pts) {
   score += pts;
-  if (score >= 100000) unlockAch('score_100k');
-  if (score >= 500000) unlockAch('score_500k');
+  raiseStat('maxScore', score);
   var el = document.getElementById('scoreBox');
   document.getElementById('scoreVal').textContent = score.toLocaleString();
   el.style.transform = 'scale(1.1)';
@@ -1401,17 +1498,17 @@ function registerBreach() {
 var breachesAtStageStart = 0;
 function onStageClear() {
   if (breaches === breachesAtStageStart) {
-    achData.perfectStages++;
-    saveAch();
-    unlockAch('perfect_1');
-    if (achData.perfectStages >= 5) unlockAch('perfect_5');
+    bumpStat('perfectStages', 1);
   }
   level++;
   scoreMultiplier = 1 + (level-1) * 0.2;
   breachesAtStageStart = breaches;
   document.getElementById('levelVal').textContent = level;
-  if (level >= 10) unlockAch('stage_10');
-  if (level >= 20) unlockAch('stage_20');
+  raiseStat('maxStage', level);
+  if (level >= 10 && lives === maxLives) unlockAch('sp_flawless10');
+  if (level >= 6 && runItems === 0) unlockAch('sp_no_item');
+  if (breaches >= 19) unlockAch('sp_comeback');
+  checkAch();
   showLevelBanner();
   setTimeout(function() { if (gameState === 'playing') grantCoupon(); }, 900);
   if (level % 5 === 0) {
@@ -1469,13 +1566,17 @@ function runCouponHtml() {
 async function triggerGameOver() {
   if (gameState === 'gameover') return;
   gameState = 'gameover';
+  raiseStat('maxScore', score);
+  raiseStat('maxCombo', maxComboThisRun);
+  raiseStat('maxStage', level);
+  checkAch();
   clearScene();
   if (player) { scene.remove(player); player = null; }
   document.getElementById('finalScore').textContent = score.toLocaleString();
   document.getElementById('goReason').innerHTML =
     escHtml(gameOverReason) +
     '<div style="color:#ffcf8a; margin-top:6px;">STAGE ' + level +
-    '　最大コンボ ' + maxComboThisRun + '　🎖' + achCount() + '/' + ACHIEVEMENTS.length + '</div>';
+    '　最大コンボ ' + maxComboThisRun + '　🎖' + achCount() + '/' + achTotal() + '</div>';
   document.getElementById('goCouponArea').innerHTML = runCouponHtml();
   document.getElementById('playerNameInput').value = '';
   document.getElementById('submitMsg').textContent = '';
@@ -1544,6 +1645,8 @@ function gameLoop(t) {
     comboTimer--;
     if (comboTimer === 0) breakCombo();
   }
+  achData.stats.seconds = (achData.stats.seconds || 0) + dt;
+  if (frameCount % 120 === 0) checkAch();
   if (invincibleTime > 0) {
     invincibleTime--;
     if (player) {
