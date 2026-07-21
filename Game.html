@@ -136,6 +136,17 @@
   .ach-row.locked .ach-icon { filter: grayscale(1); opacity: 0.35; }
   .ach-row.locked .ach-name { color: #666; }
   .ach-row.locked .ach-desc { color: #555; }
+  #diffPicker { display: flex; gap: 8px; margin-bottom: 6px; }
+  .diff-btn {
+    background: rgba(255,255,255,0.05);
+    border: 1.5px solid rgba(255,255,255,0.2);
+    color: #ccc; border-radius: 10px;
+    padding: 8px 16px; font-family: inherit; font-size: 0.95rem;
+    letter-spacing: 2px; cursor: pointer; transition: all 0.15s;
+  }
+  .diff-btn.active { color: #fff; font-weight: bold; transform: translateY(-2px); }
+  .diff-btn.locked { opacity: 0.35; cursor: not-allowed; }
+  #diffNote { color: #999; font-size: 0.85rem; margin-bottom: 22px; text-align: center; min-height: 1.2em; }
   .rank-badge {
     display: inline-block; margin: 4px 0 18px;
     color: #8de0ff; font-size: 1.05rem; letter-spacing: 3px;
@@ -382,7 +393,7 @@
       </div>
     </div>
     <div class="hud-box hud-shot">SHOT <span id="shotVal">1</span></div>
-    <div class="hud-box hud-breach">突破 <span id="breachVal">0</span><span style="font-size:1rem;">/20</span></div>
+    <div class="hud-box hud-breach">突破 <span id="breachVal">0</span><span style="font-size:1rem;">/<span id="breachMax">20</span></span></div>
   </div>
 </div>
 <div id="levelBanner">STAGE CLEAR!</div>
@@ -410,12 +421,15 @@
   <img src="star_3_sparkle.png" class="player-img-lg" alt="" onerror="this.onerror=null; this.src='star_2_open.png'">
   <div class="game-title">プリン星団を守れ！</div>
   <div class="sub-title" style="line-height:1.9; margin-bottom:14px;">🍮 信州プリンで弾を増やす<br>🧀 安曇野バスクチーズケーキで全滅</div>
-  <div style="color:#ff9aa8; font-size:1rem; margin-bottom:26px; text-align:center;">敵を20体通すとプリン星団が陥落します</div>
+  <div style="color:#ff9aa8; font-size:1rem; margin-bottom:20px; text-align:center;" id="breachWarn">敵を20体通すとプリン星団が陥落します</div>
+  <div id="diffPicker"></div>
+  <div id="diffNote">標準の難易度</div>
   <button class="btn" onclick="startGame()">ゲームスタート</button>
   <button class="btn-secondary" onclick="showRanking()">🏆 ランキング</button>
   <button class="btn-secondary" onclick="showCoupons()">🎟 クーポンを見る</button>
   <button class="btn-secondary" onclick="showAchievements()">🎖 実績</button>
   <div class="rank-badge" id="titleRankBadge">見習い星</div>
+  <button class="btn-secondary" onclick="goHome()" style="margin-bottom:40px;">🏠 ホームページTOPへ</button>
   <div id="rankPanel">
     <div class="rank-title">🏆 TOP 10 ランキング</div>
     <div id="rankListTitle"><div class="rank-empty">読み込み中...</div></div>
@@ -498,6 +512,56 @@ var warpFactor = 0;
 var invincibleTime = 0; 
 var breaches = 0;
 var MAX_BREACH = 20;
+var DIFF_KEY = 'shinshu_marche_diff_v1';
+var DIFFS = [
+  { key:'normal',  name:'NORMAL',  color:'#8de0ff', hp:1.0, spd:1.00, spawn:1.00,
+    breach:20, lives:3, score:1.0, coupon:0, note:'標準の難易度' },
+  { key:'hard',    name:'HARD',    color:'#ffb03a', hp:1.7, spd:1.15, spawn:0.78,
+    breach:15, lives:3, score:1.8, coupon:1, note:'敵が硬く速い／突破15でゲームオーバー／スコア1.8倍・割引券+1%',
+    req:function(){ return achData.stats.maxStage >= 10; }, reqText:'ステージ10到達で解放' },
+  { key:'inferno', name:'INFERNO', color:'#ff3b6b', hp:2.6, spd:1.32, spawn:0.60,
+    breach:10, lives:2, score:3.0, coupon:2, note:'ライフ2／突破10でゲームオーバー／スコア3倍・割引券+2%',
+    req:function(){ return achData.stats.bossKills >= 5; }, reqText:'ボス通算5体撃破で解放' }
+];
+var DIFF = DIFFS[0];
+function diffUnlocked(d) { return !d.req || d.req(); }
+function loadDiff() {
+  try {
+    var k = localStorage.getItem(DIFF_KEY);
+    var d = DIFFS.find(function(x) { return x.key === k; });
+    if (d && diffUnlocked(d)) DIFF = d;
+  } catch (e) {}
+}
+window.selectDiff = function(key) {
+  var d = DIFFS.find(function(x) { return x.key === key; });
+  if (!d || !diffUnlocked(d)) return;
+  DIFF = d;
+  try { localStorage.setItem(DIFF_KEY, d.key); } catch (e) {}
+  renderDiffPicker();
+}
+function renderDiffPicker() {
+  var el = document.getElementById('diffPicker');
+  if (!el) return;
+  el.innerHTML = DIFFS.map(function(d) {
+    var ok = diffUnlocked(d);
+    var active = d.key === DIFF.key;
+    return '<button class="diff-btn' + (active ? ' active' : '') + (ok ? '' : ' locked') + '"' +
+      ' style="' + (active ? 'border-color:' + d.color + ';box-shadow:0 0 14px ' + d.color + '55;color:' + d.color + ';' : '') + '"' +
+      ' onclick="selectDiff(\'' + d.key + '\')">' + (ok ? '' : '🔒 ') + d.name + '</button>';
+  }).join('');
+  var note = document.getElementById('diffNote');
+  if (note) {
+    var b = achData.best[DIFF.key] || { score: 0, stage: 0 };
+    var bestLine = b.score > 0
+      ? '自己ベスト ' + b.score.toLocaleString() + '点 / STAGE ' + b.stage
+      : '記録なし';
+    note.innerHTML = (diffUnlocked(DIFF) ? DIFF.note : DIFF.reqText) +
+      '<br><span style="color:#8de0ff;">' + bestLine + '</span>';
+  }
+  var warn = document.getElementById('breachWarn');
+  if (warn) warn.textContent = '敵を' + DIFF.breach + '体通すとプリン星団が陥落します';
+}
+window.goHome = function() { location.href = 'index.html'; }
 var gameOverReason = '';
 var COUPON_MAX = 20;
 var COUPON_KEY = 'shinshu_marche_coupons_v1';
@@ -532,12 +596,24 @@ function makeCouponCode(kind) {
   for (var i = 0; i < 6; i++) s += chars[Math.floor(Math.random() * chars.length)];
   return COUPON_TYPES[kind].prefix + '-' + s;
 }
+var lastStagePerfect = false;
+function couponRoll() {
+  var tbl;
+  if (level < 5)       tbl = [1,1,1,1,1,1,1,2];
+  else if (level < 10) tbl = [1,1,1,1,1,2,2,2];
+  else if (level < 15) tbl = [1,1,1,2,2,2,3,3];
+  else if (level < 25) tbl = [1,2,2,2,3,3,4,4];
+  else                 tbl = [2,2,3,3,4,4,5,5];
+  var v = tbl[Math.floor(Math.random() * tbl.length)] + (DIFF ? DIFF.coupon : 0);
+  if (lastStagePerfect) v += 1;
+  return Math.max(1, Math.min(5, v));
+}
 function grantCoupon() {
   var kind = Math.random() < 0.5 ? 'purin' : 'cc';
   if (coupons[kind].rate >= COUPON_MAX && coupons[kind === 'purin' ? 'cc' : 'purin'].rate < COUPON_MAX) {
     kind = kind === 'purin' ? 'cc' : 'purin';
   }
-  var add = 1 + Math.floor(Math.random() * 5);
+  var add = couponRoll();
   var before = coupons[kind].rate;
   var after = Math.min(COUPON_MAX, before + add);
   var gained = after - before;
@@ -645,7 +721,9 @@ var ACH_INDEX = (function() {
 function achTotal() { return ACH_INDEX.length; }
 var achData = loadAch();
 function loadAch() {
-  var base = { unlocked: {}, stats: {
+  var base = { unlocked: {}, best: {
+    normal: { score: 0, stage: 0 }, hard: { score: 0, stage: 0 }, inferno: { score: 0, stage: 0 }
+  }, stats: {
     plays: 0, kills: 0, maxStage: 1, maxCombo: 0, maxScore: 0, bossKills: 0,
     perfectStages: 0, purin: 0, cc: 0, maxBomb: 0, couponTotal: 0, minutes: 0, seconds: 0
   } };
@@ -654,6 +732,12 @@ function loadAch() {
     if (raw) {
       var d = JSON.parse(raw);
       base.unlocked = d.unlocked || {};
+      if (d.best) Object.keys(base.best).forEach(function(k) {
+        if (d.best[k]) {
+          base.best[k].score = Number(d.best[k].score) || 0;
+          base.best[k].stage = Number(d.best[k].stage) || 0;
+        }
+      });
       Object.keys(base.stats).forEach(function(k) {
         if (d.stats && typeof d.stats[k] !== 'undefined') base.stats[k] = Number(d.stats[k]) || 0;
       });
@@ -880,6 +964,7 @@ function showScreen(id) {
   ['titleScreen','rankingScreen','gameOverScreen','couponScreen','achScreen'].forEach(s => {
     document.getElementById(s).classList.toggle('hidden', s !== id);
   });
+  if (id === 'titleScreen') { renderDiffPicker(); updateRankBadge(); }
 }
 window.showRanking = function() { showScreen('rankingScreen'); refreshRanking(); }
 window.hideRanking = function() { showScreen('titleScreen'); }
@@ -891,9 +976,13 @@ window.startGame = function() {
   document.getElementById('couponScreen').classList.add('hidden');
   document.getElementById('achScreen').classList.add('hidden');
   score = 0; 
+  maxLives = DIFF.lives;
+  MAX_BREACH = DIFF.breach;
+  document.getElementById('breachMax').textContent = MAX_BREACH;
   lives = maxLives;
   level = 1; frameCount = 0;
-  lastShotFrame = 0; lastEnemyFrame = 0; scoreMultiplier = 1;
+  lastShotFrame = 0; lastEnemyFrame = 0; scoreMultiplier = DIFF.score;
+  lastStagePerfect = false;
   stageTime = 30.0; lastTime = 0;
   warpFactor = 0; ambLight.color.setHex(0x8888cc); 
   invincibleTime = 0;
@@ -1044,7 +1133,7 @@ var enemyBulletMat = new THREE.MeshStandardMaterial({
   color: 0xff0044, emissive: 0xff0000, emissiveIntensity: 2, roughness: 0.2
 });
 function shoot() {
-  var interval = Math.max(11, 30 - (multiShot - 1) * 2);
+  var interval = Math.max(15, 30 - (multiShot - 1) * 1.8);
   if (frameCount - lastShotFrame < interval) return;
   lastShotFrame = frameCount;
   var offsets = [];
@@ -1117,17 +1206,35 @@ function spawnEnemy() {
   mesh.position.set((Math.random() - 0.5) * (W() - 80), H()/2 + s + 10, Math.random() * 60 - 30);
   const drift = (Math.random() - 0.5) * 2.5;
   const driftFreq = 0.02 + Math.random() * 0.03;
-  const spd = (t.speed + level * 0.15) * (0.8 + Math.random() * 0.4);
+  const spd = (t.speed + level * 0.15) * (0.8 + Math.random() * 0.4) * DIFF.spd;
   const shootTimer = Math.floor(Math.random() * 60) + 30; 
   scene.add(mesh);
-  var hp = t.hp + Math.floor(level / 5);
-  enemies.push({ mesh, vy: -spd, drift, driftFreq, hp: hp, maxHp: hp, pts: t.pts, size: s, rx:Math.random()*0.06-0.03, ry:Math.random()*0.06-0.03, shootTimer });
+  var hp = Math.max(1, Math.round((t.hp + Math.floor(level / 4)) * (1 + level * 0.12) * DIFF.hp));
+  enemies.push({ mesh, vy: -spd, drift, driftFreq, hp: hp, maxHp: hp, pts: t.pts, size: s,
+    rx:Math.random()*0.06-0.03, ry:Math.random()*0.06-0.03, shootTimer, canSplit: s > 38 });
+}
+function spawnSplit(x, y, size, hp, pts) {
+  var geo = new THREE.TetrahedronGeometry(1, 0);
+  var mat = new THREE.MeshStandardMaterial({
+    color: 0xff5599, emissive: 0x660022, emissiveIntensity: 1.6, metalness: 0.6, roughness: 0.3
+  });
+  for (var k = 0; k < 2; k++) {
+    var mesh = new THREE.Mesh(geo, mat.clone());
+    mesh.scale.set(size, size, size);
+    mesh.position.set(x + (k === 0 ? -size : size), y, 0);
+    scene.add(mesh);
+    enemies.push({
+      mesh: mesh, vy: -(2.6 + level * 0.12) * DIFF.spd, drift: (k === 0 ? -1 : 1) * 2.2,
+      driftFreq: 0.05, hp: hp, maxHp: hp, pts: pts, size: size,
+      rx: 0.08, ry: 0.08, shootTimer: 9999, canSplit: false
+    });
+  }
 }
 function updateEnemies() {
-  const interval = Math.max(20, 80 - level * 5);
+  const interval = Math.max(10, Math.round((80 - level * 4) * DIFF.spawn));
   if (!bossStage && frameCount - lastEnemyFrame > interval) {
     spawnEnemy();
-    if (level > 3 && Math.random() < 0.3) spawnEnemy();
+    if (level > 3 && Math.random() < Math.min(0.75, 0.2 + level * 0.03)) spawnEnemy();
     lastEnemyFrame = frameCount;
   }
   for (var i = enemies.length-1; i >= 0; i--) {
@@ -1381,6 +1488,10 @@ function checkCollisions() {
         setTimeout(() => { if (e.mesh.material) e.mesh.material.emissiveIntensity = 1.2; }, 80);
         if (e.hp <= 0) {
           spawnExplosion(e.mesh.position.x, e.mesh.position.y);
+          if (level >= 8 && e.canSplit && Math.random() < 0.45) {
+            spawnSplit(e.mesh.position.x, e.mesh.position.y, e.size * 0.45,
+              Math.max(1, Math.ceil(e.maxHp * 0.2)), Math.round(e.pts * 0.3));
+          }
           addCombo(1);
           bumpStat('kills', 1);
           var pts = Math.floor(e.pts * scoreMultiplier * comboMultiplier());
@@ -1480,7 +1591,7 @@ function updateBreachUI() {
   var el = document.getElementById('breachVal');
   if (!el) return;
   el.textContent = breaches;
-  if (box) box.classList.toggle('danger', breaches >= MAX_BREACH - 5);
+  if (box) box.classList.toggle('danger', breaches >= MAX_BREACH - Math.max(3, Math.round(MAX_BREACH * 0.25)));
 }
 function registerBreach() {
   if (gameState !== 'playing') return;
@@ -1491,17 +1602,18 @@ function registerBreach() {
   if (breaches >= MAX_BREACH) {
     breaches = MAX_BREACH;
     updateBreachUI();
-    gameOverReason = '敵機が20体プリン星団へ到達しました';
+    gameOverReason = '敵機が' + MAX_BREACH + '体プリン星団へ到達しました';
     triggerGameOver();
   }
 }
 var breachesAtStageStart = 0;
 function onStageClear() {
-  if (breaches === breachesAtStageStart) {
+  lastStagePerfect = (breaches === breachesAtStageStart);
+  if (lastStagePerfect) {
     bumpStat('perfectStages', 1);
   }
   level++;
-  scoreMultiplier = 1 + (level-1) * 0.2;
+  scoreMultiplier = (1 + (level-1) * 0.2) * DIFF.score;
   breachesAtStageStart = breaches;
   document.getElementById('levelVal').textContent = level;
   raiseStat('maxStage', level);
@@ -1540,6 +1652,7 @@ function playerHit() {
   lives--;
   updateLivesUI();
   breakCombo();
+  if (multiShot > 1) { multiShot = Math.max(1, multiShot - 2); updateShotUI(); }
   hitStop = 15; 
   shakeTime = 20; shakeMag = 15; 
   if (lives <= 0) {
@@ -1569,13 +1682,18 @@ async function triggerGameOver() {
   raiseStat('maxScore', score);
   raiseStat('maxCombo', maxComboThisRun);
   raiseStat('maxStage', level);
+  var bd = achData.best[DIFF.key];
+  if (bd) {
+    if (score > bd.score) bd.score = score;
+    if (level > bd.stage) bd.stage = level;
+  }
   checkAch();
   clearScene();
   if (player) { scene.remove(player); player = null; }
   document.getElementById('finalScore').textContent = score.toLocaleString();
   document.getElementById('goReason').innerHTML =
     escHtml(gameOverReason) +
-    '<div style="color:#ffcf8a; margin-top:6px;">STAGE ' + level +
+    '<div style="color:#ffcf8a; margin-top:6px;">' + DIFF.name + '　STAGE ' + level +
     '　最大コンボ ' + maxComboThisRun + '　🎖' + achCount() + '/' + achTotal() + '</div>';
   document.getElementById('goCouponArea').innerHTML = runCouponHtml();
   document.getElementById('playerNameInput').value = '';
@@ -1686,6 +1804,8 @@ function handleTouchMove(e) {
 canvas.addEventListener('touchstart', handleTouchMove, { passive: false });
 canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
 initBg();
+loadDiff();
+renderDiffPicker();
 updateRankBadge();
 refreshRanking();
 showScreen('titleScreen');
