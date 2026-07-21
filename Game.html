@@ -74,24 +74,54 @@
     box-shadow: 0 0 8px rgba(50,255,100,0.8);
     transition: width 0.2s ease-out, background 0.3s;
   }
-  #energyBarContainer {
-    width: 80px;
-    height: 14px;
-    background: rgba(0, 0, 0, 0.6);
-    border: 1.5px solid rgba(255, 100, 200, 0.5);
-    border-radius: 8px;
-    margin-left: 8px;
-    overflow: hidden;
+  .hud-shot { color: #ffd9a0; border-color: rgba(255,190,110,0.4); }
+  .hud-shot span { color: #fff; text-shadow: 0 0 8px #ffb347; }
+  .hud-breach { color: #ff9aa8; border-color: rgba(255,90,120,0.4); }
+  .hud-breach span { color: #fff; text-shadow: 0 0 8px #ff3355; }
+  .hud-breach.danger { animation: breachPulse 0.7s infinite; }
+  @keyframes breachPulse {
+    0%,100% { box-shadow: 0 0 0 rgba(255,0,60,0); }
+    50% { box-shadow: 0 0 18px rgba(255,0,60,0.9); }
+  }
+  .coupon-card {
     position: relative;
-    box-shadow: inset 0 0 4px rgba(0,0,0,0.8);
+    background: linear-gradient(135deg, #1a1030 0%, #2a1440 100%);
+    border: 2px dashed rgba(255,220,120,0.55);
+    border-radius: 14px;
+    padding: 16px 18px;
+    margin: 10px 0;
+    display: flex; align-items: center; gap: 16px;
+    width: 100%;
   }
-  #energyBar {
-    height: 100%;
-    width: 0%;
-    background: linear-gradient(90deg, #ff99cc, #ff3366);
-    box-shadow: 0 0 8px rgba(255,50,100,0.8);
-    transition: width 0.2s ease-out;
+  .coupon-card.maxed { border-color: #ffd700; box-shadow: 0 0 24px rgba(255,200,60,0.35); }
+  .coupon-emoji { font-size: 2.4rem; line-height: 1; }
+  .coupon-body { flex: 1; text-align: left; }
+  .coupon-name { color: #ffe87a; font-size: 1.1rem; letter-spacing: 1px; }
+  .coupon-rate { color: #fff; font-size: 2.2rem; font-weight: 900; text-shadow: 0 0 18px rgba(255,200,60,0.8); line-height: 1.1; }
+  .coupon-rate small { font-size: 1rem; font-weight: normal; color: #bbb; margin-left: 6px; }
+  .coupon-code {
+    color: #8de0ff; font-size: 0.95rem; letter-spacing: 2px;
+    margin-top: 2px;
   }
+  .coupon-note { color: #888; font-size: 0.85rem; margin-top: 14px; line-height: 1.6; text-align: center; }
+  .coupon-gain {
+    color: #64ffb4; font-size: 1.15rem; margin: 4px 0;
+    text-shadow: 0 0 10px rgba(100,255,180,0.6);
+  }
+  #couponToast {
+    position: fixed; top: 68%; left: 50%;
+    transform: translate(-50%,-50%) scale(0.6);
+    z-index: 40; pointer-events: none; opacity: 0;
+    background: rgba(6,4,20,0.9);
+    border: 2px dashed rgba(255,220,120,0.7);
+    border-radius: 18px; padding: 18px 30px;
+    text-align: center;
+    transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  #couponToast.show { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+  #couponToast .ct-title { color: #ffd700; font-size: 1.2rem; letter-spacing: 2px; }
+  #couponToast .ct-main { color: #fff; font-size: 2.4rem; font-weight: 900; text-shadow: 0 0 20px #ffd700; margin: 4px 0; }
+  #couponToast .ct-sub { color: #aaa; font-size: 1rem; }
   .screen {
     position: fixed; inset: 0;
     display: flex; flex-direction: column;
@@ -279,23 +309,26 @@
         <div id="lifeBar"></div>
       </div>
     </div>
-    <div class="hud-box">
-      ENERGY
-      <div id="energyBarContainer">
-        <div id="energyBar"></div>
-      </div>
-    </div>
+    <div class="hud-box hud-shot">SHOT <span id="shotVal">1</span></div>
+    <div class="hud-box hud-breach">突破 <span id="breachVal">0</span><span style="font-size:1rem;">/20</span></div>
   </div>
 </div>
 <div id="levelBanner">STAGE CLEAR!</div>
+<div id="couponToast">
+  <div class="ct-title">クーポン獲得</div>
+  <div class="ct-main" id="ctMain">🍮 +3%</div>
+  <div class="ct-sub" id="ctSub">信州プリン 合計 8% 引き</div>
+</div>
 <div id="controlsHint">画面をスワイプして移動（オート連射）</div>
 <div class="screen" id="titleScreen">
   <div class="credit">製作：MONDOCOLO STUDIO</div>
   <img src="star_3_sparkle.png" class="player-img-lg" alt="" onerror="this.onerror=null; this.src='star_2_open.png'">
   <div class="game-title">プリン星団を守れ！</div>
-  <div class="sub-title">プリン星団からやってきたプリンAスター</div>
+  <div class="sub-title">🍮 プリンで弾を増やす　🧀 チーズケーキで全滅</div>
+  <div style="color:#ff9aa8; font-size:1rem; margin-top:-24px; margin-bottom:24px; text-align:center;">敵を20体通すとプリン星団が陥落します</div>
   <button class="btn" onclick="startGame()">ゲームスタート</button>
   <button class="btn-secondary" onclick="showRanking()">🏆 ランキング</button>
+  <button class="btn-secondary" onclick="showCoupons()">🎟 クーポンを見る</button>
   <div id="rankPanel">
     <div class="rank-title">🏆 TOP 10 ランキング</div>
     <div id="rankListTitle"><div class="rank-empty">読み込み中...</div></div>
@@ -309,10 +342,24 @@
   </div>
   <button class="btn-secondary" onclick="hideRanking()" style="margin-bottom: 40px;">← 戻る</button>
 </div>
+<div class="screen hidden" id="couponScreen">
+  <div class="game-title" style="font-size:2.3rem; margin-top:20px;">🎟 わたしのクーポン</div>
+  <div class="sub-title" style="margin-bottom:12px;">ステージクリアで割引が貯まります（最大20%引き）</div>
+  <div id="rankPanel">
+    <div id="couponList"></div>
+    <div class="coupon-note">
+      店頭でこの画面をスタッフにご提示ください。<br>
+      信州マルシェ出店ブース限定・他割引との併用不可。
+    </div>
+  </div>
+  <button class="btn-secondary" onclick="hideRanking()" style="margin-bottom: 40px;">← 戻る</button>
+</div>
 <div class="screen hidden" id="gameOverScreen">
   <div class="game-title" style="font-size:2.8rem; color:#ff6b6b; text-shadow:0 0 30px #ff0000; margin-top:20px;">GAME OVER</div>
   <div style="color:#aaa; margin:6px 0 2px; letter-spacing:2px; font-size:1.2rem;">YOUR SCORE</div>
   <div class="go-score" id="finalScore">0</div>
+  <div id="goReason" style="color:#ff9aa8; font-size:1.05rem; margin-bottom:10px; text-align:center;"></div>
+  <div id="goCouponArea" style="width:90%; max-width:480px; text-align:center;"></div>
   <div id="nameEntryArea">
     <div id="nameInputWrapper">
       <div style="color:#ffe87a; margin-bottom:8px; font-size:1.2rem; text-align: center;">名前を入力してランキングに登録！</div>
@@ -354,8 +401,86 @@ var shakeMag = 0;
 var hitStop = 0;
 var warpFactor = 0;
 var invincibleTime = 0; 
-var puddingEnergy = 0;
-var laserTime = 0;
+var breaches = 0;
+var MAX_BREACH = 20;
+var gameOverReason = '';
+var COUPON_MAX = 20;
+var COUPON_KEY = 'shinshu_marche_coupons_v1';
+var COUPON_TYPES = {
+  purin: { label: '信州プリン', emoji: '🍮', prefix: 'SP' },
+  cc:    { label: 'バスクチーズケーキ', emoji: '🧀', prefix: 'BC' }
+};
+var coupons = loadCoupons();
+var runCoupons = { purin: 0, cc: 0 };
+function loadCoupons() {
+  var base = { purin: { rate: 0, code: '' }, cc: { rate: 0, code: '' } };
+  try {
+    var raw = localStorage.getItem(COUPON_KEY);
+    if (raw) {
+      var saved = JSON.parse(raw);
+      Object.keys(base).forEach(function(k) {
+        if (saved[k]) {
+          base[k].rate = Math.min(COUPON_MAX, Number(saved[k].rate) || 0);
+          base[k].code = saved[k].code || '';
+        }
+      });
+    }
+  } catch (e) {}
+  return base;
+}
+function saveCoupons() {
+  try { localStorage.setItem(COUPON_KEY, JSON.stringify(coupons)); } catch (e) {}
+}
+function makeCouponCode(kind) {
+  var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  var s = '';
+  for (var i = 0; i < 6; i++) s += chars[Math.floor(Math.random() * chars.length)];
+  return COUPON_TYPES[kind].prefix + '-' + s;
+}
+function grantCoupon() {
+  var kind = Math.random() < 0.5 ? 'purin' : 'cc';
+  if (coupons[kind].rate >= COUPON_MAX && coupons[kind === 'purin' ? 'cc' : 'purin'].rate < COUPON_MAX) {
+    kind = kind === 'purin' ? 'cc' : 'purin';
+  }
+  var add = 1 + Math.floor(Math.random() * 5);
+  var before = coupons[kind].rate;
+  var after = Math.min(COUPON_MAX, before + add);
+  var gained = after - before;
+  coupons[kind].rate = after;
+  if (!coupons[kind].code) coupons[kind].code = makeCouponCode(kind);
+  saveCoupons();
+  runCoupons[kind] += gained;
+  showCouponToast(kind, gained, after);
+}
+function showCouponToast(kind, gained, total) {
+  var t = COUPON_TYPES[kind];
+  var el = document.getElementById('couponToast');
+  document.getElementById('ctMain').textContent = t.emoji + ' +' + gained + '%';
+  document.getElementById('ctSub').textContent =
+    gained === 0 ? t.label + ' はすでに最大20%引き' : t.label + ' 合計 ' + total + '% 引き';
+  el.classList.add('show');
+  setTimeout(function() { el.classList.remove('show'); }, 1800);
+}
+function couponCardHtml(kind) {
+  var t = COUPON_TYPES[kind];
+  var c = coupons[kind];
+  if (c.rate <= 0) {
+    return '<div class="coupon-card"><div class="coupon-emoji">' + t.emoji + '</div>' +
+      '<div class="coupon-body"><div class="coupon-name">' + t.label + '</div>' +
+      '<div class="coupon-rate" style="color:#666; text-shadow:none;">まだ0%</div>' +
+      '<div class="coupon-code" style="color:#666;">ステージをクリアして獲得</div></div></div>';
+  }
+  var maxed = c.rate >= COUPON_MAX ? ' maxed' : '';
+  return '<div class="coupon-card' + maxed + '"><div class="coupon-emoji">' + t.emoji + '</div>' +
+    '<div class="coupon-body"><div class="coupon-name">' + t.label + '</div>' +
+    '<div class="coupon-rate">' + c.rate + '% OFF' + (maxed ? '<small>MAX</small>' : '') + '</div>' +
+    '<div class="coupon-code">' + c.code + '</div></div></div>';
+}
+function renderCoupons() {
+  var el = document.getElementById('couponList');
+  if (el) el.innerHTML = couponCardHtml('purin') + couponCardHtml('cc');
+}
+window.showCoupons = function() { renderCoupons(); showScreen('couponScreen'); }
 var SUPABASE_URL = 'https://ufjojhraqyzqqzlkokwd.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_ha-q_6WBEngyBT3dOLMJQQ_EZsVSGI6';
 var supabaseClient = null;
@@ -439,7 +564,7 @@ async function refreshRanking() {
   }
 }
 function showScreen(id) {
-  ['titleScreen','rankingScreen','gameOverScreen'].forEach(s => {
+  ['titleScreen','rankingScreen','gameOverScreen','couponScreen'].forEach(s => {
     document.getElementById(s).classList.toggle('hidden', s !== id);
   });
 }
@@ -450,6 +575,7 @@ window.startGame = function() {
   document.getElementById('titleScreen').classList.add('hidden');
   document.getElementById('rankingScreen').classList.add('hidden');
   document.getElementById('gameOverScreen').classList.add('hidden');
+  document.getElementById('couponScreen').classList.add('hidden');
   score = 0; 
   lives = maxLives;
   level = 1; frameCount = 0;
@@ -457,13 +583,15 @@ window.startGame = function() {
   stageTime = 30.0; lastTime = 0;
   warpFactor = 0; ambLight.color.setHex(0x8888cc); 
   invincibleTime = 0;
-  puddingEnergy = 0;
-  laserTime = 0;
+  breaches = 0;
+  gameOverReason = '';
+  runCoupons = { purin: 0, cc: 0 };
   document.getElementById('scoreVal').textContent = '0';
   document.getElementById('levelVal').textContent = '1';
   document.getElementById('timeVal').textContent = '30';
-  document.getElementById('energyBar').style.width = '0%';
   updateLivesUI();
+  updateBreachUI();
+  updateShotUI();
   clearScene();
   createPlayer();
   gameState = 'playing';
@@ -533,10 +661,8 @@ function drawBg(t) {
 }
 var items = [];
 var multiShot = 1;
+var MAX_SHOT = 9;
 var speedBoost = 1.0;
-var multiShotTimer = 0;
-var speedTimer = 0;
-var ITEM_DURATION = 600;
 var canvas = document.getElementById('gameCanvas');
 var renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
 renderer.setPixelRatio(window.devicePixelRatio);
@@ -568,8 +694,6 @@ pointLight.position.set(0, 0, 200);
 scene.add(pointLight);
 var textureLoader = new THREE.TextureLoader();
 var starTexture  = textureLoader.load('star_2_open.png');
-var lemonTexture = textureLoader.load('item_lemon.png');
-var mintTexture  = textureLoader.load('item_mint.png');
 var ccTexture    = textureLoader.load('cc.png');
 var purinTexture = textureLoader.load('purin.png');
 var player, playerSprite;
@@ -590,37 +714,25 @@ var bulletMatSingle = new THREE.MeshStandardMaterial({
 var bulletMatMulti = new THREE.MeshStandardMaterial({
   color: 0x88ffee, emissive: 0x00aa88, emissiveIntensity: 1.5, metalness: 0.2, roughness: 0.3
 });
-var laserGeo = new THREE.CylinderGeometry(8, 8, 120, 8);
-var laserMat = new THREE.MeshStandardMaterial({
-  color: 0xffaaff, emissive: 0xff00aa, emissiveIntensity: 2, roughness: 0.2
-});
 var enemyBullets = [];
 var enemyBulletGeo = new THREE.SphereGeometry(6, 8, 8);
 var enemyBulletMat = new THREE.MeshStandardMaterial({
   color: 0xff0044, emissive: 0xff0000, emissiveIntensity: 2, roughness: 0.2
 });
 function shoot() {
-  if (laserTime > 0) {
-    if (frameCount % 4 === 0) {
-      var mesh = new THREE.Mesh(laserGeo, laserMat);
-      mesh.position.set(player.position.x, player.position.y + 80, 0);
-      scene.add(mesh);
-      bullets.push({ mesh: mesh, vy: 25, isLaser: true });
-    }
-  } else {
-    if (frameCount - lastShotFrame < 35) return; 
-    lastShotFrame = frameCount;
-    var offsets = [];
-    if (multiShot === 1) offsets.push(0);
-    else for (var k=0;k<multiShot;k++) offsets.push((k-(multiShot-1)/2)*22);
-    offsets.forEach(ox => {
-      var mat = multiShot > 1 ? bulletMatMulti : bulletMatSingle;
-      var mesh = new THREE.Mesh(bulletGeo, mat);
-      mesh.position.set(player.position.x + ox, player.position.y + 40, 0);
-      scene.add(mesh);
-      bullets.push({ mesh: mesh, vy: 14 + level * 0.4, isLaser: false });
-    });
-  }
+  var interval = Math.max(14, 35 - (multiShot - 1) * 2);
+  if (frameCount - lastShotFrame < interval) return;
+  lastShotFrame = frameCount;
+  var offsets = [];
+  if (multiShot === 1) offsets.push(0);
+  else for (var k = 0; k < multiShot; k++) offsets.push((k - (multiShot-1)/2) * 22);
+  offsets.forEach(ox => {
+    var mat = multiShot > 1 ? bulletMatMulti : bulletMatSingle;
+    var mesh = new THREE.Mesh(bulletGeo, mat);
+    mesh.position.set(player.position.x + ox, player.position.y + 40, 0);
+    scene.add(mesh);
+    bullets.push({ mesh: mesh, vy: 14 + level * 0.4 });
+  });
 }
 function spawnEnemyBullet(x, y) {
   var mesh = new THREE.Mesh(enemyBulletGeo, enemyBulletMat);
@@ -640,10 +752,8 @@ function updateBullets() {
   for (var i = bullets.length-1; i >= 0; i--) {
     var b = bullets[i];
     b.mesh.position.y += b.vy;
-    if (!b.isLaser) {
-      b.mesh.rotation.y += 0.2;
-      b.mesh.rotation.x += 0.1;
-    }
+    b.mesh.rotation.y += 0.2;
+    b.mesh.rotation.x += 0.1;
     if (b.mesh.position.y > H()/2 + 80) {
       scene.remove(b.mesh);
       bullets.splice(i, 1);
@@ -709,21 +819,14 @@ function updateEnemies() {
     if (e.mesh.position.y < -H()/2 - e.size - 10) {
       scene.remove(e.mesh);
       enemies.splice(i, 1);
+      registerBreach();
     }
   }
 }
 function spawnItem() {
-  var r = Math.random();
-  var tex, type;
-  if (r < 0.65) {
-    tex = purinTexture; type = 'purin';
-  } else if (r < 0.85) {
-    tex = ccTexture; type = 'cc';
-  } else if (r < 0.92) {
-    tex = lemonTexture; type = 'multishot';
-  } else {
-    tex = mintTexture; type = 'speed';
-  }
+  var isPurin = Math.random() < 0.7;
+  var type = isPurin ? 'purin' : 'cc';
+  var tex = isPurin ? purinTexture : ccTexture;
   var mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
   var sprite = new THREE.Sprite(mat);
   if (tex.image) {
@@ -746,8 +849,6 @@ function updateItems() {
       items.splice(i, 1);
     }
   }
-  if (multiShotTimer > 0) { multiShotTimer--; if (multiShotTimer===0) multiShot=1; }
-  if (speedTimer > 0)     { speedTimer--;      if (speedTimer===0)    speedBoost=1.0; }
 }
 function showItemGet(type) {
   var overlay = document.createElement('div');
@@ -757,29 +858,14 @@ function showItemGet(type) {
   var img = '';
   var colorClass = '';
   if (type === 'cc') {
-    label = '🍰 安曇野からの贈り物';
-    effect = '全敵消滅！';
+    label = '🧀 バスクチーズケーキ';
+    effect = '画面上の敵を殲滅！';
     img = 'cc.jpg';
-    colorClass = 'item-lemon'; 
+    colorClass = 'item-lemon';
   } else if (type === 'purin') {
     label = '🍮 信州濃厚プリン';
-    effect = 'エネルギー上昇！';
+    effect = multiShot >= MAX_SHOT ? '弾数 MAX ' + multiShot + '発！' : '弾数 UP ' + multiShot + '発！';
     img = 'purin.jpg';
-    colorClass = 'item-mint'; 
-  } else if (type === 'laser') {
-    label = '🍮 プリンエネルギーMAX！';
-    effect = '強烈なレーザービーム！';
-    img = 'purin.jpg';
-    colorClass = 'item-lemon';
-  } else if (type === 'multishot') {
-    label = '🍋 AROMA LEMON';
-    effect = '弾数 UP ×' + multiShot + '発！';
-    img = 'item_lemon.png';
-    colorClass = 'item-lemon';
-  } else if (type === 'speed') {
-    label = '🌿 AROMA MINT';
-    effect = '速度 UP ×' + speedBoost.toFixed(1) + '！';
-    img = 'item_mint.png';
     colorClass = 'item-mint';
   }
   overlay.innerHTML = `
@@ -837,15 +923,13 @@ function checkCollisions() {
     var hit = false;
     for (var ei = enemies.length-1; ei >= 0; ei--) {
       var e = enemies[ei];
-      var collisionDist = b.isLaser ? e.size * 0.85 + 15 : e.size * 0.85;
+      var collisionDist = e.size * 0.85;
       var dist = Math.sqrt((b.mesh.position.x - e.mesh.position.x)**2 + (b.mesh.position.y - e.mesh.position.y)**2);
       if (dist < collisionDist) {
-        if (!b.isLaser) {
-          scene.remove(b.mesh);
-          bullets.splice(bi, 1);
-          hit = true;
-        }
-        e.hp -= b.isLaser ? 5 : 1;
+        scene.remove(b.mesh);
+        bullets.splice(bi, 1);
+        hit = true;
+        e.hp -= 1;
         e.mesh.material.emissiveIntensity = 4;
         setTimeout(() => { if (e.mesh.material) e.mesh.material.emissiveIntensity = 1.2; }, 80);
         if (e.hp <= 0) {
@@ -854,8 +938,8 @@ function checkCollisions() {
           addScore2(pts);
           spawnDamageText(e.mesh.position.x, e.mesh.position.y, pts, '#ffe87a'); 
           hitStop = 2; 
-          shakeTime = b.isLaser ? 2 : 8; 
-          shakeMag = b.isLaser ? 2 : 4; 
+          shakeTime = 8; 
+          shakeMag = 4; 
           scene.remove(e.mesh);
           enemies.splice(ei, 1);
         }
@@ -871,29 +955,16 @@ function checkCollisions() {
       scene.remove(it.sprite);
       items.splice(i, 1);
       if (it.type === 'purin') {
-        if (laserTime <= 0) {
-          puddingEnergy = Math.min(100, puddingEnergy + 25);
-          document.getElementById('energyBar').style.width = puddingEnergy + '%';
-          if (puddingEnergy >= 100) {
-            laserTime = 1200;
-            showItemGet('laser');
-          } else {
-            showItemGet('purin');
-          }
+        if (multiShot < MAX_SHOT) {
+          multiShot++;
+          updateShotUI();
         } else {
-          addScore2(500);
+          addScore2(300);
         }
+        showItemGet('purin');
       } else if (it.type === 'cc') {
         showItemGet('cc');
         triggerBomb();
-      } else if (it.type === 'multishot') {
-        multiShot = Math.min(5, multiShot + 1);
-        multiShotTimer = ITEM_DURATION;
-        showItemGet(it.type);
-      } else {
-        speedBoost = Math.min(2.5, speedBoost + 0.4);
-        speedTimer = ITEM_DURATION;
-        showItemGet(it.type);
       }
       spawnExplosion(it.sprite.position.x, it.sprite.position.y, '🌟');
     }
@@ -938,6 +1009,38 @@ function showLevelBanner() {
   ambLight.color.setHSL((level * 0.1) % 1.0, 0.8, 0.6); 
   setTimeout(() => { b.classList.remove('show'); }, 2000);
 }
+function updateShotUI() {
+  var el = document.getElementById('shotVal');
+  if (!el) return;
+  el.textContent = multiShot;
+}
+function updateBreachUI() {
+  var box = document.querySelector('.hud-breach');
+  var el = document.getElementById('breachVal');
+  if (!el) return;
+  el.textContent = breaches;
+  if (box) box.classList.toggle('danger', breaches >= MAX_BREACH - 5);
+}
+function registerBreach() {
+  if (gameState !== 'playing') return;
+  breaches++;
+  updateBreachUI();
+  shakeTime = 8; shakeMag = 6;
+  if (breaches >= MAX_BREACH) {
+    breaches = MAX_BREACH;
+    updateBreachUI();
+    gameOverReason = '敵機が20体プリン星団へ到達しました';
+    triggerGameOver();
+  }
+}
+function onStageClear() {
+  level++;
+  stageTime = 30.0;
+  scoreMultiplier = 1 + (level-1) * 0.2;
+  document.getElementById('levelVal').textContent = level;
+  showLevelBanner();
+  setTimeout(function() { if (gameState === 'playing') grantCoupon(); }, 900);
+}
 function updateLivesUI() {
   var bar = document.getElementById('lifeBar');
   if (!bar) return;
@@ -961,16 +1064,33 @@ function playerHit() {
   shakeTime = 20; shakeMag = 15; 
   if (lives <= 0) {
     if (player) { player.material.color.set(0xff0000); }
+    gameOverReason = 'プリンAスターが撃墜されました';
     setTimeout(() => { triggerGameOver(); }, 300);
   } else {
     invincibleTime = 120;
   }
 }
+function runCouponHtml() {
+  var lines = [];
+  Object.keys(COUPON_TYPES).forEach(function(k) {
+    if (runCoupons[k] > 0) {
+      lines.push('<div class="coupon-gain">' + COUPON_TYPES[k].emoji + ' ' +
+        COUPON_TYPES[k].label + ' +' + runCoupons[k] + '% （合計 ' + coupons[k].rate + '% 引き）</div>');
+    }
+  });
+  if (lines.length === 0) return '';
+  return '<div style="color:#ffe87a; letter-spacing:2px; margin-top:6px;">今回の獲得クーポン</div>' +
+    lines.join('') +
+    '<button class="btn-secondary" onclick="showCoupons()">🎟 クーポンを見る</button>';
+}
 async function triggerGameOver() {
+  if (gameState === 'gameover') return;
   gameState = 'gameover';
   clearScene();
   if (player) { scene.remove(player); player = null; }
   document.getElementById('finalScore').textContent = score.toLocaleString();
+  document.getElementById('goReason').textContent = gameOverReason;
+  document.getElementById('goCouponArea').innerHTML = runCouponHtml();
   document.getElementById('playerNameInput').value = '';
   document.getElementById('submitMsg').textContent = '';
   document.getElementById('submitBtn').disabled = false;
@@ -990,8 +1110,9 @@ function clearScene() {
   enemyBullets.length = 0;
   [...items].forEach(it => scene.remove(it.sprite));
   items.length = 0;
-  multiShot = 1; speedBoost = 1.0;
-  multiShotTimer = 0; speedTimer = 0;
+  multiShot = 1;
+  speedBoost = 1.0;
+  updateShotUI();
 }
 var PLAYER_SPEED = 6;
 function gameLoop(t) {
@@ -1023,19 +1144,8 @@ function gameLoop(t) {
     canvas.style.transform = 'none';
   }
   stageTime -= dt;
-  if (stageTime <= 0) {
-    level++;
-    stageTime = 30.0;
-    scoreMultiplier = 1 + (level-1) * 0.2;
-    document.getElementById('levelVal').textContent = level;
-    showLevelBanner();
-  }
+  if (stageTime <= 0) onStageClear();
   document.getElementById('timeVal').textContent = Math.ceil(stageTime);
-  if (laserTime > 0) {
-    laserTime--;
-    puddingEnergy = (laserTime / 1200) * 100;
-    document.getElementById('energyBar').style.width = puddingEnergy + '%';
-  }
   if (invincibleTime > 0) {
     invincibleTime--;
     if (player) {
