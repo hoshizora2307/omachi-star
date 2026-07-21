@@ -326,6 +326,7 @@
   .item-mint  { border: 2px solid rgba(100,255,180,0.7); }
   .item-popup-img { height: 160px; width: auto; filter: drop-shadow(0 0 20px rgba(255,255,255,0.4)); animation: imgSpin 2.2s forwards; }
   @keyframes imgSpin { 0% { transform: rotate(-30deg) scale(0.4); } 30% { transform: rotate(15deg) scale(1.15); } 55% { transform: rotate(-5deg) scale(1); } 80% { transform: rotate(0deg) scale(1); } 100%{ transform: rotate(20deg) scale(0.5); } }
+  .item-popup-fallback { font-size: 7rem; line-height: 1; animation: imgSpin 2.2s forwards; }
   .item-popup-label { font-size: 1.5rem; font-weight: 900; letter-spacing: 2px; margin-top: 10px; }
   .item-lemon .item-popup-label { color: #ffe840; text-shadow: 0 0 12px #ffe840; }
   .item-mint  .item-popup-label { color: #64ffb4; text-shadow: 0 0 12px #64ffb4; }
@@ -401,8 +402,8 @@
   <div class="credit">製作：MONDOCOLO STUDIO</div>
   <img src="star_3_sparkle.png" class="player-img-lg" alt="" onerror="this.onerror=null; this.src='star_2_open.png'">
   <div class="game-title">プリン星団を守れ！</div>
-  <div class="sub-title">🍮 プリンで弾を増やす　🧀 チーズケーキで全滅</div>
-  <div style="color:#ff9aa8; font-size:1rem; margin-top:-24px; margin-bottom:24px; text-align:center;">敵を20体通すとプリン星団が陥落します</div>
+  <div class="sub-title" style="line-height:1.9; margin-bottom:14px;">🍮 信州プリンで弾を増やす<br>🧀 安曇野バスクチーズケーキで全滅</div>
+  <div style="color:#ff9aa8; font-size:1rem; margin-bottom:26px; text-align:center;">敵を20体通すとプリン星団が陥落します</div>
   <button class="btn" onclick="startGame()">ゲームスタート</button>
   <button class="btn-secondary" onclick="showRanking()">🏆 ランキング</button>
   <button class="btn-secondary" onclick="showCoupons()">🎟 クーポンを見る</button>
@@ -495,7 +496,7 @@ var COUPON_MAX = 20;
 var COUPON_KEY = 'shinshu_marche_coupons_v1';
 var COUPON_TYPES = {
   purin: { label: '信州プリン', emoji: '🍮', prefix: 'SP' },
-  cc:    { label: 'バスクチーズケーキ', emoji: '🧀', prefix: 'BC' }
+  cc:    { label: '安曇野バスクチーズケーキ', emoji: '🧀', prefix: 'BC' }
 };
 var coupons = loadCoupons();
 var runCoupons = { purin: 0, cc: 0 };
@@ -1192,19 +1193,20 @@ function showItemGet(type) {
   var img = '';
   var colorClass = '';
   if (type === 'cc') {
-    label = '🧀 バスクチーズケーキ';
+    label = '🧀 安曇野バスクチーズケーキ';
     effect = '画面上の敵を殲滅！';
-    img = 'cc.jpg';
+    img = 'cc.png';
     colorClass = 'item-lemon';
   } else if (type === 'purin') {
-    label = '🍮 信州濃厚プリン';
+    label = '🍮 信州プリン';
     effect = multiShot >= MAX_SHOT ? '弾数 MAX ' + multiShot + '発！' : '弾数 UP ' + multiShot + '発！';
-    img = 'purin.jpg';
+    img = 'purin.png';
     colorClass = 'item-mint';
   }
+  var fallback = type === 'cc' ? '🧀' : '🍮';
   overlay.innerHTML = `
     <div class="item-popup ${colorClass}">
-      <img src="${img}" class="item-popup-img" alt="">
+      <img src="${img}" class="item-popup-img" alt="" onerror="this.outerHTML='<div class=&quot;item-popup-fallback&quot;>${fallback}</div>'">
       <div class="item-popup-label">${label}</div>
       <div class="item-popup-effect">${effect}</div>
     </div>`;
