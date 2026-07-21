@@ -148,7 +148,8 @@
   .diff-btn.locked { opacity: 0.35; cursor: not-allowed; }
   #diffNote { color: #999; font-size: 0.85rem; margin-bottom: 22px; text-align: center; min-height: 1.2em; }
   #camStage {
-    position: relative; width: 240px; height: 240px;
+    position: relative; width: min(80vw, 380px); height: min(80vw, 380px);
+    max-height: 46vh; max-width: 46vh;
     border-radius: 50%; overflow: hidden;
     border: 3px solid rgba(255,220,120,0.65);
     box-shadow: 0 0 30px rgba(255,200,80,0.3);
@@ -163,16 +164,16 @@
   #camStage.shot video { display: none; }
   #camStage.shot canvas { display: block; }
   #camGuide {
-    position: absolute; inset: 26px;
+    position: absolute; inset: 11%;
     border: 2px dashed rgba(255,255,255,0.35);
     border-radius: 50%; pointer-events: none;
   }
   #camStage.shot #camGuide { display: none; }
-  #camMsg { color: #ff9aa8; font-size: 0.9rem; min-height: 1.2em; margin-bottom: 8px; text-align: center; }
+  #camMsg { color: #ff9aa8; font-size: 0.9rem; min-height: 1.2em; margin-bottom: 6px; text-align: center; }
   #buddyName {
     background: rgba(255,255,255,0.08); border: 1.5px solid rgba(255,255,255,0.25);
     border-radius: 10px; color: #fff; font-family: inherit; font-size: 1rem;
-    padding: 9px 14px; text-align: center; width: 200px; margin-bottom: 12px;
+    padding: 9px 14px; text-align: center; width: 200px; margin-bottom: 10px;
   }
   .file-btn { position: relative; overflow: hidden; }
   .file-btn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
@@ -483,8 +484,8 @@
   <button class="btn-secondary" onclick="hideRanking()" style="margin-bottom: 40px;">← 戻る</button>
 </div>
 <div class="screen hidden" id="cameraScreen">
-  <div class="game-title" style="font-size:2rem; margin-top:20px;">📷 なかまを登録</div>
-  <div class="sub-title" style="margin-bottom:10px;">顔を撮ると、プリンAスターの相棒として<br>一緒に戦ってくれます</div>
+  <div class="game-title" style="font-size:1.7rem; margin-top:14px; margin-bottom:2px;">📷 なかまを登録</div>
+  <div class="sub-title" style="margin-bottom:6px; font-size:0.95rem;">顔を撮ると、プリンAスターの相棒として一緒に戦ってくれます</div>
   <div id="camStage">
     <video id="camVideo" autoplay playsinline muted></video>
     <canvas id="camCanvas" width="256" height="256"></canvas>
