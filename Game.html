@@ -147,6 +147,43 @@
   .diff-btn.active { color: #fff; font-weight: bold; transform: translateY(-2px); }
   .diff-btn.locked { opacity: 0.35; cursor: not-allowed; }
   #diffNote { color: #999; font-size: 0.85rem; margin-bottom: 22px; text-align: center; min-height: 1.2em; }
+  #camStage {
+    position: relative; width: 240px; height: 240px;
+    border-radius: 50%; overflow: hidden;
+    border: 3px solid rgba(255,220,120,0.65);
+    box-shadow: 0 0 30px rgba(255,200,80,0.3);
+    background: rgba(0,0,0,0.5); margin: 6px 0 12px;
+  }
+  #camStage video, #camStage canvas {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%; object-fit: cover;
+    transform: scaleX(-1);
+  }
+  #camStage canvas { display: none; }
+  #camStage.shot video { display: none; }
+  #camStage.shot canvas { display: block; }
+  #camGuide {
+    position: absolute; inset: 26px;
+    border: 2px dashed rgba(255,255,255,0.35);
+    border-radius: 50%; pointer-events: none;
+  }
+  #camStage.shot #camGuide { display: none; }
+  #camMsg { color: #ff9aa8; font-size: 0.9rem; min-height: 1.2em; margin-bottom: 8px; text-align: center; }
+  #buddyName {
+    background: rgba(255,255,255,0.08); border: 1.5px solid rgba(255,255,255,0.25);
+    border-radius: 10px; color: #fff; font-family: inherit; font-size: 1rem;
+    padding: 9px 14px; text-align: center; width: 200px; margin-bottom: 12px;
+  }
+  .file-btn { position: relative; overflow: hidden; }
+  .file-btn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  #buddyBadge {
+    display: flex; align-items: center; gap: 8px;
+    color: #ffe87a; font-size: 0.95rem; margin-bottom: 10px;
+  }
+  #buddyBadge img {
+    width: 34px; height: 34px; border-radius: 50%;
+    border: 2px solid rgba(255,220,120,0.7);
+  }
   .rank-badge {
     display: inline-block; margin: 4px 0 18px;
     color: #8de0ff; font-size: 1.05rem; letter-spacing: 3px;
@@ -428,6 +465,8 @@
   <button class="btn-secondary" onclick="showRanking()">🏆 ランキング</button>
   <button class="btn-secondary" onclick="showCoupons()">🎟 クーポンを見る</button>
   <button class="btn-secondary" onclick="showAchievements()">🎖 実績</button>
+  <button class="btn-secondary" onclick="openCamera()">📷 なかまを登録</button>
+  <div id="buddyBadge"></div>
   <div class="rank-badge" id="titleRankBadge">見習い星</div>
   <button class="btn-secondary" onclick="goHome()" style="margin-bottom:40px;">🏠 ホームページTOPへ</button>
   <div id="rankPanel">
@@ -442,6 +481,25 @@
     <div id="rankListFull"><div class="rank-empty">読み込み中...</div></div>
   </div>
   <button class="btn-secondary" onclick="hideRanking()" style="margin-bottom: 40px;">← 戻る</button>
+</div>
+<div class="screen hidden" id="cameraScreen">
+  <div class="game-title" style="font-size:2rem; margin-top:20px;">📷 なかまを登録</div>
+  <div class="sub-title" style="margin-bottom:10px;">顔を撮ると、プリンAスターの相棒として<br>一緒に戦ってくれます</div>
+  <div id="camStage">
+    <video id="camVideo" autoplay playsinline muted></video>
+    <canvas id="camCanvas" width="256" height="256"></canvas>
+    <div id="camGuide"></div>
+  </div>
+  <div id="camMsg"></div>
+  <input id="buddyName" maxlength="8" placeholder="なかまの名前（任意）">
+  <button class="btn" id="camShotBtn" onclick="captureBuddy()">📸 撮影する</button>
+  <button class="btn-secondary" id="camRetakeBtn" onclick="retakeBuddy()" style="display:none;">撮り直す</button>
+  <label class="btn-secondary file-btn">🖼 写真から選ぶ<input type="file" accept="image/*" onchange="pickBuddyFile(event)"></label>
+  <button class="btn-secondary" onclick="deleteBuddy()">なかまを削除</button>
+  <div class="coupon-note" style="max-width:320px;">
+    写真はこの端末のブラウザ内にだけ保存されます。<br>サーバーには一切送信されません。
+  </div>
+  <button class="btn-secondary" onclick="closeCamera()" style="margin-bottom:40px;">← 戻る</button>
 </div>
 <div class="screen hidden" id="achScreen">
   <div class="game-title" style="font-size:2.3rem; margin-top:20px;">🎖 実績</div>
@@ -694,7 +752,8 @@ var ACH_SPECIALS = [
   { id: 'sp_flawless10',   icon: '💎', name: '無傷の航海',       desc: '一度も被弾せずステージ10へ到達' },
   { id: 'sp_no_item',      icon: '🕊', name: '素手の勇者',       desc: 'アイテムを取らずステージ5をクリア' },
   { id: 'sp_comeback',     icon: '🔁', name: '瀬戸際の反撃',     desc: '突破19の状態でステージをクリア' },
-  { id: 'sp_night',        icon: '🌙', name: '夜更かしスター',   desc: '深夜0時〜4時に出撃する' }
+  { id: 'sp_night',        icon: '🌙', name: '夜更かしスター',   desc: '深夜0時〜4時に出撃する' },
+  { id: 'sp_buddy',        icon: '📷', name: 'ふたりの冒険',     desc: 'なかまを登録して一緒に出撃する' }
 ];
 var RANK_TITLES = [
   { min: 0,  name: '見習い星' },
@@ -961,7 +1020,7 @@ async function refreshRanking() {
   }
 }
 function showScreen(id) {
-  ['titleScreen','rankingScreen','gameOverScreen','couponScreen','achScreen'].forEach(s => {
+  ['titleScreen','rankingScreen','gameOverScreen','couponScreen','achScreen','cameraScreen'].forEach(s => {
     document.getElementById(s).classList.toggle('hidden', s !== id);
   });
   if (id === 'titleScreen') { renderDiffPicker(); updateRankBadge(); }
@@ -969,12 +1028,14 @@ function showScreen(id) {
 window.showRanking = function() { showScreen('rankingScreen'); refreshRanking(); }
 window.hideRanking = function() { showScreen('titleScreen'); }
 window.startGame = function() {
+  stopCamStream();
   showScreen(null);
   document.getElementById('titleScreen').classList.add('hidden');
   document.getElementById('rankingScreen').classList.add('hidden');
   document.getElementById('gameOverScreen').classList.add('hidden');
   document.getElementById('couponScreen').classList.add('hidden');
   document.getElementById('achScreen').classList.add('hidden');
+  document.getElementById('cameraScreen').classList.add('hidden');
   score = 0; 
   maxLives = DIFF.lives;
   MAX_BREACH = DIFF.breach;
@@ -995,6 +1056,7 @@ window.startGame = function() {
   updateComboUI(false);
   runBossKills = 0;
   runItems = 0;
+  buddyShootTimer = 60;
   bumpStat('plays', 1);
   var hr = new Date().getHours();
   if (hr >= 0 && hr < 4) unlockAch('sp_night');
@@ -1007,6 +1069,8 @@ window.startGame = function() {
   updateShotUI();
   clearScene();
   createPlayer();
+  buildBuddy();
+  if (buddyData) unlockAch('sp_buddy');
   gameState = 'playing';
 }
 window.submitScore = async function() {
@@ -1106,6 +1170,205 @@ var pointLight = new THREE.PointLight(0x4488ff, 1.5, 600);
 pointLight.position.set(0, 0, 200);
 scene.add(pointLight);
 var textureLoader = new THREE.TextureLoader();
+var BUDDY_KEY = 'shinshu_marche_buddy_v1';
+var buddyData = loadBuddy();
+var camStream = null;
+function loadBuddy() {
+  try {
+    var raw = localStorage.getItem(BUDDY_KEY);
+    if (raw) {
+      var d = JSON.parse(raw);
+      if (d && d.img) return { img: d.img, name: d.name || '' };
+    }
+  } catch (e) {}
+  return null;
+}
+function saveBuddy(d) {
+  try {
+    if (d) localStorage.setItem(BUDDY_KEY, JSON.stringify(d));
+    else localStorage.removeItem(BUDDY_KEY);
+  } catch (e) {}
+  buddyData = d;
+  renderBuddyBadge();
+}
+function renderBuddyBadge() {
+  var el = document.getElementById('buddyBadge');
+  if (!el) return;
+  if (!buddyData) { el.innerHTML = ''; return; }
+  el.innerHTML = '<img src="' + buddyData.img + '" alt="">' +
+    (buddyData.name ? buddyData.name : 'なかま') + ' 参戦中';
+}
+function camMsg(t) {
+  var el = document.getElementById('camMsg');
+  if (el) el.textContent = t || '';
+}
+window.openCamera = function() {
+  showScreen('cameraScreen');
+  var stage = document.getElementById('camStage');
+  var nameEl = document.getElementById('buddyName');
+  if (buddyData) {
+    nameEl.value = buddyData.name || '';
+    drawBuddyPreview(buddyData.img);
+  } else {
+    stage.classList.remove('shot');
+  }
+  document.getElementById('camRetakeBtn').style.display = buddyData ? '' : 'none';
+  camMsg('');
+  startCamStream();
+}
+function startCamStream() {
+  var video = document.getElementById('camVideo');
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    camMsg('このブラウザではカメラを使えません。写真から選んでください。');
+    return;
+  }
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: 640, height: 640 }, audio: false })
+    .then(function(stream) {
+      camStream = stream;
+      video.srcObject = stream;
+      camMsg('');
+    })
+    .catch(function() {
+      camMsg('カメラを使えませんでした。写真から選んでください。');
+    });
+}
+function stopCamStream() {
+  if (camStream) {
+    camStream.getTracks().forEach(function(t) { t.stop(); });
+    camStream = null;
+  }
+  var v = document.getElementById('camVideo');
+  if (v) v.srcObject = null;
+}
+window.closeCamera = function() {
+  stopCamStream();
+  showScreen('titleScreen');
+}
+function cropToCircle(source, sw, sh) {
+  var c = document.createElement('canvas');
+  c.width = 256; c.height = 256;
+  var ctx = c.getContext('2d');
+  var side = Math.min(sw, sh);
+  var sx = (sw - side) / 2, sy = (sh - side) / 2;
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(128, 128, 120, 0, Math.PI * 2);
+  ctx.closePath();
+  ctx.clip();
+  ctx.drawImage(source, sx, sy, side, side, 0, 0, 256, 256);
+  ctx.restore();
+  ctx.beginPath();
+  ctx.arc(128, 128, 120, 0, Math.PI * 2);
+  ctx.lineWidth = 10;
+  ctx.strokeStyle = '#ffd77a';
+  ctx.stroke();
+  return c.toDataURL('image/jpeg', 0.82);
+}
+function drawBuddyPreview(dataUrl) {
+  var canvas = document.getElementById('camCanvas');
+  var ctx = canvas.getContext('2d');
+  var img = new Image();
+  img.onload = function() {
+    ctx.clearRect(0, 0, 256, 256);
+    ctx.save();
+    ctx.scale(-1, 1);
+    ctx.drawImage(img, -256, 0, 256, 256);
+    ctx.restore();
+    document.getElementById('camStage').classList.add('shot');
+  };
+  img.src = dataUrl;
+}
+window.captureBuddy = function() {
+  var video = document.getElementById('camVideo');
+  if (!camStream || !video.videoWidth) {
+    camMsg('カメラの準備ができていません。');
+    return;
+  }
+  var url = cropToCircle(video, video.videoWidth, video.videoHeight);
+  applyBuddy(url);
+}
+window.pickBuddyFile = function(ev) {
+  var file = ev.target.files && ev.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function() {
+    var img = new Image();
+    img.onload = function() { applyBuddy(cropToCircle(img, img.width, img.height), true); };
+    img.onerror = function() { camMsg('画像を読み込めませんでした。'); };
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+  ev.target.value = '';
+}
+function applyBuddy(url, noMirror) {
+  var name = (document.getElementById('buddyName').value || '').trim();
+  saveBuddy({ img: url, name: name });
+  if (noMirror) {
+    var canvas = document.getElementById('camCanvas');
+    var ctx = canvas.getContext('2d');
+    var im = new Image();
+    im.onload = function() {
+      ctx.clearRect(0, 0, 256, 256);
+      ctx.drawImage(im, 0, 0, 256, 256);
+      document.getElementById('camStage').classList.add('shot');
+    };
+    im.src = url;
+  } else {
+    drawBuddyPreview(url);
+  }
+  document.getElementById('camRetakeBtn').style.display = '';
+  camMsg('なかまを登録しました！');
+  buildBuddy();
+  unlockAch('sp_buddy');
+}
+window.retakeBuddy = function() {
+  document.getElementById('camStage').classList.remove('shot');
+  camMsg('');
+  if (!camStream) startCamStream();
+}
+window.deleteBuddy = function() {
+  saveBuddy(null);
+  document.getElementById('camStage').classList.remove('shot');
+  document.getElementById('buddyName').value = '';
+  document.getElementById('camRetakeBtn').style.display = 'none';
+  camMsg('なかまを削除しました。');
+  if (buddySprite) { scene.remove(buddySprite); buddySprite = null; }
+}
+var buddySprite = null;
+var buddyShootTimer = 0;
+function buildBuddy() {
+  if (buddySprite) { scene.remove(buddySprite); buddySprite = null; }
+  if (!buddyData || !buddyData.img) return;
+  var img = new Image();
+  img.onload = function() {
+    var tex = new THREE.Texture(img);
+    tex.needsUpdate = true;
+    var mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
+    var sp = new THREE.Sprite(mat);
+    sp.scale.set(58, 58, 1);
+    sp.position.set(-90, -H()/2 + 190, 1);
+    scene.add(sp);
+    buddySprite = sp;
+  };
+  img.src = buddyData.img;
+}
+function updateBuddy() {
+  if (!buddySprite || !player) return;
+  var tx = player.position.x - 92;
+  var ty = player.position.y + 6 + Math.sin(frameCount * 0.05) * 9;
+  var half = W()/2 - 30;
+  if (tx < -half) tx = player.position.x + 92;
+  buddySprite.position.x += (tx - buddySprite.position.x) * 0.11;
+  buddySprite.position.y += (ty - buddySprite.position.y) * 0.11;
+  buddyShootTimer--;
+  if (buddyShootTimer <= 0) {
+    buddyShootTimer = 48;
+    var mesh = new THREE.Mesh(bulletGeo, bulletMatSingle);
+    mesh.position.set(buddySprite.position.x, buddySprite.position.y + 30, 0);
+    scene.add(mesh);
+    bullets.push({ mesh: mesh, vy: 13 + level * 0.3 });
+  }
+}
 var starTexture  = textureLoader.load('star_2_open.png');
 var ccTexture    = textureLoader.load('cc.png');
 var purinTexture = textureLoader.load('purin.png');
@@ -1707,6 +1970,7 @@ async function triggerGameOver() {
   showScreen('gameOverScreen');
 }
 function clearScene() {
+  if (buddySprite) { scene.remove(buddySprite); buddySprite = null; }
   if (boss) { scene.remove(boss.mesh); boss = null; }
   bossActive = false;
   document.getElementById('bossBarWrap').classList.remove('show');
@@ -1781,6 +2045,7 @@ function gameLoop(t) {
     player.material.rotation = (keys['ArrowLeft'] ? -0.25 : keys['ArrowRight'] ? 0.25 : 0);
   }
   updateBullets();
+  updateBuddy();
   updateBoss();
   updateEnemies();
   updateItems();
@@ -1804,6 +2069,7 @@ function handleTouchMove(e) {
 canvas.addEventListener('touchstart', handleTouchMove, { passive: false });
 canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
 initBg();
+renderBuddyBadge();
 loadDiff();
 renderDiffPicker();
 updateRankBadge();
