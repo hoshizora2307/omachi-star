@@ -83,6 +83,70 @@
     0%,100% { box-shadow: 0 0 0 rgba(255,0,60,0); }
     50% { box-shadow: 0 0 18px rgba(255,0,60,0.9); }
   }
+  #comboDisplay {
+    position: fixed; top: 78px; left: 50%;
+    transform: translateX(-50%) scale(0.8);
+    z-index: 12; pointer-events: none; opacity: 0;
+    text-align: center; transition: opacity 0.15s;
+  }
+  #comboDisplay.show { opacity: 1; }
+  #comboDisplay .cmb-num {
+    font-size: 2.6rem; font-weight: 900; color: #fff;
+    text-shadow: 0 0 18px #ff9a3c, 0 3px 0 rgba(0,0,0,0.6);
+    line-height: 1;
+  }
+  #comboDisplay .cmb-label { font-size: 0.95rem; letter-spacing: 4px; color: #ffcf8a; }
+  #comboDisplay .cmb-mult { font-size: 1.1rem; color: #64ffb4; text-shadow: 0 0 10px #64ffb4; }
+  @keyframes comboPop { 0% { transform: translateX(-50%) scale(1.4); } 100% { transform: translateX(-50%) scale(1); } }
+  #bossBarWrap {
+    position: fixed; top: 78px; left: 50%; transform: translateX(-50%);
+    width: min(76vw, 520px); z-index: 12; pointer-events: none; display: none;
+  }
+  #bossBarWrap.show { display: block; }
+  #bossBarName {
+    color: #ff6b9d; font-size: 1rem; letter-spacing: 3px; text-align: center;
+    text-shadow: 0 0 12px rgba(255,60,140,0.8); margin-bottom: 4px;
+  }
+  #bossBarOuter {
+    height: 12px; background: rgba(0,0,0,0.65);
+    border: 1.5px solid rgba(255,90,150,0.6); border-radius: 8px; overflow: hidden;
+  }
+  #bossBarInner {
+    height: 100%; width: 100%;
+    background: linear-gradient(90deg, #ff2d6f, #ffb03a);
+    box-shadow: 0 0 12px rgba(255,60,120,0.9);
+    transition: width 0.15s linear;
+  }
+  .ach-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 4px; border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .ach-row:last-child { border-bottom: none; }
+  .ach-icon { font-size: 1.7rem; width: 34px; text-align: center; }
+  .ach-body { flex: 1; text-align: left; }
+  .ach-name { color: #ffe87a; font-size: 1.05rem; letter-spacing: 1px; }
+  .ach-desc { color: #999; font-size: 0.85rem; }
+  .ach-row.locked .ach-icon { filter: grayscale(1); opacity: 0.35; }
+  .ach-row.locked .ach-name { color: #666; }
+  .ach-row.locked .ach-desc { color: #555; }
+  .rank-badge {
+    display: inline-block; margin: 4px 0 18px;
+    color: #8de0ff; font-size: 1.05rem; letter-spacing: 3px;
+    border: 1px solid rgba(140,220,255,0.35); border-radius: 50px;
+    padding: 5px 20px;
+  }
+  #achToast {
+    position: fixed; left: 50%; bottom: 90px;
+    transform: translate(-50%, 30px);
+    z-index: 45; pointer-events: none; opacity: 0;
+    background: rgba(6,4,20,0.92);
+    border: 1.5px solid rgba(255,215,0,0.7);
+    border-radius: 14px; padding: 12px 24px;
+    text-align: center; transition: all 0.35s ease-out;
+  }
+  #achToast.show { opacity: 1; transform: translate(-50%, 0); }
+  #achToast .at-title { color: #ffd700; font-size: 0.9rem; letter-spacing: 3px; }
+  #achToast .at-name { color: #fff; font-size: 1.3rem; font-weight: 900; }
   .coupon-card {
     position: relative;
     background: linear-gradient(135deg, #1a1030 0%, #2a1440 100%);
@@ -319,6 +383,19 @@
   <div class="ct-main" id="ctMain">🍮 +3%</div>
   <div class="ct-sub" id="ctSub">信州プリン 合計 8% 引き</div>
 </div>
+<div id="comboDisplay">
+  <div class="cmb-num" id="comboNum">0</div>
+  <div class="cmb-label">COMBO</div>
+  <div class="cmb-mult" id="comboMult">×1.0</div>
+</div>
+<div id="bossBarWrap">
+  <div id="bossBarName">BOSS</div>
+  <div id="bossBarOuter"><div id="bossBarInner"></div></div>
+</div>
+<div id="achToast">
+  <div class="at-title">実績解除</div>
+  <div class="at-name" id="atName"></div>
+</div>
 <div id="controlsHint">画面をスワイプして移動（オート連射）</div>
 <div class="screen" id="titleScreen">
   <div class="credit">製作：MONDOCOLO STUDIO</div>
@@ -329,6 +406,8 @@
   <button class="btn" onclick="startGame()">ゲームスタート</button>
   <button class="btn-secondary" onclick="showRanking()">🏆 ランキング</button>
   <button class="btn-secondary" onclick="showCoupons()">🎟 クーポンを見る</button>
+  <button class="btn-secondary" onclick="showAchievements()">🎖 実績</button>
+  <div class="rank-badge" id="titleRankBadge">見習い星</div>
   <div id="rankPanel">
     <div class="rank-title">🏆 TOP 10 ランキング</div>
     <div id="rankListTitle"><div class="rank-empty">読み込み中...</div></div>
@@ -339,6 +418,14 @@
   <div id="rankPanel">
     <div class="rank-title">TOP 10</div>
     <div id="rankListFull"><div class="rank-empty">読み込み中...</div></div>
+  </div>
+  <button class="btn-secondary" onclick="hideRanking()" style="margin-bottom: 40px;">← 戻る</button>
+</div>
+<div class="screen hidden" id="achScreen">
+  <div class="game-title" style="font-size:2.3rem; margin-top:20px;">🎖 実績</div>
+  <div class="sub-title" id="achProgress" style="margin-bottom:12px;">0 / 16 解除</div>
+  <div id="rankPanel">
+    <div id="achList"></div>
   </div>
   <button class="btn-secondary" onclick="hideRanking()" style="margin-bottom: 40px;">← 戻る</button>
 </div>
@@ -451,6 +538,7 @@ function grantCoupon() {
   saveCoupons();
   runCoupons[kind] += gained;
   showCouponToast(kind, gained, after);
+  checkCouponAch();
 }
 function showCouponToast(kind, gained, total) {
   var t = COUPON_TYPES[kind];
@@ -481,6 +569,143 @@ function renderCoupons() {
   if (el) el.innerHTML = couponCardHtml('purin') + couponCardHtml('cc');
 }
 window.showCoupons = function() { renderCoupons(); showScreen('couponScreen'); }
+var ACH_KEY = 'shinshu_marche_ach_v1';
+var ACHIEVEMENTS = [
+  { id: 'first_flight', icon: '🚀', name: '初出撃',           desc: 'プリンAスターで出撃する' },
+  { id: 'shot_max',     icon: '🍮', name: 'プリンマスター',   desc: '弾数を9発まで増やす' },
+  { id: 'combo_20',     icon: '🔥', name: '連鎖の星',         desc: '20コンボを達成する' },
+  { id: 'combo_50',     icon: '💥', name: '止まらない流星',   desc: '50コンボを達成する' },
+  { id: 'combo_100',    icon: '☄️', name: '銀河一の連撃',     desc: '100コンボを達成する' },
+  { id: 'bomb_8',       icon: '🧀', name: '一網打尽',         desc: 'チーズケーキで8体以上を同時撃破' },
+  { id: 'boss_1',       icon: '👾', name: '初ボス撃破',       desc: 'ボスを1体倒す' },
+  { id: 'boss_5',       icon: '⚔️', name: 'ボスハンター',     desc: 'ボスを通算5体倒す' },
+  { id: 'boss_20',      icon: '🛡', name: '星団の守護者',     desc: 'ボスを通算20体倒す' },
+  { id: 'stage_10',     icon: '🔟', name: '深宙域到達',       desc: 'ステージ10に到達する' },
+  { id: 'stage_20',     icon: '🌌', name: '果ての宙域',       desc: 'ステージ20に到達する' },
+  { id: 'perfect_1',    icon: '✨', name: '完全防衛',         desc: '突破0でステージをクリアする' },
+  { id: 'perfect_5',    icon: '🧱', name: '鉄壁の防衛線',     desc: '完全防衛を通算5回達成する' },
+  { id: 'score_100k',   icon: '💯', name: '10万点突破',       desc: '1プレイで100,000点を出す' },
+  { id: 'score_500k',   icon: '🏅', name: '50万点突破',       desc: '1プレイで500,000点を出す' },
+  { id: 'coupon_max',   icon: '🎟', name: 'クーポンコンプ',   desc: '両方の割引券を20%にする' }
+];
+var RANK_TITLES = [
+  { min: 0,  name: '見習い星' },
+  { min: 3,  name: 'プリン運搬係' },
+  { min: 6,  name: '星団防衛隊員' },
+  { min: 9,  name: '防衛隊 隊長' },
+  { min: 12, name: 'エースパイロット' },
+  { min: 15, name: 'プリン星団の英雄' }
+];
+var achData = loadAch();
+function loadAch() {
+  var base = { unlocked: {}, bossKills: 0, perfectStages: 0, plays: 0 };
+  try {
+    var raw = localStorage.getItem(ACH_KEY);
+    if (raw) {
+      var s = JSON.parse(raw);
+      base.unlocked = s.unlocked || {};
+      base.bossKills = Number(s.bossKills) || 0;
+      base.perfectStages = Number(s.perfectStages) || 0;
+      base.plays = Number(s.plays) || 0;
+    }
+  } catch (e) {}
+  return base;
+}
+function saveAch() {
+  try { localStorage.setItem(ACH_KEY, JSON.stringify(achData)); } catch (e) {}
+}
+var achQueue = [];
+var achToastBusy = false;
+function unlockAch(id) {
+  if (achData.unlocked[id]) return;
+  var a = ACHIEVEMENTS.find(function(x) { return x.id === id; });
+  if (!a) return;
+  achData.unlocked[id] = true;
+  saveAch();
+  achQueue.push(a);
+  pumpAchToast();
+  updateRankBadge();
+}
+function pumpAchToast() {
+  if (achToastBusy || achQueue.length === 0) return;
+  achToastBusy = true;
+  var a = achQueue.shift();
+  var el = document.getElementById('achToast');
+  document.getElementById('atName').textContent = a.icon + ' ' + a.name;
+  el.classList.add('show');
+  setTimeout(function() {
+    el.classList.remove('show');
+    setTimeout(function() { achToastBusy = false; pumpAchToast(); }, 350);
+  }, 1900);
+}
+function achCount() {
+  return ACHIEVEMENTS.filter(function(a) { return achData.unlocked[a.id]; }).length;
+}
+function rankTitle() {
+  var n = achCount();
+  var t = RANK_TITLES[0].name;
+  RANK_TITLES.forEach(function(r) { if (n >= r.min) t = r.name; });
+  return t;
+}
+function updateRankBadge() {
+  var el = document.getElementById('titleRankBadge');
+  if (el) el.textContent = rankTitle() + '　🎖' + achCount() + '/' + ACHIEVEMENTS.length;
+}
+function renderAchievements() {
+  var el = document.getElementById('achList');
+  if (!el) return;
+  el.innerHTML = ACHIEVEMENTS.map(function(a) {
+    var got = !!achData.unlocked[a.id];
+    return '<div class="ach-row' + (got ? '' : ' locked') + '">' +
+      '<div class="ach-icon">' + (got ? a.icon : '🔒') + '</div>' +
+      '<div class="ach-body"><div class="ach-name">' + a.name + '</div>' +
+      '<div class="ach-desc">' + a.desc + '</div></div></div>';
+  }).join('');
+  document.getElementById('achProgress').textContent =
+    achCount() + ' / ' + ACHIEVEMENTS.length + ' 解除　—　' + rankTitle();
+}
+window.showAchievements = function() { renderAchievements(); showScreen('achScreen'); }
+function checkCouponAch() {
+  if (coupons.purin.rate >= COUPON_MAX && coupons.cc.rate >= COUPON_MAX) unlockAch('coupon_max');
+}
+var combo = 0;
+var comboTimer = 0;
+var COMBO_WINDOW = 150;
+var maxComboThisRun = 0;
+function comboMultiplier() {
+  return 1 + Math.min(combo, 100) * 0.03;
+}
+function addCombo(n) {
+  combo += (n || 1);
+  comboTimer = COMBO_WINDOW;
+  if (combo > maxComboThisRun) maxComboThisRun = combo;
+  if (combo >= 20) unlockAch('combo_20');
+  if (combo >= 50) unlockAch('combo_50');
+  if (combo >= 100) unlockAch('combo_100');
+  updateComboUI(true);
+}
+function breakCombo() {
+  if (combo >= 3) {
+    var el = document.getElementById('comboDisplay');
+    if (el) el.classList.remove('show');
+  }
+  combo = 0;
+  comboTimer = 0;
+  updateComboUI(false);
+}
+function updateComboUI(pop) {
+  var el = document.getElementById('comboDisplay');
+  if (!el) return;
+  if (combo < 3 || bossActive) { el.classList.remove('show'); return; }
+  document.getElementById('comboNum').textContent = combo;
+  document.getElementById('comboMult').textContent = '×' + comboMultiplier().toFixed(2);
+  el.classList.add('show');
+  if (pop) {
+    el.style.animation = 'none';
+    void el.offsetWidth;
+    el.style.animation = 'comboPop 0.18s ease-out';
+  }
+}
 var SUPABASE_URL = 'https://ufjojhraqyzqqzlkokwd.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_ha-q_6WBEngyBT3dOLMJQQ_EZsVSGI6';
 var supabaseClient = null;
@@ -564,7 +789,7 @@ async function refreshRanking() {
   }
 }
 function showScreen(id) {
-  ['titleScreen','rankingScreen','gameOverScreen','couponScreen'].forEach(s => {
+  ['titleScreen','rankingScreen','gameOverScreen','couponScreen','achScreen'].forEach(s => {
     document.getElementById(s).classList.toggle('hidden', s !== id);
   });
 }
@@ -576,6 +801,7 @@ window.startGame = function() {
   document.getElementById('rankingScreen').classList.add('hidden');
   document.getElementById('gameOverScreen').classList.add('hidden');
   document.getElementById('couponScreen').classList.add('hidden');
+  document.getElementById('achScreen').classList.add('hidden');
   score = 0; 
   lives = maxLives;
   level = 1; frameCount = 0;
@@ -584,8 +810,15 @@ window.startGame = function() {
   warpFactor = 0; ambLight.color.setHex(0x8888cc); 
   invincibleTime = 0;
   breaches = 0;
+  breachesAtStageStart = 0;
   gameOverReason = '';
   runCoupons = { purin: 0, cc: 0 };
+  combo = 0; comboTimer = 0; maxComboThisRun = 0;
+  bossStage = false;
+  updateComboUI(false);
+  achData.plays++;
+  saveAch();
+  unlockAch('first_flight');
   document.getElementById('scoreVal').textContent = '0';
   document.getElementById('levelVal').textContent = '1';
   document.getElementById('timeVal').textContent = '30';
@@ -800,7 +1033,7 @@ function spawnEnemy() {
 }
 function updateEnemies() {
   const interval = Math.max(20, 80 - level * 5);
-  if (frameCount - lastEnemyFrame > interval) {
+  if (!bossStage && frameCount - lastEnemyFrame > interval) {
     spawnEnemy();
     if (level > 3 && Math.random() < 0.3) spawnEnemy();
     lastEnemyFrame = frameCount;
@@ -823,6 +1056,107 @@ function updateEnemies() {
     }
   }
 }
+var boss = null;
+var bossActive = false;
+var bossStage = false;
+var bossGeo = new THREE.IcosahedronGeometry(1, 1);
+var BOSS_NAMES = ['ヌルポ星人', 'カラメル大公', 'ブラックホールプリン', '虚無のスフィア', '終末のカスタード'];
+function bossIndex() { return Math.max(1, Math.floor(level / 5)); }
+function spawnBoss() {
+  if (gameState !== 'playing') return;
+  var bi = bossIndex();
+  var hp = 120 + (bi - 1) * 110;
+  var size = 95 + Math.min(bi, 6) * 6;
+  var mat = new THREE.MeshStandardMaterial({
+    color: 0xff2d6f, emissive: 0x66001f, emissiveIntensity: 1.4, metalness: 0.8, roughness: 0.25
+  });
+  var mesh = new THREE.Mesh(bossGeo, mat);
+  mesh.scale.set(size, size, size);
+  mesh.position.set(0, H()/2 + size, 0);
+  scene.add(mesh);
+  boss = {
+    mesh: mesh, hp: hp, maxHp: hp, size: size,
+    targetY: H()/2 - size - 40,
+    entering: true, shootTimer: 90, phase: 0, pts: 3000 * bi
+  };
+  bossActive = true;
+  document.getElementById('bossBarName').textContent =
+    '⚠ ' + BOSS_NAMES[(bi - 1) % BOSS_NAMES.length] + ' ⚠';
+  document.getElementById('bossBarInner').style.width = '100%';
+  document.getElementById('bossBarWrap').classList.add('show');
+  updateComboUI(false);
+}
+function bossShoot() {
+  var bi = bossIndex();
+  var n = Math.min(9, 3 + bi);
+  var spread = 0.9;
+  var speed = 4.5 + bi * 0.5;
+  for (var i = 0; i < n; i++) {
+    var ang = -Math.PI/2 + (i - (n-1)/2) * (spread / n);
+    var mesh = new THREE.Mesh(enemyBulletGeo, enemyBulletMat);
+    mesh.scale.set(1.4, 1.4, 1.4);
+    mesh.position.set(boss.mesh.position.x, boss.mesh.position.y - boss.size * 0.6, 0);
+    scene.add(mesh);
+    enemyBullets.push({ mesh: mesh, vx: Math.cos(ang) * speed, vy: Math.sin(ang) * speed });
+  }
+}
+function updateBoss() {
+  if (!boss) return;
+  var b = boss;
+  b.mesh.rotation.x += 0.006;
+  b.mesh.rotation.y += 0.012;
+  if (b.entering) {
+    b.mesh.position.y -= 4;
+    if (b.mesh.position.y <= b.targetY) { b.mesh.position.y = b.targetY; b.entering = false; }
+    return;
+  }
+  b.phase += 0.012;
+  var range = W()/2 - b.size * 0.7 - 20;
+  b.mesh.position.x = Math.sin(b.phase) * range;
+  b.mesh.position.y = b.targetY + Math.sin(b.phase * 2.3) * 22;
+  b.shootTimer--;
+  if (b.shootTimer <= 0) {
+    bossShoot();
+    b.shootTimer = Math.max(40, 100 - bossIndex() * 6);
+  }
+}
+function damageBoss(amount) {
+  if (!boss) return;
+  boss.hp -= amount;
+  boss.mesh.material.emissiveIntensity = 4;
+  setTimeout(function() { if (boss && boss.mesh.material) boss.mesh.material.emissiveIntensity = 1.4; }, 70);
+  var ratio = Math.max(0, boss.hp / boss.maxHp) * 100;
+  document.getElementById('bossBarInner').style.width = ratio + '%';
+  if (boss.hp <= 0) defeatBoss();
+}
+function defeatBoss() {
+  var bx = boss.mesh.position.x, by = boss.mesh.position.y;
+  boss_lastSize = boss.size;
+  for (var i = 0; i < 12; i++) {
+    (function(k) {
+      setTimeout(function() {
+        spawnExplosion(bx + (Math.random()-0.5) * boss_lastSize, by + (Math.random()-0.5) * boss_lastSize, '💥');
+      }, k * 60);
+    })(i);
+  }
+  var pts = Math.floor(boss.pts * scoreMultiplier * comboMultiplier());
+  addScore2(pts);
+  spawnDamageText(bx, by, pts, '#ff6b9d');
+  scene.remove(boss.mesh);
+  boss = null;
+  bossActive = false;
+  bossStage = false;
+  document.getElementById('bossBarWrap').classList.remove('show');
+  shakeTime = 40; shakeMag = 24;
+  achData.bossKills++;
+  saveAch();
+  unlockAch('boss_1');
+  if (achData.bossKills >= 5) unlockAch('boss_5');
+  if (achData.bossKills >= 20) unlockAch('boss_20');
+  setTimeout(function() { if (gameState === 'playing') grantCoupon(); }, 400);
+  onStageClear();
+}
+var boss_lastSize = 120;
 function spawnItem() {
   var isPurin = Math.random() < 0.7;
   var type = isPurin ? 'purin' : 'cc';
@@ -900,10 +1234,14 @@ function spawnExplosion(worldX, worldY, emoji) {
   }
 }
 function triggerBomb() {
+  var killed = enemies.length;
+  if (killed >= 8) unlockAch('bomb_8');
+  if (killed > 0) addCombo(killed);
+  if (bossActive) damageBoss(Math.floor((boss ? boss.maxHp : 0) * 0.18));
   for (var i = enemies.length - 1; i >= 0; i--) {
     var e = enemies[i];
     spawnExplosion(e.mesh.position.x, e.mesh.position.y);
-    var pts = Math.floor(e.pts * scoreMultiplier);
+    var pts = Math.floor(e.pts * scoreMultiplier * comboMultiplier());
     addScore2(pts);
     spawnDamageText(e.mesh.position.x, e.mesh.position.y, pts, '#ffe87a');
     scene.remove(e.mesh);
@@ -918,6 +1256,18 @@ function triggerBomb() {
   shakeMag = 20;
 }
 function checkCollisions() {
+  if (boss && !boss.entering) {
+    for (var bi = bullets.length-1; bi >= 0; bi--) {
+      var b = bullets[bi];
+      var d = Math.sqrt((b.mesh.position.x - boss.mesh.position.x)**2 + (b.mesh.position.y - boss.mesh.position.y)**2);
+      if (d < boss.size * 0.72) {
+        scene.remove(b.mesh);
+        bullets.splice(bi, 1);
+        damageBoss(1);
+        if (!boss) break;
+      }
+    }
+  }
   for (var bi = bullets.length-1; bi >= 0; bi--) {
     var b = bullets[bi];
     var hit = false;
@@ -934,7 +1284,8 @@ function checkCollisions() {
         setTimeout(() => { if (e.mesh.material) e.mesh.material.emissiveIntensity = 1.2; }, 80);
         if (e.hp <= 0) {
           spawnExplosion(e.mesh.position.x, e.mesh.position.y);
-          var pts = Math.floor(e.pts * scoreMultiplier);
+          addCombo(1);
+          var pts = Math.floor(e.pts * scoreMultiplier * comboMultiplier());
           addScore2(pts);
           spawnDamageText(e.mesh.position.x, e.mesh.position.y, pts, '#ffe87a'); 
           hitStop = 2; 
@@ -958,6 +1309,7 @@ function checkCollisions() {
         if (multiShot < MAX_SHOT) {
           multiShot++;
           updateShotUI();
+          if (multiShot >= MAX_SHOT) unlockAch('shot_max');
         } else {
           addScore2(300);
         }
@@ -967,6 +1319,14 @@ function checkCollisions() {
         triggerBomb();
       }
       spawnExplosion(it.sprite.position.x, it.sprite.position.y, '🌟');
+    }
+  }
+  if (invincibleTime <= 0 && boss && !boss.entering) {
+    var bd = Math.sqrt((player.position.x - boss.mesh.position.x)**2 + (player.position.y - boss.mesh.position.y)**2);
+    if (bd < boss.size * 0.7 + 22) {
+      spawnExplosion(player.position.x, player.position.y, '💥');
+      playerHit();
+      return;
     }
   }
   if (invincibleTime <= 0) {
@@ -996,6 +1356,8 @@ function checkCollisions() {
 }
 function addScore2(pts) {
   score += pts;
+  if (score >= 100000) unlockAch('score_100k');
+  if (score >= 500000) unlockAch('score_500k');
   var el = document.getElementById('scoreBox');
   document.getElementById('scoreVal').textContent = score.toLocaleString();
   el.style.transform = 'scale(1.1)';
@@ -1025,6 +1387,7 @@ function registerBreach() {
   if (gameState !== 'playing') return;
   breaches++;
   updateBreachUI();
+  breakCombo();
   shakeTime = 8; shakeMag = 6;
   if (breaches >= MAX_BREACH) {
     breaches = MAX_BREACH;
@@ -1033,13 +1396,30 @@ function registerBreach() {
     triggerGameOver();
   }
 }
+var breachesAtStageStart = 0;
 function onStageClear() {
+  if (breaches === breachesAtStageStart) {
+    achData.perfectStages++;
+    saveAch();
+    unlockAch('perfect_1');
+    if (achData.perfectStages >= 5) unlockAch('perfect_5');
+  }
   level++;
-  stageTime = 30.0;
   scoreMultiplier = 1 + (level-1) * 0.2;
+  breachesAtStageStart = breaches;
   document.getElementById('levelVal').textContent = level;
+  if (level >= 10) unlockAch('stage_10');
+  if (level >= 20) unlockAch('stage_20');
   showLevelBanner();
   setTimeout(function() { if (gameState === 'playing') grantCoupon(); }, 900);
+  if (level % 5 === 0) {
+    bossStage = true;
+    stageTime = 0;
+    setTimeout(function() { if (gameState === 'playing') spawnBoss(); }, 1800);
+  } else {
+    bossStage = false;
+    stageTime = 30.0;
+  }
 }
 function updateLivesUI() {
   var bar = document.getElementById('lifeBar');
@@ -1060,6 +1440,7 @@ function updateLivesUI() {
 function playerHit() {
   lives--;
   updateLivesUI();
+  breakCombo();
   hitStop = 15; 
   shakeTime = 20; shakeMag = 15; 
   if (lives <= 0) {
@@ -1089,7 +1470,10 @@ async function triggerGameOver() {
   clearScene();
   if (player) { scene.remove(player); player = null; }
   document.getElementById('finalScore').textContent = score.toLocaleString();
-  document.getElementById('goReason').textContent = gameOverReason;
+  document.getElementById('goReason').innerHTML =
+    escHtml(gameOverReason) +
+    '<div style="color:#ffcf8a; margin-top:6px;">STAGE ' + level +
+    '　最大コンボ ' + maxComboThisRun + '　🎖' + achCount() + '/' + ACHIEVEMENTS.length + '</div>';
   document.getElementById('goCouponArea').innerHTML = runCouponHtml();
   document.getElementById('playerNameInput').value = '';
   document.getElementById('submitMsg').textContent = '';
@@ -1102,6 +1486,10 @@ async function triggerGameOver() {
   showScreen('gameOverScreen');
 }
 function clearScene() {
+  if (boss) { scene.remove(boss.mesh); boss = null; }
+  bossActive = false;
+  document.getElementById('bossBarWrap').classList.remove('show');
+  document.getElementById('comboDisplay').classList.remove('show');
   [...enemies].forEach(e => scene.remove(e.mesh));
   enemies.length = 0;
   [...bullets].forEach(b => scene.remove(b.mesh));
@@ -1143,9 +1531,17 @@ function gameLoop(t) {
   } else {
     canvas.style.transform = 'none';
   }
-  stageTime -= dt;
-  if (stageTime <= 0) onStageClear();
-  document.getElementById('timeVal').textContent = Math.ceil(stageTime);
+  if (bossStage) {
+    document.getElementById('timeVal').textContent = 'BOSS';
+  } else {
+    stageTime -= dt;
+    if (stageTime <= 0) onStageClear();
+    document.getElementById('timeVal').textContent = Math.ceil(stageTime);
+  }
+  if (comboTimer > 0) {
+    comboTimer--;
+    if (comboTimer === 0) breakCombo();
+  }
   if (invincibleTime > 0) {
     invincibleTime--;
     if (player) {
@@ -1162,6 +1558,7 @@ function gameLoop(t) {
     player.material.rotation = (keys['ArrowLeft'] ? -0.25 : keys['ArrowRight'] ? 0.25 : 0);
   }
   updateBullets();
+  updateBoss();
   updateEnemies();
   updateItems();
   checkCollisions();
@@ -1184,6 +1581,7 @@ function handleTouchMove(e) {
 canvas.addEventListener('touchstart', handleTouchMove, { passive: false });
 canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
 initBg();
+updateRankBadge();
 refreshRanking();
 showScreen('titleScreen');
 requestAnimationFrame(gameLoop);
