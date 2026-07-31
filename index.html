@@ -1,1506 +1,1264 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>大町温泉郷 星空観賞会 ～銀河の旅人～</title>
-    <meta name="description" content="長野県・大町温泉郷で2026年8月始動。星空案内ガイドによる本格的な星空観賞会「銀河の旅人」。全88星座図鑑、その日の星空指数もチェックできます。">
-
-<meta property="og:title" content="大町温泉郷 星空観賞会 ～銀河の旅人～">
-<meta property="og:description" content="長野県・大町温泉郷で2026年8月始動。星空案内ガイドによる本格的な星空観賞会。全88星座図鑑や星空指数も。">
-<meta property="og:image" content="https://hoshitokimi.jp/ogp.jpg">
-<meta property="og:url" content="https://hoshitokimi.jp/">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="星と君ぷろじぇくと">
-<meta property="og:locale" content="ja_JP">
-
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="大町温泉郷 星空観賞会 ～銀河の旅人～">
-<meta name="twitter:description" content="長野県・大町温泉郷で2026年8月8日始動。本格的な星空観賞会「銀河の旅人」。">
-<meta name="twitter:image" content="https://hoshitokimi.jp/ogp.jpg">
-
-<meta property="og:image" content="https://hoshitokimi.jp/ogp.jpg">
-  
-    <link rel="icon" href="fabi.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@500&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-overlay: rgba(6, 10, 23, 0.75);
-            --text-main: #f0f8ff;
-            --accent-gold: #e6c27a;
-            --accent-glow: rgba(230, 194, 122, 0.4);
-            --card-bg: rgba(15, 23, 42, 0.6);
-            --accent-pink: #ff7495;
-            --kids-cyan: #7bf2ff;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: 'Helvetica Neue', 'Hiragino Kaku Gothic ProN', sans-serif;
-            color: var(--text-main);
-            line-height: 1.6;
-            background-color: #060a17;
-            overflow-x: hidden;
-        }
-
-        body.no-scroll {
-            overflow: hidden;
-        }
-
-        .video-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            object-fit: cover;
-            z-index: -2;
-        }
-        
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: radial-gradient(circle at center, transparent 20%, var(--bg-overlay) 80%);
-            z-index: -1;
-        }
-
-        header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 106px;
-            background: transparent;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 50px;
-            z-index: 1000;
-            transition: all 0.4s ease;
-        }
-
-        header.scrolled {
-            height: 92px;
-            background: rgba(6, 10, 23, 0.9);
-            backdrop-filter: blur(15px);
-            border-bottom: 1px solid rgba(230, 194, 122, 0.2);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
-        }
-
-        .logo {
-            font-size: 1.4rem;
-            font-weight: bold;
-            text-decoration: none;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .logo-icon {
-            color: var(--accent-gold);
-            font-size: 1.8rem;
-            animation: pulse 3s infinite ease-in-out;
-        }
-
-        .logo-text {
-            white-space: nowrap;
-        }
-
-        .logo-text span {
-            color: var(--accent-gold);
-            font-size: 0.85rem;
-            display: block;
-            letter-spacing: 2px;
-        }
-
-        .main-logo-text {
-            font-size: 1.4rem;
-            color: #fff;
-            font-weight: bold;
-            letter-spacing: 0;
-        }
-
-        .right-nav-box {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 6px;
-        }
-
-        .nav-container {
-            display: flex;
-            align-items: center;
-            gap: 40px;
-        }
-
-        nav ul {
-            list-style: none;
-            display: flex;
-            gap: 35px;
-        }
-
-        nav a {
-            color: rgba(255, 255, 255, 0.7);
-            text-decoration: none;
-            font-size: 0.95rem;
-            letter-spacing: 1px;
-            position: relative;
-            padding: 5px 0;
-            transition: color 0.3s;
-        }
-
-        nav a:hover, nav a.active {
-            color: var(--accent-gold);
-        }
-
-        nav a::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--accent-gold);
-            transition: width 0.3s;
-        }
-        nav a:hover::after, nav a.active::after {
-            width: 100%;
-        }
-
-        .lang-switcher {
-            position: relative;
-            display: inline-block;
-        }
-
-        .lang-btn {
-            background: rgba(255, 255, 255, 0.07);
-            border: 1px solid rgba(230, 194, 122, 0.4);
-            color: var(--text-main);
-            padding: 5px 12px;
-            font-size: 0.8rem;
-            border-radius: 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.3s ease;
-        }
-
-        .lang-btn:hover {
-            background: rgba(230, 194, 122, 0.15);
-            border-color: var(--accent-gold);
-        }
-
-        .lang-dropdown {
-            position: absolute;
-            top: 120%;
-            right: 0;
-            background: rgba(15, 23, 42, 0.95);
-            border: 1px solid rgba(230, 194, 122, 0.3);
-            border-radius: 8px;
-            list-style: none;
-            padding: 6px 0;
-            min-width: 110px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            backdrop-filter: blur(10px);
-            opacity: 0;
-            transform: translateY(-10px);
-            pointer-events: none;
-            transition: all 0.3s ease;
-        }
-
-        .lang-switcher.open .lang-dropdown {
-            opacity: 1;
-            transform: translateY(0);
-            pointer-events: auto;
-        }
-
-        .lang-dropdown li {
-            padding: 8px 16px;
-            font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.8);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .lang-dropdown li:hover {
-            background: rgba(230, 194, 122, 0.2);
-            color: var(--accent-gold);
-        }
-
-        .project-tag {
-            display: flex;
-            align-items: center;
-            animation: bounce 4s infinite ease-in-out;
-        }
-
-        .project-logo-img {
-            height: 68px;
-            width: auto;
-            object-fit: contain;
-            filter: drop-shadow(0 2px 7px rgba(0, 0, 0, 0.5));
-            transition: height 0.4s ease;
-        }
-
-        header.scrolled .project-logo-img {
-            height: 56px;
-        }
-
-        .content {
-            position: relative;
-            z-index: 1;
-        }
-
-        .container {
-            max-width: 950px;
-            margin: 0 auto;
-            padding: 100px 20px;
-        }
-
-        .fade-in-up {
-            opacity: 0;
-            transform: translateY(40px);
-            transition: opacity 1s ease, transform 1s ease;
-        }
-
-        .fade-in-up.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .hero {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 0 20px;
-        }
-
-        .hero p {
-            font-size: 1.2rem;
-            letter-spacing: 4px;
-            color: #bbb;
-            animation: fadeIn 2s ease-out;
-        }
-
-        .hero h1 {
-            font-size: 4rem;
-            margin: 20px 0 30px 0;
-            letter-spacing: 8px;
-            color: #fff;
-            text-shadow: 0 0 20px var(--accent-gold), 0 0 40px rgba(255,255,255,0.2);
-            animation: fadeIn 2.5s ease-out;
-        }
-
-        .launch-text {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: var(--accent-gold);
-            letter-spacing: 6px;
-            text-shadow: 0 0 10px var(--accent-glow);
-            animation: fadeIn 3s ease-out;
-            border: 1px solid var(--accent-gold);
-            padding: 10px 30px;
-            background: rgba(6, 10, 23, 0.4);
-            backdrop-filter: blur(5px);
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            z-index: 10;
-        }
-
-        .launch-text:hover {
-            background: rgba(230, 194, 122, 0.2);
-            box-shadow: 0 0 20px var(--accent-gold);
-            transform: scale(1.03);
-        }
-
-        .sec-title {
-            text-align: center;
-            font-size: 2.2rem;
-            margin-bottom: 50px;
-            color: var(--accent-gold);
-            letter-spacing: 4px;
-            position: relative;
-        }
-
-        .partner-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-        }
-
-        .partner-card {
-            background: var(--card-bg);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 12px;
-            padding: 25px 15px;
-            text-align: center;
-            font-weight: bold;
-            letter-spacing: 1px;
-            backdrop-filter: blur(12px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 90px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            transition: transform 0.3s ease;
-        }
-
-        .partner-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent-gold);
-        }
-
-        .partner-logo-card {
-            padding: 14px;
-            text-decoration: none;
-            color: inherit;
-        }
-        .partner-logo-card img {
-            width: 100%;
-            max-width: 175px;
-            height: auto;
-            display: block;
-            background: #fff;
-            padding: 9px 13px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
-            transition: box-shadow 0.3s ease, transform 0.3s ease;
-        }
-        .partner-logo-card:hover img {
-            box-shadow: 0 4px 18px rgba(230, 194, 122, 0.55);
-        }
-
-        .to-top {
-            position: fixed;
-            bottom: 25px;
-            right: 25px;
-            width: 54px;
-            height: 54px;
-            background: rgba(15, 23, 42, 0.85);
-            border: 1px solid var(--accent-gold);
-            border-radius: 50%;
-            color: var(--accent-gold);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            z-index: 999;
-            box-shadow: 0 0 15px var(--accent-glow);
-            transition: all 0.3s ease;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .to-top .star-icon {
-            font-size: 1.2rem;
-            line-height: 1;
-            margin-bottom: -2px;
-        }
-
-        .to-top .to-top-text {
-            font-size: 0.65rem;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-        }
-
-        .to-top.visible {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .to-top:hover {
-            background: var(--accent-gold);
-            color: #060a17;
-            box-shadow: 0 0 20px var(--accent-gold);
-            transform: translateY(-4px);
-        }
-
-        footer {
-            text-align: center;
-            padding: 60px 20px;
-            background: rgba(6, 10, 23, 0.95);
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            margin-top: 100px;
-        }
-
-        .footer-info {
-            font-size: 0.9rem;
-            color: #cbd5e1;
-            margin-bottom: 20px;
-            letter-spacing: 1px;
-        }
-
-        .footer-info span {
-            display: inline-block;
-            margin: 0 12px;
-        }
-
-        .footer-credit {
-            font-size: 0.85rem;
-            color: #718096;
-            letter-spacing: 1px;
-            white-space: normal;
-            line-height: 1.8;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .cinema-page {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: #000;
-            z-index: 2000;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.8s ease;
-            overflow: hidden;
-        }
-
-        .cinema-page.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .cinema-video {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: 2001;
-        }
-
-        .cinema-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.7) 100%);
-            z-index: 2002;
-        }
-
-        .cinema-container {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: 2003;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .cinema-text-box {
-            position: absolute;
-            width: 90%;
-            max-width: 720px;
-            text-align: center;
-            top: 100%;
-            transform: translateY(0);
-        }
-
-        .cinema-page.active .cinema-text-box {
-            animation: movieScroll 30s linear forwards;
-        }
-
-        .cinema-text-box p {
-            font-family: 'Zen Maru Gothic', sans-serif;
-            font-size: 1.9rem;
-            line-height: 2.4;
-            color: #fff;
-            letter-spacing: 4px;
-            text-shadow: 0 0 10px rgba(255,255,255,0.4), 0 0 20px rgba(230,194,122,0.2);
-            font-weight: 500;
-            word-break: keep-all;
-            overflow-wrap: anywhere;
-        }
-
-        .love-highlight {
-            color: var(--accent-pink);
-            font-weight: 700;
-            text-shadow: 0 0 12px rgba(255, 116, 149, 0.6);
-        }
-
-        .btn-home-back {
-            position: absolute;
-            bottom: 5%;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 2010;
-            background: rgba(15, 23, 42, 0.85);
-            border: 1px solid rgba(230, 194, 122, 0.8);
-            padding: 14px 32px;
-            color: var(--accent-gold);
-            border-radius: 30px;
-            cursor: pointer;
-            font-size: 1rem;
-            letter-spacing: 2px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 25px rgba(0,0,0,0.6);
-            opacity: 0;
-            transition: all 0.4s ease;
-        }
-
-        .cinema-page.active .btn-home-back {
-            animation: fadeInButton 3s ease forwards;
-            animation-delay: 1.5s;
-        }
-
-        .btn-home-back:hover {
-            background: var(--accent-gold);
-            color: #000;
-            box-shadow: 0 0 15px var(--accent-gold);
-        }
-
-        @keyframes movieScroll {
-            0% { top: 100%; transform: translateY(0); }
-            100% { top: -85%; transform: translateY(0); }
-        }
-
-        @keyframes fadeInButton {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; text-shadow: 0 0 15px var(--accent-gold); } }
-        
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-4px); }
-        }
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        @media (max-width: 768px) {
-            header { padding: 0 20px; height: 92px; }
-            header.scrolled { height: 82px; }
-            .logo { font-size: 1.1rem; gap: 8px; }
-            .logo-icon { font-size: 1.4rem; }
-            .logo-text span { font-size: 0.75rem; letter-spacing: 1px; }
-            
-            .main-logo-text { font-size: 1.1rem; }
-
-            .nav-container { gap: 15px; }
-            nav ul { gap: 15px; }
-            nav a { font-size: 0.85rem; }
-            .lang-btn { padding: 4px 10px; font-size: 0.75rem; }
-            .lang-dropdown { top: 165%; min-width: 140px; padding: 8px 0; }
-            .lang-dropdown li { padding: 14px 20px; font-size: 1rem; min-height: 48px; display: flex; align-items: center; }
-            .project-logo-img { height: 56px; }
-            header.scrolled .project-logo-img { height: 46px; }
-            
-            .container { padding: 60px 15px; }
-            .hero h1 { font-size: 2.5rem; letter-spacing: 4px; word-break: keep-all; overflow-wrap: anywhere; margin: 15px 0 25px 0; }
-            .hero p { font-size: 1rem; letter-spacing: 2px; padding: 0 10px; }
-            .launch-text { font-size: 1.3rem; letter-spacing: 4px; padding: 8px 20px; }
-            .sec-title { font-size: 1.8rem; margin-bottom: 30px; }
-            
-            .partner-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-            .partner-card { padding: 15px 10px; min-height: 75px; font-size: 0.9rem; }
-            
-            .to-top { bottom: 20px; right: 20px; width: 46px; height: 46px; }
-            .to-top .star-icon { font-size: 1rem; }
-            .to-top .to-top-text { font-size: 0.55rem; }
-
-            .footer-info span { display: block; margin: 6px 0; }
-            .footer-credit { font-size: 0.75rem; letter-spacing: 0.5px; padding: 0 10px; }
-
-            .cinema-text-box p {
-                font-size: 1.35rem;
-                line-height: 2.5;
-                letter-spacing: 3px;
-                padding: 0 10px;
-            }
-            @keyframes movieScroll {
-                0% { top: 100%; }
-                100% { top: -110%; }
-            }
-            .btn-home-back { 
-                padding: 12px 26px; 
-                font-size: 0.9rem; 
-                bottom: 8%; 
-                width: auto;
-                max-width: 80%;
-                justify-content: center;
-            }
-
-            .news-preview-container { padding: 20px 15px; }
-            #news-preview-list li { flex-direction: column; align-items: flex-start; gap: 8px; }
-            .preview-title { white-space: normal; line-height: 1.4; }
-        }
-
-        @media (max-width: 480px) {
-            .main-logo-text { font-size: 0.95rem; }
-
-            .partner-grid { grid-template-columns: 1fr; }
-            nav ul { gap: 10px; }
-            nav a { font-size: 0.8rem; }
-            .footer-info { font-size: 0.75rem; }
-            .footer-credit { font-size: 0.65rem; }
-            header { padding: 0 10px; }
-            .nav-container { gap: 8px; }
-            .project-logo-img { height: 52px; }
-        }
-
-        #news-preview {
-            margin-bottom: 80px;
-        }
-        
-        .news-preview-container {
-            max-width: 650px;
-            margin: 0 auto;
-            background: var(--card-bg);
-            border: 1px solid rgba(230, 194, 122, 0.4);
-            border-radius: 12px;
-            padding: 30px;
-            backdrop-filter: blur(15px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-        }
-
-        #news-preview-list {
-            list-style: none;
-            margin-bottom: 20px;
-        }
-
-        #news-preview-list li {
-            border-bottom: 1px dashed rgba(255,255,255,0.15);
-            padding: 15px 0;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        #news-preview-list li:last-child {
-            border-bottom: none;
-        }
-
-        .preview-meta {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            min-width: 170px;
-        }
-
-        .preview-date {
-            color: rgba(255,255,255,0.7);
-            font-size: 0.85rem;
-            font-family: 'Zen Maru Gothic', sans-serif;
-        }
-
-        .preview-cat {
-            background: rgba(230, 194, 122, 0.15);
-            color: var(--accent-gold);
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            white-space: nowrap;
-        }
-
-        .preview-title {
-            font-size: 0.95rem;
-            color: #fff;
-            text-decoration: none;
-            display: block;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            transition: color 0.3s;
-            font-family: 'Kiwi Maru', serif;
-        }
-
-        .preview-title:hover {
-            color: var(--accent-gold);
-        }
-
-        .news-more {
-            text-align: right;
-            margin-top: 10px;
-        }
-
-        #btn-news-more {
-            color: var(--accent-gold);
-            text-decoration: none;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-            transition: opacity 0.3s;
-        }
-
-        #btn-news-more:hover {
-            opacity: 0.7;
-        }
-
-        #moon-phase {
-            margin-bottom: 80px;
-        }
-        
-        .moon-card {
-            background: var(--card-bg);
-            border: 1px solid rgba(230, 194, 122, 0.4);
-            border-radius: 12px;
-            padding: 40px 20px;
-            text-align: center;
-            backdrop-filter: blur(15px);
-            max-width: 380px;
-            margin: 0 auto;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-            transition: transform 0.4s ease, box-shadow 0.4s ease;
-        }
-
-        .moon-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px var(--accent-glow);
-        }
-
-        .moon-visual {
-            font-size: 6.5rem;
-            line-height: 1;
-            margin-bottom: 20px;
-            filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.5));
-            animation: pulse 4s infinite ease-in-out;
-        }
-
-        .moon-date {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 1rem;
-            letter-spacing: 3px;
-            margin-bottom: 12px;
-            font-family: 'Zen Maru Gothic', sans-serif;
-        }
-
-        .moon-age-text {
-            font-size: 1.5rem;
-            color: var(--accent-gold);
-            font-weight: bold;
-            letter-spacing: 2px;
-            margin-bottom: 8px;
-        }
-
-        .moon-name {
-            font-size: 1.2rem;
-            color: var(--text-main);
-            letter-spacing: 4px;
-            font-family: 'Kiwi Maru', serif;
-        }
-
-        #starry-index {
-            margin-bottom: 80px;
-        }
-        
-        .starry-card {
-            background: var(--card-bg);
-            border: 1px solid rgba(230, 194, 122, 0.4);
-            border-radius: 12px;
-            padding: 40px 20px;
-            text-align: center;
-            backdrop-filter: blur(15px);
-            max-width: 380px;
-            margin: 0 auto;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-            transition: transform 0.4s ease, box-shadow 0.4s ease;
-        }
-
-        .starry-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px var(--accent-glow);
-        }
-
-        .starry-visual {
-            font-size: 6.5rem;
-            line-height: 1;
-            margin-bottom: 20px;
-            filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.5));
-            animation: pulse 4s infinite ease-in-out;
-        }
-
-        .starry-date {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 1rem;
-            letter-spacing: 3px;
-            margin-bottom: 12px;
-            font-family: 'Zen Maru Gothic', sans-serif;
-        }
-
-        .starry-score-text {
-            font-size: 1.5rem;
-            color: var(--accent-gold);
-            font-weight: bold;
-            letter-spacing: 2px;
-            margin-bottom: 8px;
-        }
-
-        .starry-condition {
-            font-size: 1.2rem;
-            color: var(--text-main);
-            letter-spacing: 4px;
-            font-family: 'Kiwi Maru', serif;
-        }
-        
-        .grid-10 {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-        }
-        .grid-10 .partner-card {
-            font-size: 0.8rem;
-            padding: 10px;
-            text-align: left;
-            justify-content: flex-start;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        .grid-10 .char-id {
-            color: #718096;
-            font-size: 0.7rem;
-            margin-bottom: 4px;
-        }
-        .grid-10 .char-name {
-            color: #fff;
-            font-weight: bold;
-            font-size: 1rem;
-            margin-bottom: 6px;
-        }
-        .grid-10 .char-desc {
-            color: #cbd5e1;
-            font-size: 0.75rem;
-            line-height: 1.4;
-        }
-        
-        .new-friend-entry {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            background: var(--card-bg);
-            border: 1px solid var(--accent-gold);
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 20px;
-            box-shadow: 0 0 20px var(--accent-glow);
-        }
-        .new-friend-entry img {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            border: 2px solid var(--accent-gold);
-            box-shadow: 0 0 10px var(--accent-glow);
-        }
-        .new-friend-info {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-        .new-friend-label {
-            color: var(--kids-cyan);
-            font-size: 0.8rem;
-            font-weight: bold;
-            letter-spacing: 2px;
-        }
-        .new-friend-name {
-            color: #fff;
-            font-size: 1.4rem;
-            font-weight: bold;
-            font-family: 'Kiwi Maru', serif;
-        }
-        .new-friend-desc {
-            color: #cbd5e1;
-            font-size: 0.9rem;
-            line-height: 1.5;
-        }
-
-        @media (max-width: 480px) {
-            .grid-10 { grid-template-columns: 1fr; }
-            .new-friend-entry { flex-direction: column; text-align: center; }
-            .new-friend-info { align-items: center; }
-        }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>大町温泉郷 星空観賞会 ～銀河の旅人～</title>
+<meta name="description" content="長野県・大町温泉郷で2026年8月始動。星空案内ガイドとともに歩く本格的な星空観賞会「銀河の旅人」。正確な月齢とその日の星空指数、全88星座図鑑もチェックできます。" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="星と君ぷろじぇくと" />
+<meta property="og:title" content="大町温泉郷 星空観賞会 ～銀河の旅人～" />
+<meta property="og:description" content="長野県・大町温泉郷で2026年8月始動。星空案内ガイドとともに歩く本格的な星空観賞会。" />
+<meta property="og:image" content="https://hoshitokimi.jp/ogp.jpg" />
+<meta property="og:url" content="https://hoshitokimi.jp/" />
+<meta property="og:locale" content="ja_JP" />
+<meta name="twitter:card" content="summary_large_image" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;500;600;700;900&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
+
+<style>
+  :root{
+    --night-deep:#080d1e;
+    --night:#101a37;
+    --twilight:#20335a;
+    --dusk:#c98a86;
+    --amber:#e9b25c;
+    --amber-soft:#f4d9a0;
+    --starlight:#f4eede;
+    --haze:#a99bc4;
+    --cream:#f6efe0;
+    --dawn:#f3e3c9;
+
+    --ink-soft:rgba(244,238,222,.72);
+    --ink-faint:rgba(244,238,222,.5);
+    --line:rgba(244,238,222,.14);
+
+    --serif:"Zen Old Mincho", serif;
+    --latin:"Cormorant Garamond", serif;
+    --sans:"Zen Kaku Gothic New", system-ui, sans-serif;
+
+    --maxw:1160px;
+    --ease:cubic-bezier(.22,.61,.36,1);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+  body{
+    font-family:var(--sans);
+    background:var(--night-deep);
+    color:var(--starlight);
+    line-height:1.85;
+    overflow-x:hidden;
+    letter-spacing:.02em;
+  }
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%;display:block}
+  ::selection{background:var(--amber);color:var(--night-deep)}
+
+  #sky{
+    position:fixed;inset:0;width:100%;height:100%;
+    z-index:0;pointer-events:none;
+    background:
+      radial-gradient(120% 80% at 78% -10%, rgba(40,60,110,.55), transparent 60%),
+      radial-gradient(90% 60% at 12% 6%, rgba(201,138,134,.14), transparent 55%),
+      linear-gradient(180deg, #060a18 0%, #0a1330 42%, #0c1732 70%, #0a1226 100%);
+  }
+
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 clamp(20px,5vw,48px)}
+
+  header.nav{
+    position:fixed;top:0;left:0;right:0;z-index:50;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:clamp(14px,2.4vw,22px) clamp(20px,5vw,48px);
+    transition:background .5s var(--ease), backdrop-filter .5s var(--ease), border-color .5s;
+    border-bottom:1px solid transparent;
+  }
+  header.nav.scrolled{
+    background:rgba(8,13,30,.62);
+    backdrop-filter:blur(14px) saturate(1.2);
+    border-bottom:1px solid var(--line);
+  }
+  .brand{display:flex;align-items:center;gap:.6em;font-family:var(--serif);font-weight:600;font-size:clamp(15px,1.5vw,18px);letter-spacing:.14em}
+  .brand .mark{color:var(--amber);font-size:1.15em;line-height:1}
+  nav.menu{display:flex;align-items:center;gap:clamp(14px,2vw,30px)}
+  nav.menu a{font-size:13px;letter-spacing:.16em;color:var(--ink-soft);position:relative;padding:4px 0;transition:color .3s}
+  nav.menu a::after{content:"";position:absolute;left:0;bottom:-2px;width:0;height:1px;background:var(--amber);transition:width .35s var(--ease)}
+  nav.menu a:hover,nav.menu a:focus-visible{color:var(--starlight)}
+  nav.menu a:hover::after,nav.menu a:focus-visible::after{width:100%}
+  .lang{display:flex;gap:2px;border:1px solid var(--line);border-radius:999px;padding:3px;background:rgba(255,255,255,.03)}
+  .lang button{font-family:var(--sans);font-size:11px;letter-spacing:.14em;color:var(--ink-faint);background:none;border:none;cursor:pointer;padding:5px 11px;border-radius:999px;transition:.3s}
+  .lang button[aria-pressed="true"]{background:var(--amber);color:var(--night-deep);font-weight:700}
+  .nav-menu-btn{display:none}
+
+  .hero{position:relative;z-index:1;min-height:100svh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:120px 24px 90px}
+  .hero .constellation-mark{width:min(340px,72vw);height:auto;margin-bottom:clamp(20px,4vh,44px);opacity:0}
+  .hero .logo-img{width:clamp(120px,15vw,168px);margin:0 auto clamp(18px,3vh,26px);opacity:0;filter:drop-shadow(0 4px 26px rgba(233,178,92,.28))}
+  .eyebrow{font-family:var(--latin);font-style:italic;font-size:clamp(15px,1.7vw,19px);letter-spacing:.24em;color:var(--amber-soft);text-transform:none;margin-bottom:.9em}
+  .hero h1{
+    font-family:var(--serif);font-weight:900;
+    font-size:clamp(58px,12vw,148px);
+    line-height:1.02;letter-spacing:.08em;
+    color:var(--starlight);
+    text-shadow:0 2px 50px rgba(120,150,230,.35), 0 0 3px rgba(244,238,222,.4);
+  }
+  .hero h1 .en{display:none;font-family:var(--latin);font-weight:500;letter-spacing:.06em}
+  .hero .lede{max-width:38ch;margin:clamp(22px,4vh,34px) auto 0;color:var(--ink-soft);font-size:clamp(15px,1.7vw,18px);line-height:2}
+  .launch{margin-top:1.6em;font-family:var(--latin);letter-spacing:.28em;font-size:clamp(13px,1.4vw,15px);color:var(--haze);text-transform:uppercase}
+  .cta-row{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:clamp(30px,5vh,44px)}
+  .btn{font-family:var(--sans);font-size:14px;letter-spacing:.1em;padding:15px 30px;border-radius:999px;cursor:pointer;transition:.4s var(--ease);border:1px solid var(--amber);display:inline-flex;align-items:center;gap:.6em}
+  .btn.primary{background:var(--amber);color:var(--night-deep);font-weight:700;box-shadow:0 10px 40px -12px rgba(233,178,92,.7)}
+  .btn.primary:hover{transform:translateY(-3px);box-shadow:0 18px 48px -12px rgba(233,178,92,.85)}
+  .btn.ghost{background:transparent;color:var(--amber-soft);border-color:var(--line)}
+  .btn.ghost:hover{border-color:var(--amber);color:var(--starlight);transform:translateY(-3px)}
+
+
+  .vtag{position:fixed;right:clamp(10px,2vw,26px);top:50%;transform:translateY(-50%);writing-mode:vertical-rl;font-family:var(--serif);letter-spacing:.34em;font-size:13px;color:var(--ink-faint);z-index:20;pointer-events:none}
+  .vtag .glyph{color:var(--amber)}
+
+  section{position:relative;z-index:1;padding:clamp(90px,13vh,150px) 0}
+  .sec-head{text-align:center;margin-bottom:clamp(46px,7vh,74px)}
+  .sec-eyebrow{font-family:var(--latin);font-style:italic;font-size:clamp(15px,1.7vw,20px);letter-spacing:.22em;color:var(--amber);margin-bottom:.7em}
+  .sec-eyebrow::before,.sec-eyebrow::after{content:"✦";font-style:normal;font-size:.6em;vertical-align:middle;margin:0 .8em;opacity:.6}
+  .sec-title{font-family:var(--serif);font-weight:700;font-size:clamp(28px,4.4vw,52px);line-height:1.35;letter-spacing:.06em}
+  .sec-lede{max-width:52ch;margin:1.2em auto 0;color:var(--ink-soft);font-size:clamp(15px,1.6vw,17px)}
+
+  .news{position:relative;z-index:1;padding:clamp(48px,7vh,74px) 0;background:linear-gradient(180deg,rgba(8,13,30,.5),rgba(12,20,44,.55))}
+  .news-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:clamp(20px,3vh,30px)}
+  .news-eyebrow{display:block;font-family:var(--latin);font-style:italic;font-size:clamp(13px,1.5vw,17px);letter-spacing:.22em;color:var(--amber)}
+  .news-title{font-family:var(--serif);font-weight:700;font-size:clamp(24px,3.4vw,36px);letter-spacing:.08em;line-height:1.1;margin-top:.1em}
+  .news-all{font-family:var(--sans);font-size:12.5px;letter-spacing:.14em;color:var(--amber-soft);white-space:nowrap;border:1px solid var(--line);border-radius:999px;padding:9px 18px;transition:.35s var(--ease)}
+  .news-all:hover{border-color:var(--amber);color:var(--starlight);transform:translateY(-2px)}
+
+  .news-list{display:flex;flex-direction:column;gap:clamp(10px,1.4vw,14px)}
+  .news-card{
+    position:relative;display:flex;align-items:center;gap:clamp(14px,2.6vw,26px);
+    padding:clamp(14px,2vw,20px) clamp(18px,3vw,30px);
+    border:1px solid var(--line);border-radius:14px;
+    background:linear-gradient(150deg,rgba(24,34,66,.55),rgba(10,16,36,.62));
+    backdrop-filter:blur(8px);
+    transition:transform .4s var(--ease),border-color .4s,background .4s;
+    flex-wrap:wrap;
+  }
+  .news-card:hover{transform:translateX(6px);border-color:rgba(233,178,92,.4);background:linear-gradient(150deg,rgba(30,42,78,.7),rgba(14,20,42,.72))}
+  .news-card.featured{
+    border-color:rgba(233,178,92,.38);
+    background:linear-gradient(150deg,rgba(40,44,70,.7),rgba(16,22,46,.72));
+    box-shadow:0 10px 34px -20px rgba(233,178,92,.5);
+  }
+  .nc-badge{
+    position:absolute;top:-10px;left:clamp(16px,2.5vw,26px);
+    font-family:var(--sans);font-size:10px;font-weight:700;letter-spacing:.16em;
+    color:var(--night-deep);background:var(--amber);
+    padding:4px 11px;border-radius:999px;
+    box-shadow:0 6px 18px -6px rgba(233,178,92,.9);
+    animation:newPulse 2.4s ease-in-out infinite;
+  }
+  @keyframes newPulse{0%,100%{transform:scale(1);box-shadow:0 6px 18px -6px rgba(233,178,92,.9)}50%{transform:scale(1.08);box-shadow:0 6px 26px -6px rgba(233,178,92,1)}}
+  .nc-meta{display:flex;align-items:center;gap:12px;flex-shrink:0}
+  .nc-date{font-family:var(--latin);letter-spacing:.1em;font-size:clamp(15px,1.9vw,19px);color:var(--amber-soft);line-height:1}
+  .nc-cat{font-family:var(--sans);font-size:11px;letter-spacing:.08em;padding:3px 10px;border-radius:6px;white-space:nowrap}
+  .cat-open{background:rgba(233,178,92,.2);color:var(--amber);border:1px solid rgba(233,178,92,.4)}
+  .cat-info{background:rgba(169,155,196,.16);color:var(--haze);border:1px solid rgba(169,155,196,.3)}
+  .nc-text{flex:1;min-width:180px;font-family:var(--serif);font-size:clamp(14px,1.6vw,16.5px);line-height:1.55;color:var(--starlight);letter-spacing:.02em}
+  .nc-arrow{flex-shrink:0;font-size:17px;color:var(--amber);opacity:.5;transition:.4s var(--ease)}
+  .news-card:hover .nc-arrow{opacity:1;transform:translateX(4px)}
+  @media(max-width:640px){
+    .nc-meta{width:100%}
+    .nc-arrow{position:absolute;right:18px;top:50%;transform:translateY(-50%)}
+  }
+
+  .tonight{background:linear-gradient(180deg, transparent, rgba(10,17,42,.4) 30%, rgba(10,17,42,.4) 70%, transparent)}
+  .almanac{display:grid;grid-template-columns:1fr 1fr;gap:clamp(18px,3vw,30px);max-width:920px;margin:0 auto}
+  .card{
+    position:relative;border:1px solid var(--line);border-radius:22px;
+    background:linear-gradient(160deg, rgba(24,34,66,.66), rgba(10,16,36,.72));
+    backdrop-filter:blur(10px);
+    padding:clamp(28px,4vw,44px);overflow:hidden;
+  }
+  .card::before{content:"";position:absolute;inset:0;border-radius:22px;padding:1px;background:linear-gradient(160deg, rgba(233,178,92,.4), transparent 45%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+  .card .k-label{font-family:var(--latin);font-style:italic;letter-spacing:.18em;color:var(--amber);font-size:15px;margin-bottom:.4em}
+  .card .k-jp{font-family:var(--serif);font-size:20px;letter-spacing:.1em;margin-bottom:1.4em}
+  .moon-wrap{display:flex;align-items:center;gap:clamp(18px,3vw,30px)}
+  .moon-svg{width:clamp(96px,13vw,132px);height:auto;flex-shrink:0;filter:drop-shadow(0 0 30px rgba(244,217,160,.35))}
+  .moon-data .age{font-family:var(--latin);font-size:clamp(40px,6vw,60px);line-height:1;color:var(--starlight)}
+  .moon-data .age small{font-size:.34em;letter-spacing:.1em;color:var(--haze);margin-left:.3em}
+  .moon-data .phase-name{font-family:var(--serif);font-size:18px;margin-top:.5em;color:var(--amber-soft)}
+  .moon-data .illum{font-size:12.5px;color:var(--ink-faint);letter-spacing:.08em;margin-top:.3em}
+
+  .gauge-wrap{display:flex;align-items:center;gap:clamp(18px,3vw,30px)}
+  .gauge{position:relative;width:clamp(120px,15vw,150px);height:clamp(120px,15vw,150px);flex-shrink:0}
+  .gauge svg{transform:rotate(-90deg)}
+  .gauge .val{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+  .gauge .val .n{font-family:var(--latin);font-size:clamp(34px,5vw,46px);line-height:1;color:var(--starlight)}
+  .gauge .val .u{font-size:11px;letter-spacing:.16em;color:var(--haze)}
+  .index-meta .label{font-family:var(--serif);font-size:20px;color:var(--amber-soft);letter-spacing:.06em}
+  .index-meta .note{font-size:12.5px;color:var(--ink-faint);margin-top:.5em;letter-spacing:.04em;max-width:22ch}
+  .index-meta .loc{font-family:var(--latin);letter-spacing:.16em;font-size:12px;color:var(--haze);margin-top:1em}
+
+  .pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(18px,3vw,28px);max-width:1040px;margin:0 auto}
+  .pillar{border-top:1px solid var(--line);padding-top:26px;position:relative}
+  .pillar .num{font-family:var(--latin);font-style:italic;font-size:14px;letter-spacing:.2em;color:var(--amber);opacity:.85}
+  .pillar h3{font-family:var(--serif);font-weight:600;font-size:clamp(21px,2.5vw,27px);margin:.5em 0 .1em;letter-spacing:.04em}
+  .pillar .role{font-family:var(--latin);font-style:italic;color:var(--haze);letter-spacing:.1em;font-size:14px;margin-bottom:.9em}
+  .pillar p{color:var(--ink-soft);font-size:14.5px}
+
+  .stars-sec{background:linear-gradient(180deg,transparent,rgba(6,10,24,.72) 40%,rgba(6,10,24,.72) 60%,transparent)}
+  .stars-cta{text-align:center}
+
+  .st-stage{
+    position:relative;width:100%;
+    height:clamp(420px,56vw,680px);
+    overflow:hidden;
+    margin:clamp(30px,5vh,54px) 0 0;
+    background:radial-gradient(ellipse 140% 80% at 50% 60%, #0d1b3e 0%, #06090f 100%);
+  }
+  #stCanvas{position:absolute;inset:0;width:100%;height:100%}
+
+  .st-star{
+    position:absolute;width:clamp(42px,6vw,64px);height:clamp(42px,6vw,64px);
+    transform:translate(-50%,-50%);
+    border-radius:50%;border:none;background:none;cursor:pointer;
+    z-index:6;
+  }
+  .st-star::before{
+    content:"";position:absolute;inset:25%;border-radius:50%;
+    background:#dcebff;
+    box-shadow:0 0 18px 6px rgba(200,222,255,.9), 0 0 40px 14px rgba(200,222,255,.4);
+    transition:transform .35s var(--ease), box-shadow .35s;
+  }
+  .st-star:hover::before,
+  .st-star.active::before{
+    transform:scale(1.45);
+    box-shadow:0 0 28px 10px rgba(200,222,255,1), 0 0 70px 24px rgba(200,222,255,.55);
+  }
+
+  .st-label{
+    position:absolute;display:flex;flex-direction:column;align-items:center;gap:2px;
+    transform:translate(-50%,0);pointer-events:none;z-index:7;
+    transition:opacity .5s,transform .5s var(--ease);
+  }
+  .st-lname{font-family:var(--serif);font-size:clamp(13px,1.8vw,18px);font-weight:700;letter-spacing:.1em;
+    color:var(--amber-soft);text-shadow:0 2px 12px rgba(0,0,0,.8)}
+  .st-lsub{font-family:var(--latin);font-style:italic;font-size:clamp(11px,1.4vw,14px);
+    letter-spacing:.14em;color:var(--haze);text-shadow:0 2px 8px rgba(0,0,0,.8)}
+
+  .st-tri-label{
+    position:absolute;font-family:var(--serif);font-weight:700;
+    font-size:clamp(16px,2.4vw,26px);letter-spacing:.18em;
+    color:rgba(244,220,150,.55);text-shadow:0 0 30px rgba(244,220,150,.3);
+    pointer-events:none;z-index:5;
+    transform:translate(-50%,-50%);
+    transition:opacity 1.2s;
+  }
+
+  .st-purin{
+    position:absolute;z-index:10;
+    width:clamp(80px,11vw,130px);
+    transition:left 1s var(--ease), bottom 1s var(--ease);
+    pointer-events:none;
+  }
+  .st-purin img{
+    width:100%;display:block;
+    filter:drop-shadow(0 8px 24px rgba(0,0,0,.55));
+    animation:purinBob 2.6s ease-in-out infinite;
+  }
+  @keyframes purinBob{
+    0%,100%{transform:translateY(0) rotate(-3deg) scale(1)}
+    50%{transform:translateY(-10px) rotate(3deg) scale(1.05)}
+  }
+  .st-purin.jumping img{animation:purinJump .7s var(--ease) forwards}
+  @keyframes purinJump{
+    0%{transform:scale(1) rotate(0)}
+    40%{transform:scale(1.2,0.85) rotate(-8deg) translateY(-18px)}
+    70%{transform:scale(0.9,1.1) rotate(6deg) translateY(-28px)}
+    100%{transform:scale(1) rotate(0) translateY(0)}
+  }
+
+  .st-bubble{
+    position:absolute;bottom:calc(100% + 10px);left:50%;
+    transform:translateX(-30%);
+    background:rgba(255,252,240,.97);border-radius:18px 18px 18px 4px;
+    padding:10px 16px;min-width:clamp(140px,22vw,240px);max-width:clamp(180px,28vw,300px);
+    box-shadow:0 8px 32px rgba(0,0,0,.35);
+    transition:opacity .4s,transform .4s var(--ease);
+    pointer-events:none;
+  }
+  .st-bubble::after{
+    content:"";position:absolute;top:100%;left:28px;
+    border:9px solid transparent;border-top-color:rgba(255,252,240,.97);
+  }
+  .st-bubble p{
+    font-family:var(--serif);color:#2a1f10;
+    font-size:clamp(12px,1.5vw,15px);line-height:1.7;margin:0;
+  }
+  .st-bubble.hide{opacity:0;transform:translateX(-30%) translateY(6px)}
+
+  .st-info{
+    position:absolute;right:0;top:0;bottom:0;
+    width:min(300px,42%);
+    background:linear-gradient(90deg,transparent,rgba(6,10,24,.88) 20%);
+    display:flex;align-items:center;justify-content:flex-end;
+    padding:0 clamp(16px,3vw,32px) 0 0;
+    z-index:8;pointer-events:none;
+    transition:opacity .5s;opacity:0;
+  }
+  .st-info.show{opacity:1}
+  .sti-inner{max-width:220px;text-align:right}
+  .sti-name{font-family:var(--serif);font-weight:700;font-size:clamp(22px,3.5vw,36px);
+    letter-spacing:.08em;color:var(--amber-soft);margin-bottom:.1em}
+  .sti-lat{font-family:var(--latin);font-style:italic;letter-spacing:.16em;
+    color:var(--haze);font-size:clamp(13px,1.6vw,17px);margin-bottom:.9em}
+  .sti-body{color:var(--ink-soft);font-size:clamp(12px,1.4vw,14px);line-height:1.85;margin-bottom:.8em}
+  .sti-data{display:flex;flex-direction:column;gap:5px;align-items:flex-end}
+  .sti-row{display:flex;gap:.5em;align-items:center;font-family:var(--latin);
+    font-size:11.5px;letter-spacing:.12em;color:var(--haze)}
+  .sti-row .pill{background:rgba(233,178,92,.18);color:var(--amber);border:1px solid rgba(233,178,92,.35);
+    border-radius:999px;padding:3px 10px;font-size:11px}
+
+  .st-tour-btn{
+    position:absolute;top:clamp(12px,2vw,18px);left:clamp(12px,2vw,18px);z-index:12;
+    display:inline-flex;align-items:center;gap:.55em;
+    font-family:var(--sans);font-size:clamp(12px,1.5vw,14px);letter-spacing:.06em;font-weight:700;
+    color:var(--night-deep);background:var(--amber);
+    border:none;border-radius:999px;padding:10px 18px;cursor:pointer;
+    box-shadow:0 8px 26px -8px rgba(233,178,92,.8);
+    transition:transform .3s var(--ease),box-shadow .3s,background .3s;
+  }
+  .st-tour-btn:hover{transform:translateY(-2px);box-shadow:0 12px 32px -8px rgba(233,178,92,.95)}
+  .st-tour-btn .tb-ico{font-size:.9em;transition:transform .3s}
+  .st-tour-btn.playing{background:var(--amber-soft)}
+  .st-tour-btn.playing .tb-ico{content:"";}
+
+  .st-purin.lean-r{transform:rotate(6deg)}
+  .st-purin.lean-l{transform:rotate(-6deg)}
+  .st-purin.entering img{animation:purinEnter .8s var(--ease)}
+  @keyframes purinEnter{
+    0%{transform:scale(0) rotate(-30deg);opacity:0}
+    60%{transform:scale(1.25) rotate(10deg);opacity:1}
+    100%{transform:scale(1) rotate(0)}
+  }
+
+    @media(max-width:700px){
+    .st-info{width:100%;bottom:0;top:auto;height:auto;
+      background:linear-gradient(0deg,rgba(6,10,24,.9) 60%,transparent);
+      align-items:flex-end;padding:16px clamp(14px,4vw,24px);}
+    .sti-inner{max-width:none;text-align:left}
+    .sti-data{align-items:flex-start}
+    .st-bubble{min-width:120px;max-width:180px}
+  }
+
+  .mascot{background:
+      radial-gradient(120% 90% at 50% 0%, rgba(243,227,201,.14), transparent 55%),
+      linear-gradient(180deg,#0b1226 0%,#1c2647 22%,#5a5170 55%,#c98a86 82%,#f3e3c9 100%);
+  }
+  .mascot .inner{display:flex;align-items:center;gap:clamp(30px,6vw,72px);max-width:960px;margin:0 auto;flex-wrap:wrap;justify-content:center}
+  .mascot .fabi{width:clamp(180px,26vw,300px);animation:float 6s ease-in-out infinite;filter:drop-shadow(0 24px 40px rgba(90,60,40,.3))}
+  @keyframes float{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-18px) rotate(2deg)}}
+  .mascot .text{max-width:36ch}
+  .mascot .sec-eyebrow{text-align:left}
+  .mascot .sec-eyebrow::before{margin-left:0}
+  .mascot h2{font-family:var(--serif);font-weight:700;font-size:clamp(34px,6vw,60px);letter-spacing:.08em;color:#3a2b3f}
+  .mascot .romaji{font-family:var(--latin);font-style:italic;letter-spacing:.2em;color:#7a5a6a;font-size:clamp(16px,2vw,20px);margin:.2em 0 1em}
+  .mascot p{color:#4a3a45;font-size:15.5px;line-height:2}
+
+  .partners{background:linear-gradient(180deg,#f3e3c9 0%,#efdcbf 100%);color:#3a2b3f}
+  .partners .sec-eyebrow{color:#b57e4d}
+  .partners .sec-eyebrow::before,.partners .sec-eyebrow::after{opacity:.5}
+  .partners .sec-title{color:#33262e}
+  .partners .sec-lede{color:#6a5648}
+  .plogos{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:clamp(26px,5vw,60px);margin-top:clamp(40px,6vh,60px)}
+  .plogos a{display:block;transition:.4s var(--ease);filter:saturate(.55) opacity(.82)}
+  .plogos a:hover{filter:saturate(1) opacity(1);transform:translateY(-5px)}
+  .plogos img{height:clamp(52px,7vw,74px);width:auto;object-fit:contain}
+  .assoc{text-align:center;margin-top:clamp(34px,5vh,46px);font-family:var(--serif);letter-spacing:.14em;color:#7a5a4a;font-size:15px}
+
+  footer{position:relative;z-index:1;background:var(--night-deep);border-top:1px solid var(--line);padding:clamp(56px,9vh,84px) 0 40px;text-align:center}
+  footer .fbrand{font-family:var(--serif);font-weight:600;letter-spacing:.14em;font-size:20px;margin-bottom:.4em}
+  footer .fbrand .mark{color:var(--amber)}
+  footer .addr{color:var(--ink-faint);font-size:13px;line-height:2;letter-spacing:.04em}
+  footer .addr a{color:var(--amber-soft)}
+  footer .totop{display:inline-flex;align-items:center;gap:.5em;margin-top:1.8em;font-family:var(--latin);letter-spacing:.2em;font-size:13px;color:var(--ink-soft);border:1px solid var(--line);border-radius:999px;padding:10px 22px;transition:.3s}
+  footer .totop:hover{border-color:var(--amber);color:var(--starlight)}
+  footer .copy{margin-top:2.4em;font-size:11.5px;letter-spacing:.14em;color:rgba(244,238,222,.32)}
+
+  .reveal{opacity:0;transform:translateY(28px);transition:opacity 1s var(--ease),transform 1s var(--ease)}
+  .reveal.in{opacity:1;transform:none}
+
+  @media (max-width:820px){
+    nav.menu a{display:none}
+    .almanac{grid-template-columns:1fr}
+    .pillars{grid-template-columns:1fr;gap:6px}
+    .pillar{border-top:1px solid var(--line);padding-top:22px;margin-top:10px}
+    .vtag{display:none}
+    .c-name{max-width:78%}
+  }
+  @media (max-width:520px){
+    .moon-wrap,.gauge-wrap{flex-direction:column;text-align:center;align-items:center}
+    .index-meta .note{max-width:none}
+    .lang button{padding:5px 8px}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+    .reveal{opacity:1;transform:none}
+    .cline{stroke-dashoffset:0}
+  }
+</style>
 </head>
 <body>
 
-    <video class="video-bg" autoplay loop muted playsinline id="bg-video-main">
-        <source src="5963.mp4" type="video/mp4">
-    </video>
-    <div class="overlay"></div>
+<canvas id="sky" aria-hidden="true"></canvas>
 
-    <header id="main-header">
-        <a href="#" class="logo">
-            <div class="logo-icon">✦</div>
-            <div class="logo-text">
-                <span id="txt-sub-logo">大町温泉郷</span>
-                <span id="txt-main-logo" class="main-logo-text">星空観賞会</span>
-            </div>
-        </a>
-        
-        <div class="right-nav-box">
-            <div class="nav-container">
-                <nav>
-                    <ul>
-                        <li><a href="#home" class="nav-link active" id="nav-home">Home</a></li>
-                        <li><a href="#partners" class="nav-link" id="nav-partners">Partners</a></li>
-                        <li><a href="seiza88.html" class="nav-link" id="nav-guide">Guide</a></li>
-                    </ul>
-                </nav>
-                <div class="lang-switcher" id="lang-switcher">
-                    <button class="lang-btn">🌐 <span id="current-lang">JA</span> ▼</button>
-                    <ul class="lang-dropdown">
-                        <li onclick="changeLanguage('ja')">日本語</li>
-                        <li onclick="changeLanguage('en')">English</li>
-                        <li onclick="changeLanguage('es')">Español</li>
-                        <li onclick="changeLanguage('zh')">简体中文</li>
-                        <li onclick="changeLanguage('ko')">한국어</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="project-tag">
-                <img src="星と君プロジェクト_ロゴ_透過.png" alt="星と君ぷろじぇくと" class="project-logo-img">
-            </div>
-        </div>
-    </header>
+<div class="vtag" aria-hidden="true"><span class="glyph">✦</span>　星空案内ガイド最高峰の体験</div>
 
-    <div class="content">
-        <div id="home" class="hero">
-            <p id="txt-hero-sub">星空案内ツアーガイド最高峰の体験</p>
-            <h1 id="txt-hero-title">銀河の旅人</h1>
-            <div class="launch-text" id="btn-launch">2026年8月始動</div>
-        </div>
+<header class="nav" id="nav">
+  <a class="brand" href="#top"><span class="mark">✦</span><span data-i18n="brand">大町温泉郷 星空観賞会</span></a>
+  <nav class="menu">
+    <a href="#top" data-i18n="nav_home">ホーム</a>
+    <a href="#experience" data-i18n="nav_exp">星空観賞会</a>
+    <a href="#tonight" data-i18n="nav_tonight">今宵の空</a>
+    <a href="#constellations" data-i18n="nav_star">88星座</a>
+    <a href="#partners" data-i18n="nav_partners">提携の宿</a>
+  </nav>
+  <div class="lang" role="group" aria-label="Language">
+    <button data-lang="ja" aria-pressed="true">JA</button>
+    <button data-lang="en" aria-pressed="false">EN</button>
+    <button data-lang="zh" aria-pressed="false">中文</button>
+  </div>
+</header>
 
-        <div class="container">
-            <section id="news-preview" class="fade-in-up">
-                <h2 class="sec-title" id="txt-news-sec-title">NEWS</h2>
-                <div class="news-preview-container">
-                    <ul id="news-preview-list">
-                    </ul>
-                    <div class="news-more">
-                        <a href="news.html" id="btn-news-more">お知らせ一覧へ <span>▶</span></a>
-                    </div>
-                </div>
-            </section>
+<main id="top" class="hero">
+  <svg class="constellation-mark" id="heroMark" viewBox="0 0 340 90" fill="none" aria-hidden="true">
+    <path id="markLines" stroke="#e9b25c" stroke-width="1" opacity=".7"
+      d="M22 60 L74 26 L130 54 L186 22 L240 50 L300 30 L322 62" />
+    <g id="markStars"></g>
+  </svg>
 
-            <section id="moon-phase" class="fade-in-up">
-                <h2 class="sec-title" id="txt-moon-sec-title">TODAY'S MOON</h2>
-                <div class="moon-card">
-                    <div class="moon-visual" id="moon-visual">🌕</div>
-                    <div class="moon-info">
-                        <div class="moon-date" id="moon-date"></div>
-                        <div class="moon-age-text"><span id="txt-moon-age-label">月齢</span>: <span id="moon-age-number"></span></div>
-                        <div class="moon-name" id="moon-name"></div>
-                    </div>
-                </div>
-            </section>
+  <img class="logo-img" id="heroLogo" src="https://hoshitokimi.jp/星と君プロジェクト_ロゴ_透過.png" alt="星と君ぷろじぇくと" />
+  <p class="eyebrow" data-i18n="hero_eyebrow">長野県・大町温泉郷</p>
+  <h1><span data-i18n-html="hero_title">銀河の旅人</span></h1>
+  <p class="lede" data-i18n="hero_lede">北アルプスの麓、標高の澄んだ夜空へ。星空案内ガイドとともに歩く、本格的な星空観賞会。</p>
+  <p class="launch" data-i18n="hero_launch">2026.08.08 — Beginning</p>
+  <div class="cta-row">
+    <a class="btn primary" href="yoyaku.html" data-i18n="hero_book">先行予約する ✦</a>
+    <a class="btn ghost" href="#experience" data-i18n="hero_cta1">星空観賞会を知る</a>
+    <a class="btn ghost" href="https://hoshitokimi.jp/seiza88.html" data-i18n="hero_cta2">88星座図鑑を開く ✦</a>
+  </div>
 
-            <section id="starry-index" class="fade-in-up">
-                <h2 class="sec-title" id="txt-starry-title">STARRY INDEX</h2>
-                <div class="starry-card">
-                    <div class="starry-visual" id="starry-visual">✨</div>
-                    <div class="starry-info">
-                        <div class="starry-date" id="starry-date"></div>
-                        <div class="starry-score-text"><span id="txt-starry-score-label">星空指数</span>: <span id="starry-score-number"></span></div>
-                        <div class="starry-condition" id="starry-condition"></div>
-                    </div>
-                </div>
-            </section>
+</main>
 
-            <section id="constellation-guide" class="fade-in-up" style="margin-bottom: 80px; text-align: center;">
-                <h2 class="sec-title" id="txt-guide-title" style="margin-bottom: 30px;">CONSTELLATION GUIDE</h2>
-                <div class="guide-banner" style="max-width: 650px; margin: 0 auto; background: var(--card-bg); border: 1px solid rgba(230, 194, 122, 0.4); border-radius: 12px; padding: 40px 20px; backdrop-filter: blur(15px); box-shadow: 0 10px 30px rgba(0,0,0,0.4);">
-                    <p id="txt-guide-desc" style="margin-bottom: 20px; font-size: 1.1rem; letter-spacing: 2px;">全88星座の神話や見つけ方を網羅した完全ガイド</p>
-                    <a href="seiza88.html" id="btn-guide-link" class="launch-text" style="display: inline-block; text-decoration: none; font-size: 1.2rem; padding: 12px 40px; margin-top: 10px;">
-                        <span id="txt-guide-btn">88星座図鑑を開く</span> <span>✦</span>
-                    </a>
-                </div>
-            </section>
-
-            <section id="partners" class="fade-in-up">
-                <h2 class="sec-title" id="txt-partner-title">PARTNERS</h2>
-                
-                <div class="new-friend-entry fade-in-up">
-                    <img src="fabi.png" alt="ミルキースター">
-                    <div class="new-friend-info">
-                        <div class="new-friend-label">NEW FRIEND</div>
-                        <div class="new-friend-name">プリンスター</div>
-                        <div class="new-friend-desc">信州プリンが大好きな星。大きな瞳がチャームポイント。モンドコロのプリンボトルをいつも持っている。</div>
-                    </div>
-                </div>
-                
-                <div class="partner-grid" style="margin-top: 40px;">
-                    <a href="https://www.keisui.jp/" target="_blank" rel="noopener noreferrer" class="partner-card partner-logo-card" aria-label="緑翠亭 景水 公式サイト（新しいタブで開きます）">
-                        <img src="keisui_logo.png" alt="緑翠亭 景水">
-                    </a>
-                    <a href="https://o-yakushinoyu.com/" target="_blank" rel="noopener noreferrer" class="partner-card partner-logo-card" aria-label="湯けむり屋敷 薬師の湯 公式サイト（新しいタブで開きます）">
-                        <img src="yakushi_logo.JPG" alt="湯けむり屋敷 薬師の湯">
-                    </a>
-                    <a href="https://neru-dake.com/" target="_blank" rel="noopener noreferrer" class="partner-card partner-logo-card" aria-label="大町温泉 ねるだけ 公式サイト（新しいタブで開きます）">
-                        <img src="nerudake_logo.JPG" alt="大町温泉 ねるだけ">
-                    </a>
-                    <div class="partner-card">大町温泉郷観光協会</div>
-                </div>
-            </section>
-        </div>
-
-        <footer>
-            <div class="footer-info">
-                <span id="txt-company">株式会社MONDOCOLO</span>
-                <span id="txt-address">〒398-0002 長野県大町市大町俵町１９０３−１</span>
-                <span>TEL: 0261-85-0131</span>
-            </div>
-            <div class="footer-credit" id="txt-credit">&copy; 株式会社MONDOCOLO. All rights reserved.</div>
-        </footer>
+<section class="news" id="news" aria-label="News">
+  <div class="wrap">
+    <div class="news-head reveal">
+      <div class="news-title-group">
+        <span class="news-eyebrow">News</span>
+        <h2 class="news-title" data-i18n="news_title">お知らせ</h2>
+      </div>
+      <a class="news-all" href="https://hoshitokimi.jp/news.html" data-i18n="news_more">お知らせ一覧へ ▶</a>
     </div>
 
-    <a href="#" id="to-top" class="to-top">
-        <span class="star-icon">✦</span>
-        <span class="to-top-text">TOP</span>
-    </a>
+    <div class="news-list">
+      <a class="news-card featured reveal" href="yoyaku.html">
+        <span class="nc-badge" data-i18n="news_new">NEW</span>
+        <div class="nc-meta">
+          <time class="nc-date">2026.08.08</time>
+          <span class="nc-cat cat-open" data-i18n="news_cat1">受付開始</span>
+        </div>
+        <p class="nc-text" data-i18n="news1">「銀河の旅人」始動。夏の星空観賞会、受付を開始します。</p>
+        <span class="nc-arrow">→</span>
+      </a>
 
-    <div id="cinema-layer" class="cinema-page">
-        <video class="cinema-video" loop muted playsinline id="cinema-video-element">
-            <source src="4989.mp4" type="video/mp4">
-        </video>
-        <div class="cinema-overlay"></div>
-        <div class="cinema-container">
-            <div class="cinema-text-box" id="cinema-text-container"></div>
+      <a class="news-card reveal" href="https://hoshitokimi.jp/news.html">
+        <div class="nc-meta">
+          <time class="nc-date">2026.07.20</time>
+          <span class="nc-cat cat-info" data-i18n="news_cat2">提携</span>
         </div>
-        <div id="btn-cinema-close" class="btn-home-back">
-            <span>✦</span> <span id="txt-cinema-back">ホームへ戻る</span>
-        </div>
+        <p class="nc-text" data-i18n="news2">大町温泉郷の提携宿が決定しました。</p>
+        <span class="nc-arrow">→</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="tonight" id="tonight">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="sec-eyebrow" data-i18n="tonight_eyebrow">Tonight's sky</p>
+      <h2 class="sec-title" data-i18n="tonight_title">大町温泉郷の、今夜。</h2>
+      <p class="sec-lede" data-i18n="tonight_lede">月のかたちと、星の見えぐあいを、その日の空から。</p>
     </div>
 
-    <script src="newsData.js?ver=1.0"></script>
-    <script>
-        const translations = {
-            ja: {
-                subLogo: "大町温泉郷",
-                mainLogo: "星空観賞会",
-                navHome: "Home",
-                navPartners: "Partners",
-                navGuide: "Guide",
-                heroSub: "星空案内ツアーガイド最高峰の体験",
-                heroTitle: "銀河の旅人",
-                btnLaunch: "2026年8月8日始動",
-                guideTitle: "CONSTELLATION GUIDE",
-                guideDesc: "全88星座の神話や見つけ方を網羅した完全ガイド",
-                guideBtn: "88星座図鑑を開く",
-                partnerTitle: "PARTNERS",
-                company: "株式会社MONDOCOLO",
-                address: "〒398-0002 長野県大町市大町俵町１９０３−１",
-                credit: "© 株式会社MONDOCOLO. All rights reserved.",
-                cinemaBack: "ホームへ戻る",
-                cinemaText: `
-                    <p>長野県は星空の観察に適しています。</p>
-                    <p style="margin-top: 30px;">阿智村・野辺山、そして大町市で、</p>
-                    <p><span class="love-highlight">愛</span>を込めてあなたを</p>
-                    <p>宇宙の旅へお連れします。</p>
-                    <p style="margin-top: 30px;">もし晴れたら、<span class="love-highlight">逢い</span>に来て！</p>
-                    <p style="margin-top: 50px;">星が夢を<span class="love-highlight">叶</span>えることもあります。</p>
-                    <p>それを<span class="love-highlight">絵</span>にしよう！</p>
-                    <p><span class="love-highlight">子</span>供たちの目の輝きは、</p>
-                    <p>どんな星よりもまばゆい光を放ちます。</p>
-                    <p style="margin-top: 30px;">みんなで宇宙を探求しよう！</p>
-                `,
-                moonSecTitle: "TODAY'S MOON",
-                moonAgeLabel: "月齢",
-                moonPhases: ["新月", "三日月", "上弦の月", "十三夜", "満月", "居待月", "下弦の月", "二十六夜"],
-                starrySecTitle: "STARRY INDEX",
-                starryScoreLabel: "星空指数",
-                starryConditions: ["最高", "良い", "普通", "悪い", "最悪"],
-                newsSecTitle: "NEWS",
-                newsMore: "お知らせ一覧へ"
-            },
-            en: {
-                subLogo: "Omachi Onsen-kyo",
-                mainLogo: "Starry Sky Tour",
-                navHome: "Home",
-                navPartners: "Partners",
-                navGuide: "Guide",
-                heroSub: "The Ultimate Starry Sky Guided Experience",
-                heroTitle: "Galactic Traveler",
-                btnLaunch: "Launching August 2026",
-                guideTitle: "CONSTELLATION GUIDE",
-                guideDesc: "A complete guide to the myths and locations of all 88 constellations",
-                guideBtn: "Open 88 Constellations Guide",
-                partnerTitle: "PARTNERS",
-                company: "MONDOCOLO Inc.",
-                address: "1903-1 Omachitawara-machi, Omachi City, Nagano 398-0002",
-                credit: "© MONDOCOLO Inc. All rights reserved.",
-                cinemaBack: "Back to Home",
-                cinemaText: `
-                    <p>Nagano Prefecture is the perfect place for stargazing.</p>
-                    <p style="margin-top: 30px;">Achi Village, Nobeyama, and Omachi City</p>
-                    <p>bring you into a journey through the universe</p>
-                    <p>with all our <span class="love-highlight">Love</span>.</p>
-                    <p style="margin-top: 30px;">If the sky is clear, come <span class="love-highlight">see</span> me!</p>
-                    <p style="margin-top: 50px;">Stars can even make dreams <span class="love-highlight">come true</span>.</p>
-                    <p>Let's <span class="love-highlight">draw</span> it!</p>
-                    <p>The sparkle in <span class="love-highlight">children</span>'s eyes</p>
-                    <p>shines brighter than any star.</p>
-                    <p style="margin-top: 30px;">Let's explore the universe together!</p>
-                `,
-                moonSecTitle: "TODAY'S MOON",
-                moonAgeLabel: "Moon Age",
-                moonPhases: ["New Moon", "Waxing Crescent", "First Quarter", "Waxing Gibbous", "Full Moon", "Waning Gibbous", "Last Quarter", "Waning Crescent"],
-                starrySecTitle: "STARRY INDEX",
-                starryScoreLabel: "Stargazing Index",
-                starryConditions: ["Excellent", "Good", "Fair", "Poor", "Very Poor"],
-                newsSecTitle: "NEWS",
-                newsMore: "More News"
-            },
-            es: {
-                subLogo: "Omachi Onsen-kyo",
-                mainLogo: "Observación de Estrellas",
-                navHome: "Inicio",
-                navPartners: "Socios",
-                navGuide: "Guía",
-                heroSub: "La Máxima Experiencia Guiada de Cielos Estrellados",
-                heroTitle: "Viajero Galáctico",
-                btnLaunch: "Inicio en Agosto de 2026",
-                guideTitle: "GUÍA DE CONSTELACIONES",
-                guideDesc: "Una guía completa sobre los mitos y la ubicación de las 88 constelaciones.",
-                guideBtn: "Abrir Guía de Constelaciones",
-                partnerTitle: "PARTNERS",
-                company: "MONDOCOLO Inc.",
-                address: "1903-1 Omachitawara-machi, Ciudad de Omachi, Nagano 398-0002",
-                credit: "© MONDOCOLO Inc. All rights reserved.",
-                cinemaBack: "Volver al Inicio",
-                cinemaText: `
-                    <p>La prefectura de Nagano es el lugar perfecto para observar las estrellas.</p>
-                    <p style="margin-top: 30px;">La villa de Achi, Nobeyama y la ciudad de Omachi</p>
-                    <p>te llevarán a un maravilloso viaje por el universe</p>
-                    <p>with all our <span class="love-highlight">Love</span>.</p>
-                    <p style="margin-top: 30px;">Si el cielo está despejado, ¡ven a <span class="love-highlight">verme</span>!</p>
-                    <p style="margin-top: 50px;">Las estrellas también pueden <span class="love-highlight">cumplir</span> los sueños.</p>
-                    <p>¡Vamos a <span class="love-highlight">dibujarlo</span>!</p>
-                    <p>El brillo en los ojos de los <span class="love-highlight">niños</span></p>
-                    <p>resplandece más que cualquier estrella.</p>
-                    <p style="margin-top: 30px;">¡Exploremos el universo juntos!</p>
-                `,
-                moonSecTitle: "LA LUNA DE HOY",
-                moonAgeLabel: "Edad Lunar",
-                moonPhases: ["Luna Nueva", "Luna Creciente", "Cuarto Creciente", "Luna Gibosa Creciente", "Luna Llena", "Luna Gibosa Menguante", "Cuarto Menguante", "Luna Menguante"],
-                starrySecTitle: "ÍNDICE DE ESTRELLAS",
-                starryScoreLabel: "Índice de Observación",
-                starryConditions: ["Excelente", "Bueno", "Regular", "Pobre", "Muy Pobre"],
-                newsSecTitle: "NOTICIAS",
-                newsMore: "Más Noticias"
-            },
-            zh: {
-                subLogo: "大町温泉乡",
-                mainLogo: "星空观賞会",
-                navHome: "首页",
-                navPartners: "合作伙伴",
-                navGuide: "指南",
-                heroSub: "星空导游带来的顶级观星體驗",
-                heroTitle: "银河旅行者",
-                btnLaunch: "2026年8月隆重登场",
-                guideTitle: "星座指南",
-                guideDesc: "全面收录88个星座神话与寻找方法的完整指南",
-                guideBtn: "打开88星座图鉴",
-                partnerTitle: "PARTNERS",
-                company: "MONDOCOLO 株式会社",
-                address: "〒398-0002 长野县大町市大町俵町1903-1",
-                credit: "© MONDOCOLO Inc. All rights reserved.",
-                cinemaBack: "返回首页",
-                cinemaText: `
-                    <p>长野县是绝佳的观星聖地。</p>
-                    <p style="margin-top: 30px;">阿智村、野边山以及大町市</p>
-                    <p>将满怀<span class="love-highlight">爱</span>意，带您开启</p>
-                    <p>一场浪漫の宇宙之旅。</p>
-                    <p style="margin-top: 30px;">如果天晴，请来<span class="love-highlight">相见</span>吧！</p>
-                    <p style="margin-top: 50px;">星星有时也能<span class="love-highlight">实现</span>梦想。</p>
-                    <p>让我们把它<span class="love-highlight">画</span>下来吧！</p>
-                    <p><span class="love-highlight">孩子</span>们眼中的光芒，</p>
-                    <p>比任何星星都更加耀眼。</p>
-                    <p style="margin-top: 30px;">让我们一起探索宇宙吧！</p>
-                `,
-                moonSecTitle: "今日月相",
-                moonAgeLabel: "月龄",
-                moonPhases: ["新月", "娥眉月", "上弦月", "盈凸月", "满月", "亏凸月", "下弦月", "残月"],
-                starrySecTitle: "星空指数",
-                starryScoreLabel: "星空观赏指数",
-                starryConditions: ["最高", "好", "普通", "坏", "最坏"],
-                newsSecTitle: "最新消息",
-                newsMore: "更多消息"
-            },
-            ko: {
-                subLogo: "오마치 온천향",
-                mainLogo: "별자리 감상회",
-                navHome: "홈",
-                navPartners: "파트너",
-                navGuide: "가이드",
-                heroSub: "최고の 별자리 가이드 투어 체험",
-                heroTitle: "은하수의 여행자",
-                btnLaunch: "2026년 8월 시동",
-                guideTitle: "별자리 가이드",
-                guideDesc: "88개 별자리의 신화와 찾는 법을 망라한 완전한 가이드",
-                guideBtn: "88 별자리 도감 열기",
-                partnerTitle: "PARTNERS",
-                company: "주식회사 MONDOCOLO",
-                address: "우편번호 398-0002 나가ノ현 오마치시 오마치타와라마치 1903-1",
-                credit: "© MONDOCOLO Inc. All rights reserved.",
-                cinemaBack: "홈으로 돌아가기",
-                cinemaText: `
-                    <p>나가ノ현은 별을 관찰하기에 가장 좋은 곳입니다.</p>
-                    <p style="margin-top: 30px;">아치 무라, 노베야マ, 그리고 오마치 시で,</p>
-                    <p>당신を <span class="love-highlight">사랑</span>를 담아</p>
-                    <p>우주 여행で 안내합니다.</p>
-                    <p style="margin-top: 30px;">만약 날이 맑다면, <span class="love-highlight">만나러</span> 와주세요!</p>
-                    <p style="margin-top: 50px;">별은 때때로 꿈을 <span class="love-highlight">이루어</span> 주기도 합니다.</p>
-                    <p>그것을 <span class="love-highlight">그림</span>으로 그려요!</p>
-                    <p><span class="love-highlight">아이들</span>의 눈빛은,</p>
-                    <p>그 어떤 별보다 눈부시게 빛납니다.</p>
-                    <p style="margin-top: 30px;">다 함께 우주를 탐험해요!</p>
-                `,
-                moonSecTitle: "오늘の 달",
-                moonAgeLabel: "월령",
-                moonPhases: ["신월", "초승달", "상현달", "차오르는 달", "보름달", "이지러지는 달", "하현달", "그믐달"],
-                starrySecTitle: "별자리 지수",
-                starryScoreLabel: "별자리 관측 지수",
-                starryConditions: ["최고", "좋음", "보통", "나쁨", "최악"],
-                newsSecTitle: "ニュース",
-                newsMore: "ニュース 더보기"
-            }
-        };
+    <div class="almanac">
+      <div class="card reveal">
+        <p class="k-label">The Moon</p>
+        <p class="k-jp" data-i18n="moon_jp">月のかたち</p>
+        <div class="moon-wrap">
+          <svg class="moon-svg" viewBox="-52 -52 104 104" id="moonSvg" aria-hidden="true">
+            <defs>
+              <radialGradient id="litG" cx="38%" cy="34%" r="72%">
+                <stop offset="0%" stop-color="#fff6e2"/>
+                <stop offset="60%" stop-color="#f4d9a0"/>
+                <stop offset="100%" stop-color="#e0b877"/>
+              </radialGradient>
+            </defs>
+            <circle r="50" fill="#141d38"/>
+            <path id="moonLit" fill="url(#litG)"/>
+            <circle r="50" fill="none" stroke="rgba(244,238,222,.18)" stroke-width="1"/>
+          </svg>
+          <div class="moon-data">
+            <div class="age" id="moonAge">—<small data-i18n="moon_unit">日</small></div>
+            <div class="phase-name" id="moonPhase">—</div>
+            <div class="illum" id="moonIllum">—</div>
+          </div>
+        </div>
+      </div>
 
-        function changeLanguage(lang) {
-            let displayLang = lang.toUpperCase();
-            if(lang === 'es') displayLang = 'ES';
-            document.getElementById('current-lang').innerText = displayLang;
-            
-            document.getElementById('txt-sub-logo').innerText = translations[lang].subLogo;
-            document.getElementById('txt-main-logo').innerText = translations[lang].mainLogo;
-            document.getElementById('nav-home').innerText = translations[lang].navHome;
-            document.getElementById('nav-partners').innerText = translations[lang].navPartners;
-            document.getElementById('nav-guide').innerText = translations[lang].navGuide;
-            document.getElementById('txt-hero-sub').innerText = translations[lang].heroSub;
-            document.getElementById('txt-hero-title').innerText = translations[lang].heroTitle;
-            document.getElementById('btn-launch').innerText = translations[lang].btnLaunch;
-            
-            document.getElementById('txt-guide-title').innerText = translations[lang].guideTitle;
-            document.getElementById('txt-guide-desc').innerText = translations[lang].guideDesc;
-            document.getElementById('txt-guide-btn').innerText = translations[lang].guideBtn;
+      <div class="card reveal">
+        <p class="k-label">Starry index</p>
+        <p class="k-jp" data-i18n="index_jp">星空指数</p>
+        <div class="gauge-wrap">
+          <div class="gauge">
+            <svg viewBox="0 0 120 120" width="100%" height="100%">
+              <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(244,238,222,.1)" stroke-width="8"/>
+              <circle id="gaugeArc" cx="60" cy="60" r="52" fill="none" stroke="var(--amber)" stroke-width="8"
+                stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7"
+                style="transition:stroke-dashoffset 1.4s var(--ease)"/>
+            </svg>
+            <div class="val"><span class="n" id="idxNum">—</span><span class="u" data-i18n="index_unit">指数</span></div>
+          </div>
+          <div class="index-meta">
+            <div class="label" id="idxLabel">読み込み中…</div>
+            <div class="note" id="idxNote" data-i18n="index_loading">現在地の空を読み込んでいます。</div>
+            <div class="loc">OMACHI ONSEN — 36.50°N</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-            document.getElementById('txt-partner-title').innerText = translations[lang].partnerTitle;
-            
-            document.getElementById('txt-company').innerText = translations[lang].company;
-            document.getElementById('txt-address').innerText = translations[lang].address;
-            document.getElementById('txt-credit').innerText = translations[lang].credit;
-            document.getElementById('txt-cinema-back').innerText = translations[lang].cinemaBack;
-            
-            document.getElementById('cinema-text-container').innerHTML = translations[lang].cinemaText;
+<section id="experience">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="sec-eyebrow" data-i18n="exp_eyebrow">The experience</p>
+      <h2 class="sec-title" data-i18n-html="exp_title">見上げるのではなく、<br>旅をする。</h2>
+      <p class="sec-lede" data-i18n="exp_lede">星座をなぞり、神話を聴き、光の届く時間に思いを馳せる。ガイドがひらく、ひと晩の物語。</p>
+    </div>
+    <div class="pillars">
+      <div class="pillar reveal">
+        <span class="num">01</span>
+        <h3 data-i18n="p1_t">ガイド</h3>
+        <p class="role" data-i18n="p1_r">One who reads the sky</p>
+        <p data-i18n="p1_d">星空案内の技をもつガイドが、その夜だけの空を、あなたの隣で案内します。</p>
+      </div>
+      <div class="pillar reveal">
+        <span class="num">02</span>
+        <h3 data-i18n="p2_t">場所</h3>
+        <p class="role" data-i18n="p2_r">Alpine darkness</p>
+        <p data-i18n="p2_d">大町温泉郷。街あかりから離れた、北アルプスの麓に広がる標高の澄んだ空。</p>
+      </div>
+      <div class="pillar reveal">
+        <span class="num">03</span>
+        <h3 data-i18n="p3_t">物語</h3>
+        <p class="role" data-i18n="p3_r">A night's journey</p>
+        <p data-i18n="p3_d">望遠鏡の向こうに、神話と科学と、あなた自身の記憶が静かに重なります。</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-            document.getElementById('txt-news-sec-title').innerText = translations[lang].newsSecTitle;
-            document.getElementById('btn-news-more').innerHTML = translations[lang].newsMore + ' <span>▶</span>';
+<section class="stars-sec" id="constellations">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="sec-eyebrow">Summer Triangle</p>
+      <h2 class="sec-title" data-i18n="star_title">夏の大三角</h2>
+      <p class="sec-lede" data-i18n="star_lede">プリンスターと一緒に、今夜の空をめぐろう。</p>
+    </div>
+  </div>
 
-            document.getElementById('lang-switcher').classList.remove('open');
-            
-            try {
-                localStorage.setItem('selectedLang', lang);
-            } catch (e) {
-            }
+  <div class="st-stage" id="stStage" aria-label="夏の大三角インタラクティブ">
+    <canvas id="stCanvas"></canvas>
+
+    <button class="st-tour-btn" id="tourBtn"><span class="tb-ico">▶</span><span id="tourLabel">プリンスターツアー</span></button>
+
+    <button class="st-star" id="starVega"    data-key="vega"    aria-label="ベガ"></button>
+    <button class="st-star" id="starAltair"  data-key="altair"  aria-label="アルタイル"></button>
+    <button class="st-star" id="starDeneb"   data-key="deneb"   aria-label="デネブ"></button>
+
+    <div class="st-label" id="lblVega"><span class="st-lname">ベガ</span><span class="st-lsub">Vega</span></div>
+    <div class="st-label" id="lblAltair"><span class="st-lname">アルタイル</span><span class="st-lsub">Altair</span></div>
+    <div class="st-label" id="lblDeneb"><span class="st-lname">デネブ</span><span class="st-lsub">Deneb</span></div>
+
+    <div class="st-purin" id="stPurin">
+      <img src="https://hoshitokimi.jp/fabi.png" alt="プリンスター" id="purinImg" />
+      <div class="st-bubble" id="stBubble">
+        <p id="bubbleText">星をタッチしてね！</p>
+      </div>
+    </div>
+
+    <div class="st-info" id="stInfo">
+      <div class="sti-inner">
+        <p class="sti-name" id="stiName"></p>
+        <p class="sti-lat"  id="stiLat"></p>
+        <p class="sti-body" id="stiBody"></p>
+        <div class="sti-data" id="stiData"></div>
+      </div>
+    </div>
+
+    <div class="st-tri-label" id="triLabel">夏の大三角</div>
+  </div>
+
+  <div class="wrap">
+    <div class="stars-cta" style="margin-top:clamp(36px,6vh,52px)">
+      <a class="btn primary" href="https://hoshitokimi.jp/seiza88.html" data-i18n="star_cta">88星座図鑑を開く ✦</a>
+    </div>
+  </div>
+</section>
+
+<section class="mascot" id="mascot">
+  <div class="wrap">
+    <div class="inner">
+      <img class="fabi" src="https://hoshitokimi.jp/fabi.png" alt="プリンスター" />
+      <div class="text reveal">
+        <p class="sec-eyebrow" data-i18n="mascot_eyebrow">New friend</p>
+        <h2 data-i18n="mascot_name">プリンスター</h2>
+        <p class="romaji">Purin Star</p>
+        <p data-i18n="mascot_desc">信州プリンが大好きな星。大きな瞳がチャームポイント。モンドコロのプリンボトルを、いつも大切に抱えています。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="partners" id="partners">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="sec-eyebrow" data-i18n="partners_eyebrow">In partnership</p>
+      <h2 class="sec-title" data-i18n="partners_title">星空の夜を、あたたかい宿とともに。</h2>
+      <p class="sec-lede" data-i18n="partners_lede">大町温泉郷の宿と手を携えて、観賞会の夜をお迎えします。</p>
+    </div>
+    <div class="plogos reveal">
+      <a href="https://www.keisui.jp/" target="_blank" rel="noopener"><img src="https://hoshitokimi.jp/keisui_logo.png" alt="緑翠亭 景水" /></a>
+      <a href="https://o-yakushinoyu.com/" target="_blank" rel="noopener"><img src="https://hoshitokimi.jp/yakushi_logo.JPG" alt="湯けむり屋敷 薬師の湯" /></a>
+      <a href="https://neru-dake.com/" target="_blank" rel="noopener"><img src="https://hoshitokimi.jp/nerudake_logo.JPG" alt="大町温泉 ねるだけ" /></a>
+    </div>
+    <p class="assoc">大町温泉郷観光協会</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p class="fbrand"><span class="mark">✦</span> 大町温泉郷 星空観賞会</p>
+    <p class="addr">
+      株式会社MONDOCOLO　〒398-0002 長野県大町市大町俵町１９０３−１<br/>
+      TEL: <a href="tel:0261850131">0261-85-0131</a>
+    </p>
+    <a class="totop" href="#top">✦ TOP</a>
+    <p class="copy">© 株式会社MONDOCOLO. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    var langSubs=[];
+  function onLang(fn){langSubs.push(fn);}
+  var curLang="ja";
+
+    var DICT = {
+    ja:{
+      brand:"大町温泉郷 星空観賞会",nav_home:"ホーム",nav_exp:"星空観賞会",nav_tonight:"今宵の空",nav_star:"88星座",nav_partners:"提携の宿",
+      hero_eyebrow:"長野県・大町温泉郷",hero_title:"銀河の旅人",
+      hero_lede:"北アルプスの麓、標高の澄んだ夜空へ。星空案内ガイドとともに歩く、本格的な星空観賞会。",
+      hero_launch:"2026.08.08 — 始動",hero_book:"先行予約する ✦",hero_cta1:"星空観賞会を知る",hero_cta2:"88星座図鑑を開く ✦",
+      news_title:"お知らせ",news_new:"NEW",news_cat1:"受付開始",news_cat2:"提携",news1:"「銀河の旅人」始動。夏の星空観賞会、受付を開始します。",news2:"大町温泉郷の提携宿が決定しました。",news_more:"お知らせ一覧へ ▶",
+      tonight_eyebrow:"Tonight's sky",tonight_title:"大町温泉郷の、今夜。",tonight_lede:"月のかたちと、星の見えぐあいを、その日の空から。",
+      moon_jp:"月のかたち",moon_unit:"日",index_jp:"星空指数",index_unit:"指数",index_loading:"現在地の空を読み込んでいます。",
+      exp_eyebrow:"The experience",exp_title:"見上げるのではなく、<br>旅をする。",exp_lede:"星座をなぞり、神話を聴き、光の届く時間に思いを馳せる。ガイドがひらく、ひと晩の物語。",
+      p1_t:"ガイド",p1_r:"One who reads the sky",p1_d:"星空案内の技をもつガイドが、その夜だけの空を、あなたの隣で案内します。",
+      p2_t:"場所",p2_r:"Alpine darkness",p2_d:"大町温泉郷。街あかりから離れた、北アルプスの麓に広がる標高の澄んだ空。",
+      p3_t:"物語",p3_r:"A night's journey",p3_d:"望遠鏡の向こうに、神話と科学と、あなた自身の記憶が静かに重なります。",
+      star_eyebrow:"Summer Triangle",star_title:"夏の大三角",star_lede:"プリンスターと一緒に、今夜の空をめぐろう。",star_cta:"88星座図鑑を開く ✦",
+      mascot_eyebrow:"New friend",mascot_name:"プリンスター",mascot_desc:"信州プリンが大好きな星。大きな瞳がチャームポイント。モンドコロのプリンボトルを、いつも大切に抱えています。",
+      partners_eyebrow:"In partnership",partners_title:"星空の夜を、あたたかい宿とともに。",partners_lede:"大町温泉郷の宿と手を携えて、観賞会の夜をお迎えします。"
+    },
+    en:{
+      brand:"Ōmachi Onsen Stargazing",nav_home:"Home",nav_exp:"Experience",nav_tonight:"Tonight",nav_star:"88 Stars",nav_partners:"Partners",
+      hero_eyebrow:"Ōmachi Onsen, Nagano",hero_title:'銀河の旅人<span class="en" style="display:block;font-size:.42em;letter-spacing:.14em;color:#f4d9a0;margin-top:.3em;">The Galaxy Traveler</span>',
+      hero_lede:"At the foot of the Northern Alps, into skies washed clean by altitude. A true stargazing experience, guided step by step.",
+      hero_launch:"2026.08.08 — Beginning",hero_book:"Book early ✦",hero_cta1:"Discover the experience",hero_cta2:"Open the star atlas ✦",
+      news_title:"News",news_new:"NEW",news_cat1:"Now Open",news_cat2:"Partners",news1:"“The Galaxy Traveler” begins. Summer stargazing reservations now open.",news2:"Our partner inns in Ōmachi Onsen are confirmed.",news_more:"All news ▶",
+      tonight_eyebrow:"Tonight's sky",tonight_title:"Above Ōmachi, tonight.",tonight_lede:"The shape of the moon and the clarity of the stars, read from today's sky.",
+      moon_jp:"The Moon",moon_unit:"d",index_jp:"Starry index",index_unit:"index",index_loading:"Reading the sky above your location…",
+      exp_eyebrow:"The experience",exp_title:"Not just looking up —<br>traveling.",exp_lede:"Trace the constellations, hear the myths, wonder at light centuries in transit. A single night, opened by your guide.",
+      p1_t:"The Guide",p1_r:"One who reads the sky",p1_d:"A trained star guide leads you, at your side, through the night that belongs only to tonight.",
+      p2_t:"The Place",p2_r:"Alpine darkness",p2_d:"Ōmachi Onsen — far from city light, where the altitude of the Northern Alps clears the air.",
+      p3_t:"The Story",p3_r:"A night's journey",p3_d:"Beyond the telescope, myth and science quietly meet your own memory.",
+      star_eyebrow:"Summer Triangle",star_title:"Summer Triangle",star_lede:"Join Purin Star on a tour of tonight's sky.",star_cta:"Open the full atlas ✦",
+      mascot_eyebrow:"New friend",mascot_name:"Purin Star",mascot_desc:"A little star who loves Shinshu pudding. Big bright eyes — and always holding a MONDOCOLO pudding bottle close.",
+      partners_eyebrow:"In partnership",partners_title:"A starlit night, warmed by these inns.",partners_lede:"Hand in hand with the inns of Ōmachi Onsen, we welcome you into the night."
+    },
+    zh:{
+      brand:"大町温泉乡 观星会",nav_home:"首页",nav_exp:"观星会",nav_tonight:"今夜星空",nav_star:"88星座",nav_partners:"合作旅馆",
+      hero_eyebrow:"长野县・大町温泉乡",hero_title:'銀河の旅人<span class="en" style="display:block;font-size:.42em;letter-spacing:.14em;color:#f4d9a0;margin-top:.3em;">银河的旅人</span>',
+      hero_lede:"在北阿尔卑斯山脚下，走进因高海拔而澄澈的夜空。与观星向导一同漫步的正统观星会。",
+      hero_launch:"2026.08.08 — 启程",hero_book:"抢先预约 ✦",hero_cta1:"了解观星会",hero_cta2:"打开88星座图鉴 ✦",
+      news_title:"最新公告",news_new:"NEW",news_cat1:"开始受理",news_cat2:"合作",news1:"「银河的旅人」启程。夏季观星会开始受理预约。",news2:"大町温泉乡的合作旅馆已确定。",news_more:"查看全部公告 ▶",
+      tonight_eyebrow:"Tonight's sky",tonight_title:"大町温泉乡的今夜。",tonight_lede:"从当天的天空，读取月亮的形状与星星的通透度。",
+      moon_jp:"月之相",moon_unit:"天",index_jp:"星空指数",index_unit:"指数",index_loading:"正在读取当地的天空。",
+      exp_eyebrow:"The experience",exp_title:"不是仰望，<br>而是旅行。",exp_lede:"描摹星座，聆听神话，遥想星光穿越的漫长时间。向导为你开启的一夜物语。",
+      p1_t:"向导",p1_r:"One who reads the sky",p1_d:"拥有观星导览技艺的向导，在你身旁介绍只属于今夜的星空。",
+      p2_t:"场所",p2_r:"Alpine darkness",p2_d:"大町温泉乡。远离城市灯火，在北阿尔卑斯山脚展开的澄澈高空。",
+      p3_t:"物语",p3_r:"A night's journey",p3_d:"望远镜的彼端，神话、科学，与你自身的记忆静静重叠。",
+      star_eyebrow:"夏季大三角",star_title:"夏季大三角",star_lede:"和布丁星一起，漫游今晚的星空。",star_cta:"打开88星座图鉴 ✦",
+      mascot_eyebrow:"New friend",mascot_name:"布丁星",mascot_desc:"最爱信州布丁的星星。大大的眼睛是它的魅力所在。总是珍惜地抱着MONDOCOLO的布丁瓶。",
+      partners_eyebrow:"In partnership",partners_title:"星空之夜，与温暖的旅馆相伴。",partners_lede:"与大町温泉乡的旅馆携手，迎接观星会的夜晚。"
+    }
+  };
+  function setLang(lang){
+    curLang=lang;
+    var d = DICT[lang]||DICT.ja;
+    document.documentElement.lang = lang;
+    document.querySelectorAll("[data-i18n]").forEach(function(el){
+      var k=el.getAttribute("data-i18n"); if(d[k]!=null) el.textContent=d[k];
+    });
+    document.querySelectorAll("[data-i18n-html]").forEach(function(el){
+      var k=el.getAttribute("data-i18n-html"); if(d[k]!=null) el.innerHTML=d[k];
+    });
+    document.querySelectorAll(".lang button").forEach(function(b){
+      b.setAttribute("aria-pressed", b.getAttribute("data-lang")===lang ? "true":"false");
+    });
+    langSubs.forEach(function(fn){ try{fn(lang);}catch(e){} });
+  }
+  document.querySelectorAll(".lang button").forEach(function(b){
+    b.addEventListener("click",function(){ setLang(b.getAttribute("data-lang")); });
+  });
+
+    var nav=document.getElementById("nav");
+  window.addEventListener("scroll",function(){
+    if(window.scrollY>40) nav.classList.add("scrolled"); else nav.classList.remove("scrolled");
+  },{passive:true});
+
+    var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target);} });
+  },{threshold:.16});
+  document.querySelectorAll(".reveal").forEach(function(el){io.observe(el);});
+
+    (function(){
+    var pts=[[22,60],[74,26],[130,54],[186,22],[240,50],[300,30],[322,62]];
+    var g=document.getElementById("markStars");
+    pts.forEach(function(p,i){
+      var c=document.createElementNS("http://www.w3.org/2000/svg","circle");
+      c.setAttribute("cx",p[0]);c.setAttribute("cy",p[1]);
+      c.setAttribute("r", (i===3?3.2:2));
+      c.setAttribute("fill", i===3? "#f4d9a0":"#f4eede");
+      c.style.opacity="0"; c.style.transition="opacity .5s ease "+(i*0.12)+"s";
+      g.appendChild(c);
+    });
+    var line=document.getElementById("markLines");
+    var L=line.getTotalLength();
+    line.style.strokeDasharray=L; line.style.strokeDashoffset=L;
+    line.style.transition="stroke-dashoffset 1.6s cubic-bezier(.22,.61,.36,1) .3s";
+    var logo=document.getElementById("heroLogo"),mark=document.getElementById("heroMark");
+    function play(){
+      requestAnimationFrame(function(){
+        mark.style.transition="opacity .8s ease"; mark.style.opacity="1";
+        line.style.strokeDashoffset=0;
+        g.querySelectorAll("circle").forEach(function(c){c.style.opacity="1";});
+        logo.style.transition="opacity 1.1s ease .2s, transform 1.1s ease .2s";
+        logo.style.opacity="1";
+      });
+    }
+    window.addEventListener("load",play);
+    if(document.readyState==="complete"){play();}
+  })();
+
+    (function(){
+    var SYN=29.53058867;
+    var known=Date.UTC(2000,0,6,18,14,0);
+    var days=(Date.now()-known)/86400000;
+    var phase=(days%SYN)/SYN; if(phase<0)phase+=1;
+    var age=phase*SYN;
+    var k=(1-Math.cos(2*Math.PI*phase))/2;
+    var R=50;
+    var waning=phase>0.5;
+    var pp=waning?1-phase:phase;
+    var rx=R*Math.cos(2*Math.PI*pp);
+    var sweep2=rx>0?0:1;
+    var rxAbs=Math.abs(rx).toFixed(2);
+    var d="M 0 "+(-R)+" A "+R+" "+R+" 0 0 1 0 "+R+" A "+rxAbs+" "+R+" 0 0 "+sweep2+" 0 "+(-R)+" Z";
+    var lit=document.getElementById("moonLit");
+    lit.setAttribute("d",d);
+    if(waning) lit.setAttribute("transform","scale(-1,1)");
+
+    var names={
+      ja:["新月","三日月","上弦の月","十三夜","満月","十六夜","下弦の月","有明の月"],
+      en:["New Moon","Waxing Crescent","First Quarter","Waxing Gibbous","Full Moon","Waning Gibbous","Last Quarter","Waning Crescent"],
+      zh:["新月","娥眉月","上弦月","盈凸月","满月","亏凸月","下弦月","残月"]
+    };
+    var units={ja:"日",en:"d",zh:"天"};
+    var illumLbl={ja:"輝面比 ",en:"Illumination ",zh:"亮面比 "};
+    var idx=Math.floor(((phase*8)+0.5))%8;
+    var ageEl=document.getElementById("moonAge"),phEl=document.getElementById("moonPhase"),ilEl=document.getElementById("moonIllum");
+    function paint(lang){
+      var L=names[lang]?lang:"ja";
+      ageEl.innerHTML=age.toFixed(1)+'<small>'+units[L]+'</small>';
+      phEl.textContent=names[L][idx];
+      ilEl.textContent=illumLbl[L]+Math.round(k*100)+"%";
+    }
+    paint("ja");
+    onLang(paint);
+  })();
+
+    (function(){
+    var arc=document.getElementById("gaugeArc"),
+        num=document.getElementById("idxNum"),
+        label=document.getElementById("idxLabel"),
+        note=document.getElementById("idxNote");
+    var CIRC=2*Math.PI*52;
+    var state={idx:null,cloud:null,sample:false};
+    function setGauge(v){
+      arc.style.strokeDashoffset=CIRC*(1-v/100);
+      arc.style.stroke = v>=75? "#e9b25c" : v>=45? "#c9b06a" : "#8f8fb0";
+      var n=0,step=Math.max(1,Math.round(v/26));
+      var t=setInterval(function(){ n+=step; if(n>=v){n=v;clearInterval(t);} num.textContent=n; },28);
+    }
+    var verdicts={
+      ja:function(v){return v>=80?"絶好の観測日和":v>=60?"良好":v>=40?"まずまず":v>=20?"うすぐもり":"くもり空";},
+      en:function(v){return v>=80?"Perfect night":v>=60?"Great viewing":v>=40?"Fair":v>=20?"Hazy skies":"Cloudy";},
+      zh:function(v){return v>=80?"绝佳观测夜":v>=60?"良好":v>=40?"尚可":v>=20?"薄云":"多云天";}
+    };
+    function noteText(lang){
+      if(state.idx==null) return DICT[lang].index_loading;
+      if(state.sample) return lang==="ja"?"リアルタイム取得ができないため、サンプルを表示しています。":lang==="zh"?"无法获取实时数据，显示示例值。":"Live data unavailable — sample shown.";
+      var c=Math.round(state.cloud);
+      return lang==="ja"?("今夜の大町、雲量はおよそ "+c+"％。"):lang==="zh"?("今夜大町，云量约 "+c+"％。"):("Tonight's cloud cover ~"+c+"% over Ōmachi.");
+    }
+    function paint(lang){
+      var L=verdicts[lang]?lang:"ja";
+      if(state.idx!=null) label.textContent=verdicts[L](state.idx);
+      note.textContent=noteText(L);
+    }
+    onLang(paint);
+
+    var lat=36.503, lon=137.851;
+    var url="https://api.open-meteo.com/v1/forecast?latitude="+lat+"&longitude="+lon+"&hourly=cloud_cover,relative_humidity_2m&timezone=Asia%2FTokyo&forecast_days=2";
+
+    function onData(j){
+      var times=j.hourly.time, cc=j.hourly.cloud_cover, rh=j.hourly.relative_humidity_2m;
+      var now=new Date(), picks=[];
+      for(var i=0;i<times.length;i++){
+        var h=new Date(times[i]), hr=h.getHours();
+        if(h>=now && (hr>=19 || hr<=1) && picks.length<6) picks.push(i);
+      }
+      if(!picks.length){ for(var i2=0;i2<6&&i2<cc.length;i2++)picks.push(i2); }
+      var ac=0,ar=0;
+      picks.forEach(function(i){ac+=cc[i];ar+=rh[i];});
+      ac/=picks.length; ar/=picks.length;
+      var idx=Math.round(Math.max(0,Math.min(100,(100-ac)-Math.max(0,(ar-70))*0.4)));
+      state.idx=idx; state.cloud=ac; state.sample=false;
+      setGauge(idx); paint(curLang);
+    }
+
+    function tryFetch(attempt){
+      var ctrl=new AbortController();
+      var to=setTimeout(function(){ctrl.abort();},12000);
+      fetch(url,{signal:ctrl.signal,cache:"no-store"}).then(function(r){
+        if(!r.ok) throw 0; return r.json();
+      }).then(function(j){
+        clearTimeout(to);
+        if(!j||!j.hourly||!j.hourly.cloud_cover) throw 0;
+        onData(j);
+      }).catch(function(){
+        clearTimeout(to);
+        if(attempt<4){ setTimeout(function(){tryFetch(attempt+1);}, 2000); }
+        else {
+          if(state.idx==null){ state.idx=68; state.cloud=null; state.sample=true; setGauge(68); paint(curLang); }
+          setTimeout(function(){tryFetch(1);}, 60000);
         }
+      });
+    }
+    tryFetch(1);
+    setInterval(function(){tryFetch(1);}, 1800000);
+  })();
 
-        const langSwitcher = document.getElementById('lang-switcher');
-        langSwitcher.querySelector('.lang-btn').addEventListener('click', (e) => {
-            e.stopPropagation();
-            langSwitcher.classList.toggle('open');
-        });
-        document.addEventListener('click', () => langSwitcher.classList.remove('open'));
+    (function(){
+    var stage=document.getElementById("stStage");
+    if(!stage)return;
+    var cv=document.getElementById("stCanvas");
+    var ctx=cv.getContext("2d");
+    var W=0,H=0,DPR=Math.min(window.devicePixelRatio||1,2);
 
-        let savedLang = 'ja';
-        try {
-            savedLang = localStorage.getItem('selectedLang') || 'ja';
-        } catch (e) {
-        }
-        changeLanguage(savedLang);
+        var STARS={
+      vega:   {fx:0.42, fy:0.20, col:"200,222,255"},
+      deneb:  {fx:0.25, fy:0.46, col:"200,222,255"},
+      altair: {fx:0.73, fy:0.56, col:"200,222,255"}
+    };
+    var KEYS=["vega","deneb","altair"];
+    function cap(k){return k.charAt(0).toUpperCase()+k.slice(1);}
 
-        const header = document.getElementById('main-header');
-        const toTopBtn = document.getElementById('to-top');
-        
-        const btnLaunch = document.getElementById('btn-launch');
-        const cinemaLayer = document.getElementById('cinema-layer');
-        const btnCinemaClose = document.getElementById('btn-cinema-close');
-        const cinemaVideo = document.getElementById('cinema-video-element');
+        var PURIN_POS={
+      vega:   {fx:0.30, fy:0.30, lean:"lean-r"},
+      deneb:  {fx:0.16, fy:0.60, lean:"lean-r"},
+      altair: {fx:0.60, fy:0.70, lean:"lean-l"},
+      idle:   {fx:0.11, fy:0.80, lean:""}
+    };
 
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) {
-                header.classList.add('scrolled');
-            } else {
-                header.classList.remove('scrolled');
-            }
+    /* ── Localized content ── */
+    var INFO={
+      vega:{
+        name:{ja:"ベガ",en:"Vega",zh:"织女星"}, lat:"Vega α Lyrae",
+        body:{ja:"こと座の輝星、七夕の織女星。25光年先の白色星で、太陽の約37倍の明るさ。夏の大三角で最も明るく、三角形の直角の頂点にあたる。",
+              en:"The brightest of the trio and the right-angle apex. A white star 25 ly away, ~37× the Sun's brightness — the Weaver Star of Tanabata.",
+              zh:"三星中最亮者，也是直角三角形的顶点。距地球25光年的白色恒星，亮度约为太阳的37倍，正是七夕的织女星。"},
+        data:{ja:[["距離","25光年"],["明るさ","0.0等"],["七夕","織女星"]],
+              en:[["Dist","25 ly"],["Mag","0.0"],["Tanabata","Weaver"]],
+              zh:[["距离","25光年"],["星等","0.0"],["七夕","织女"]]}
+      },
+      deneb:{
+        name:{ja:"デネブ",en:"Deneb",zh:"天津四"}, lat:"Deneb α Cygni",
+        body:{ja:"はくちょう座の尾に輝く超巨星。約2,600光年という桁違いの遠さにありながら見えるのは、太陽の約20万倍という絶大な光度ゆえ。",
+              en:"A supergiant at the swan's tail. Astonishingly ~2,600 ly away, yet visible because it shines ~200,000× brighter than the Sun.",
+              zh:"天鹅座尾部的超巨星。远在约2600光年之外仍清晰可见，只因它的光度是太阳的约20万倍。"},
+        data:{ja:[["距離","2,600光年"],["明るさ","1.3等"],["光度","太陽20万倍"]],
+              en:[["Dist","2,600 ly"],["Mag","1.3"],["Lum","200,000×☉"]],
+              zh:[["距离","2600光年"],["星等","1.3"],["光度","20万倍☉"]]}
+      },
+      altair:{
+        name:{ja:"アルタイル",en:"Altair",zh:"牛郎星"}, lat:"Altair α Aquilae",
+        body:{ja:"わし座の輝星、七夕の牽牛星。約9時間で1回転する超高速自転で、赤道方向にふくらんだ扁平な形。16.7光年と近い。",
+              en:"The Cowherd Star in Aquila. It spins so fast (once every ~9 hours) that it bulges at the equator. A close neighbour at 16.7 ly.",
+              zh:"天鹰座的牛郎星。自转极快，约9小时一圈，因而赤道明显隆起。距地球仅16.7光年，是较近的邻星。"},
+        data:{ja:[["距離","16.7光年"],["明るさ","0.8等"],["七夕","牽牛星"]],
+              en:[["Dist","16.7 ly"],["Mag","0.8"],["Tanabata","Cowherd"]],
+              zh:[["距离","16.7光年"],["星等","0.8"],["七夕","牛郎"]]}
+      }
+    };
 
-            if (!cinemaLayer.classList.contains('active') && window.scrollY > 300) {
-                toTopBtn.classList.add('visible');
-            } else {
-                toTopBtn.classList.remove('visible');
-            }
-        });
+    var BUBBLES={
+      idle:{
+        ja:["星をタッチしてね！✨","ぼく、プリンスター🌟","「ツアー」ボタンもあるよ▶","夏の大三角、案内する！",
+            "いま太陽系の星空を勉強中📚","天の川、きれいなんだろうなぁ…🌌","イルカ座が近くにあるって聞いたよ🐬","七夕の夜が待ち遠しい〜🎋",
+            "デネブってすっごく遠いんだって👀","プリン、食べたくなってきた…🍮","流れ星、こないかなぁ⭐","北アルプスの空は特別だよ🏔️"],
+        en:["Tap a star! ✨","I'm Purin Star 🌟","Try the Tour button ▶","Let me guide you!",
+            "Studying the Solar System 📚","The Milky Way must be gorgeous…🌌","I hear Delphinus is nearby 🐬","Can't wait for Tanabata 🎋",
+            "Deneb is soooo far away 👀","Now I want some pudding…🍮","Hope a shooting star comes ⭐","Alpine skies are the best 🏔️"],
+        zh:["点一颗星星吧！✨","我是布丁星🌟","试试「导览」按钮▶","我来当向导！",
+            "正在学习太阳系的星空📚","银河一定超美的吧…🌌","听说海豚座就在附近🐬","好期待七夕的夜晚🎋",
+            "天津四竟然那么远👀","有点想吃布丁了…🍮","会有流星吗～⭐","北阿尔卑斯的星空最棒了🏔️"]
+      },
+      vega:{
+        ja:["これがベガ！✨\nいちばん明るくて\n三角形の直角の角だよ","こと座の織女星🌟\n七夕のおひめさま！","太陽の37倍も\n明るいんだって〜！"],
+        en:["This is Vega! ✨\nBrightest star and\nthe right-angle corner","The Weaver Star 🌟\nof Tanabata!","37× brighter\nthan the Sun!"],
+        zh:["这是织女星！✨\n最亮，也是\n直角的那个角","七夕的织女🌟","比太阳亮37倍呢！"]
+      },
+      deneb:{
+        ja:["デネブは遠いのに\nめっちゃ明るい！✨","なんと2600光年！\nでも太陽の\n20万倍の明るさ🌟","はくちょう座の\nしっぽの星だよ〜"],
+        en:["Deneb is far but\nsuper bright! ✨","2,600 light-years!\nYet 200,000×\nthe Sun 🌟","The swan's tail\nstar!"],
+        zh:["天津四好远\n却超级亮！✨","2600光年！\n却有太阳的\n20万倍亮🌟","是天鹅的尾巴星～"]
+      },
+      altair:{
+        ja:["アルタイルはね、\nすっごく速く\n回ってるんだ！💫","七夕の牽牛星！🐮\nベガとにらめっこ\nしてるの","16.7光年で\nわりと近所だよ😊"],
+        en:["Altair spins\nreally fast! 💫","The Cowherd Star!\nGazing at Vega\nacross the sky","Just 16.7 ly —\na neighbour! 😊"],
+        zh:["牛郎星转得\n超级快！💫","七夕的牛郎🐮\n和织女隔河相望","才16.7光年\n算近邻啦😊"]
+      },
+      finish:{
+        ja:["これが夏の大三角！\nまた見にきてね🌟"],
+        en:["That's the Summer\nTriangle! Come again 🌟"],
+        zh:["这就是夏季大三角！\n下次再来哦🌟"]
+      }
+    };
+    var TOUR_LABEL={ja:{play:"プリンスターツアー",stop:"ツアー中…"},en:{play:"Purin Star Tour",stop:"Touring…"},zh:{play:"布丁星导览",stop:"导览中…"}};
 
-        const observerOptions = { root: null, rootMargin: '0px', threshold: 0.15 };
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, observerOptions);
+        var purin=document.getElementById("stPurin");
+    var bubbleEl=document.getElementById("stBubble");
+    var bubbleTxt=document.getElementById("bubbleText");
+    var info=document.getElementById("stInfo");
+    var tourBtn=document.getElementById("tourBtn");
+    var tourLabel=document.getElementById("tourLabel");
 
-        document.querySelectorAll('.fade-in-up').forEach(el => observer.observe(el));
+    var curKey=null, activeKey=null, bubbleTimer=null, idleTimer=null;
+    var bgStars=[], touring=false, tourTimers=[];
 
-        const sections = document.querySelectorAll('div[id], section[id]');
-        const navLinks = document.querySelectorAll('.nav-link');
-        window.addEventListener('scroll', () => {
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                if (window.pageYOffset >= sectionTop - 100) {
-                    current = section.getAttribute('id');
-                }
-            });
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href').includes(current)) {
-                    link.classList.add('active');
-                }
-            });
-        });
+        function resize(){
+      W=stage.offsetWidth; H=stage.offsetHeight;
+      cv.width=W*DPR; cv.height=H*DPR; cv.style.width=W+"px"; cv.style.height=H+"px";
+      ctx.setTransform(DPR,0,0,DPR,0,0);
+      layoutStars();
+      buildBg();
+      placePurin(curKey||"idle", false);
+    }
+    function layoutStars(){
+      KEYS.forEach(function(k){
+        var s=STARS[k], sx=s.fx*W, sy=s.fy*H;
+        var btn=document.getElementById("star"+cap(k));
+        btn.style.left=sx+"px"; btn.style.top=sy+"px";
+        var lbl=document.getElementById("lbl"+cap(k));
 
-        btnLaunch.addEventListener('click', (e) => {
-            e.preventDefault();
-            document.body.classList.add('no-scroll');
-            cinemaLayer.classList.add('active');
-            cinemaVideo.currentTime = 0;
-            cinemaVideo.play().catch(error => {
-            });
-        });
+        lbl.style.left=(sx+ (k==="deneb"? -6 : 30))+"px";
+        lbl.style.top=(sy - 4)+"px";
+        lbl.style.transform= k==="deneb" ? "translate(-100%,0)" : "translate(0,0)";
+      });
+      var cx=(STARS.vega.fx+STARS.deneb.fx+STARS.altair.fx)/3;
+      var cy=(STARS.vega.fy+STARS.deneb.fy+STARS.altair.fy)/3;
+      var tl=document.getElementById("triLabel");
+      if(tl){tl.style.left=(cx*W)+"px"; tl.style.top=(cy*H+10)+"px";}
+    }
+    function buildBg(){
+      bgStars=[];
+      var n=Math.round(W*H/850);
+      for(var i=0;i<n;i++){
+        var warm=Math.random();
+        bgStars.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.3+0.2,
+          a:Math.random()*0.5+0.15,tw:Math.random()*6.28,
+          col:warm>0.85?"190,215,255":warm>0.7?"244,220,160":"244,238,222"});
+      }
+    }
 
-        btnCinemaClose.addEventListener('click', () => {
-            cinemaLayer.classList.remove('active');
-            document.body.classList.remove('no-scroll');
-            cinemaVideo.pause();
-            
-            const textBox = cinemaLayer.querySelector('.cinema-text-box');
-            const newTextBox = textBox.cloneNode(true);
-            textBox.parentNode.replaceChild(newTextBox, textBox);
-        });
+        function placePurin(key, animate){
+      var p=PURIN_POS[key]||PURIN_POS.idle;
+      var pw=purin.offsetWidth, ph=purin.offsetHeight;
+      var left=Math.max(6,Math.min(W-pw-6, p.fx*W - pw/2));
+      var top =Math.max(6,Math.min(H-ph-6, p.fy*H - ph/2));
+      purin.style.left=left+"px";
+      purin.style.top =top+"px";
+      purin.classList.remove("lean-l","lean-r");
+      if(p.lean) purin.classList.add(p.lean);
+      if(animate){
+        purin.classList.add("jumping");
+        setTimeout(function(){purin.classList.remove("jumping");},700);
+      }
+    }
 
-        function initNewsPreview() {
-            const listEl = document.getElementById('news-preview-list');
-            if(!listEl || typeof newsData === 'undefined') return;
+        var bq=[], bqi=0;
+    function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+    function idleBubbles(lang){return shuffle(BUBBLES.idle[lang]);}
+    function setBubble(arr){
+      clearInterval(bubbleTimer);
+      bq=arr; bqi=0;
+      bubbleTxt.textContent=arr[0];
+      bubbleEl.classList.remove("hide");
+      if(arr.length>1){
+        bubbleTimer=setInterval(function(){bqi=(bqi+1)%bq.length;bubbleTxt.textContent=bq[bqi];},3400);
+      }
+    }
 
-            const topNews = newsData.slice(0, 2);
-            
-            topNews.forEach(news => {
-                const li = document.createElement('li');
-                li.innerHTML = `
-                    <div class="preview-meta">
-                        <span class="preview-date">${news.date}</span>
-                        <span class="preview-cat">${news.category}</span>
-                    </div>
-                    <a href="news.html" class="preview-title">${news.title}</a>
-                `;
-                listEl.appendChild(li);
-            });
-        }
+        function showInfo(key){
+      var L=curLang, d=INFO[key];
+      document.getElementById("stiName").textContent=d.name[L];
+      document.getElementById("stiLat").textContent=d.lat;
+      document.getElementById("stiBody").textContent=d.body[L];
+      document.getElementById("stiData").innerHTML=d.data[L].map(function(r){
+        return '<div class="sti-row"><span class="pill">'+r[0]+'</span>'+r[1]+'</div>';
+      }).join("");
+      info.classList.add("show");
+    }
+    function hideInfo(){info.classList.remove("show");}
 
-        function initMoonPhase() {
-            const today = new Date();
-            
-            const y = today.getFullYear();
-            const m = String(today.getMonth() + 1).padStart(2, '0');
-            const d = String(today.getDate()).padStart(2, '0');
-            document.getElementById('moon-date').innerText = `${y}.${m}.${d}`;
+        function select(key, fromTour){
+      if(!fromTour) stopTour();
+      KEYS.forEach(function(k){document.getElementById("star"+cap(k)).classList.remove("active");});
+      if(curKey===key && !fromTour){
+        curKey=null; activeKey=null; hideInfo();
+        placePurin("idle",true); setBubble(idleBubbles(curLang)); return;
+      }
+      curKey=key; activeKey=key;
+      document.getElementById("star"+cap(key)).classList.add("active");
+      placePurin(key,true);
+      setBubble(BUBBLES[key][curLang]);
+      showInfo(key);
+    }
 
-            const knownNewMoon = new Date(Date.UTC(2000, 0, 6, 18, 14)).getTime();
-            const lunarCycle = 29.530588853 * 24 * 60 * 60 * 1000;
-            const now = today.getTime();
-            
-            let ageMs = (now - knownNewMoon) % lunarCycle;
-            if (ageMs < 0) ageMs += lunarCycle;
-            
-            const age = ageMs / (1000 * 60 * 60 * 24);
-            document.getElementById('moon-age-number').innerText = age.toFixed(1);
+    KEYS.forEach(function(k){
+      document.getElementById("star"+cap(k)).addEventListener("click",function(){select(k,false);});
+    });
 
-            let phaseIndex = 0; 
-            let moonEmoji = "🌑";
+        function stopTour(){
+      touring=false;
+      tourTimers.forEach(clearTimeout); tourTimers=[];
+      tourBtn.classList.remove("playing");
+      tourLabel.textContent=TOUR_LABEL[curLang].play;
+    }
+    function startTour(){
+      stopTour();
+      touring=true;
+      tourBtn.classList.add("playing");
+      tourLabel.textContent=TOUR_LABEL[curLang].stop;
+      var seq=["vega","deneb","altair"], step=4200;
+      seq.forEach(function(k,i){
+        tourTimers.push(setTimeout(function(){ if(touring) select(k,true); }, i*step));
+      });
+      tourTimers.push(setTimeout(function(){
+        if(!touring)return;
+        KEYS.forEach(function(k){document.getElementById("star"+cap(k)).classList.remove("active");});
+        curKey=null; activeKey=null; hideInfo();
+        placePurin("idle",true);
+        setBubble(BUBBLES.finish[curLang]);
+        stopTour();
+        setTimeout(function(){ if(!curKey&&!touring) setBubble(idleBubbles(curLang)); },4200);
+      }, seq.length*step));
+    }
+    tourBtn.addEventListener("click",function(){ touring?stopTour():startTour(); });
 
-            if (age < 1.8)      { phaseIndex = 0; moonEmoji = "🌑"; }
-            else if (age < 5.5)  { phaseIndex = 1; moonEmoji = "🌒"; }
-            else if (age < 9.2)  { phaseIndex = 2; moonEmoji = "🌓"; }
-            else if (age < 12.9) { phaseIndex = 3; moonEmoji = "🌔"; }
-            else if (age < 16.6) { phaseIndex = 4; moonEmoji = "🌕"; }
-            else if (age < 20.3) { phaseIndex = 5; moonEmoji = "🌖"; }
-            else if (age < 24.0) { phaseIndex = 6; moonEmoji = "🌗"; }
-            else if (age < 27.7) { phaseIndex = 7; moonEmoji = "🌘"; }
-            else                 { phaseIndex = 0; moonEmoji = "🌑"; }
+        onLang(function(lang){
+      tourLabel.textContent= touring?TOUR_LABEL[lang].stop:TOUR_LABEL[lang].play;
+      if(curKey){ setBubble(BUBBLES[curKey][lang]); showInfo(curKey); }
+      else setBubble(idleBubbles(lang));
+    });
 
-            const visualEl = document.getElementById('moon-visual');
-            visualEl.innerText = moonEmoji;
-            visualEl.dataset.phaseIndex = phaseIndex; 
-            
-            const lang = localStorage.getItem('selectedLang') || 'ja';
-            document.getElementById('moon-name').innerText = translations[lang].moonPhases[phaseIndex];
-        }
+        var triProg={vega:0,deneb:0,altair:0}, triState={vega:0,deneb:0,altair:0}, t0=null;
+    function line(ax,ay,bx,by,prog,alpha){
+      if(prog<=0)return;
+      ctx.save();
+      ctx.globalAlpha=alpha; ctx.strokeStyle="#8fd0ff"; ctx.lineWidth=1.6; ctx.lineCap="round";
+      ctx.shadowColor="#8fd0ff"; ctx.shadowBlur=8;
+      ctx.beginPath(); ctx.moveTo(ax,ay); ctx.lineTo(ax+(bx-ax)*prog, ay+(by-ay)*prog); ctx.stroke();
+      ctx.restore();
+    }
+    function glow(x,y,col,r,a){
+      var g=ctx.createRadialGradient(x,y,0,x,y,r);
+      g.addColorStop(0,"rgba("+col+","+a+")"); g.addColorStop(1,"rgba("+col+",0)");
+      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,r,0,6.28); ctx.fill();
+    }
+    function pointer(){
 
-        function initStarryIndex() {
-            const today = new Date();
-            
-            const y = today.getFullYear();
-            const m = String(today.getMonth() + 1).padStart(2, '0');
-            const d = String(today.getDate()).padStart(2, '0');
-            document.getElementById('starry-date').innerText = `${y}.${m}.${d}`;
+      if(!activeKey)return;
+      var s=STARS[activeKey], sx=s.fx*W, sy=s.fy*H;
+      var px=purin.offsetLeft+purin.offsetWidth*0.5;
+      var py=purin.offsetTop+purin.offsetHeight*0.3;
+      ctx.save();
+      ctx.setLineDash([2,7]); ctx.lineDashOffset=-(Date.now()/60)%9;
+      ctx.strokeStyle="rgba(244,220,150,.8)"; ctx.lineWidth=2; ctx.lineCap="round";
+      ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(sx,sy); ctx.stroke();
+      ctx.restore();
+    }
+    function frame(ts){
+      if(!t0)t0=ts; var dt=(ts-t0)/1000; t0=ts;
+      ctx.clearRect(0,0,W,H);
 
-            const score = Math.floor(Math.random() * 101); 
-            document.getElementById('starry-score-number').innerText = score;
+      bgStars.forEach(function(st){
+        st.tw+=dt*0.5; ctx.globalAlpha=st.a*(0.6+0.4*Math.sin(st.tw));
+        ctx.fillStyle="rgba("+st.col+",1)"; ctx.beginPath(); ctx.arc(st.x,st.y,st.r,0,6.28); ctx.fill();
+      });
+      ctx.globalAlpha=1;
 
-            let conditionIndex = 0; 
-            
-            if (score >= 90)     { conditionIndex = 0; } 
-            else if (score >= 70) { conditionIndex = 1; } 
-            else if (score >= 50) { conditionIndex = 2; } 
-            else if (score >= 30) { conditionIndex = 3; } 
-            else                 { conditionIndex = 4; } 
+      var g=ctx.createLinearGradient(0,H,W*0.9,0);
+      g.addColorStop(0,"rgba(120,110,190,0)"); g.addColorStop(.4,"rgba(120,110,195,.07)");
+      g.addColorStop(.55,"rgba(140,125,205,.11)"); g.addColorStop(.7,"rgba(120,110,195,.07)");
+      g.addColorStop(1,"rgba(120,110,190,0)");
+      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
 
-            const visualEl = document.getElementById('starry-visual');
-            visualEl.dataset.conditionIndex = conditionIndex; 
-            
-            const lang = localStorage.getItem('selectedLang') || 'ja';
-            document.getElementById('starry-condition').innerText = translations[lang].starryConditions[conditionIndex];
-        }
+      var v=STARS.vega, d=STARS.deneb, a=STARS.altair;
+      var vx=v.fx*W,vy=v.fy*H, dx=d.fx*W,dy=d.fy*H, axx=a.fx*W,ayy=a.fy*H;
 
-        document.addEventListener('DOMContentLoaded', () => {
-            initNewsPreview();
-            initMoonPhase();
-            initStarryIndex();
-        });
-    </script>
+      function edgeA(k1,k2){ return (activeKey===k1||activeKey===k2)?0.9:0.22; }
+      line(vx,vy,dx,dy,Math.min(1,triProg.vega),edgeA("vega","deneb"));
+      line(dx,dy,axx,ayy,Math.min(1,triProg.deneb),edgeA("deneb","altair"));
+      line(axx,ayy,vx,vy,Math.min(1,triProg.altair),edgeA("altair","vega"));
+
+      var spd=0.75;
+      if(triState.vega===1){triProg.vega+=dt*spd; if(triProg.vega>=1){triProg.vega=1;triState.vega=2;triState.deneb=1;}}
+      if(triState.deneb===1){triProg.deneb+=dt*spd; if(triProg.deneb>=1){triProg.deneb=1;triState.deneb=2;triState.altair=1;}}
+      if(triState.altair===1){triProg.altair+=dt*spd; if(triProg.altair>=1){triProg.altair=1;triState.altair=2;}}
+
+      glow(vx,vy,v.col,34,0.4); glow(dx,dy,d.col,26,0.34); glow(axx,ayy,a.col,26,0.34);
+      pointer();
+      requestAnimationFrame(frame);
+    }
+
+        var io2=new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){ triState.vega=1; io2.disconnect(); }});
+    },{threshold:0.3});
+    io2.observe(stage);
+
+    resize();
+    window.addEventListener("resize",function(){clearTimeout(window.__str);window.__str=setTimeout(resize,180);});
+    requestAnimationFrame(frame);
+
+    purin.classList.add("entering");
+    setTimeout(function(){purin.classList.remove("entering");},900);
+    setBubble(idleBubbles('ja'));
+    idleTimer=setInterval(function(){ if(!curKey&&!touring) setBubble(idleBubbles(curLang)); },13000);
+    setTimeout(function(){placePurin("idle",false);},120);
+
+  })();
+
+    (function(){
+    var cv=document.getElementById("sky"), ctx=cv.getContext("2d");
+    var W,H,DPR=Math.min(window.devicePixelRatio||1,2);
+    var stars=[], shooters=[], milky=[], cx, cy;
+    function size(){
+      W=cv.width=innerWidth*DPR; H=cv.height=innerHeight*DPR;
+      cv.style.width=innerWidth+"px"; cv.style.height=innerHeight+"px";
+      cx=W*0.78; cy=H*0.14; build();
+    }
+    function build(){
+      stars=[]; milky=[];
+      var n=Math.max(120,Math.min(360,Math.round((innerWidth*innerHeight)/5200)));
+      for(var i=0;i<n;i++){
+        var x=Math.random()*W, y=Math.random()*H, dx=x-cx, dy=y-cy;
+        var warm=Math.random();
+        var col=warm>0.86?"244,217,160":warm>0.72?"180,200,255":"244,238,222";
+        stars.push({ang:Math.atan2(dy,dx),rad:Math.hypot(dx,dy),r:(Math.random()*1.4+0.3)*DPR,
+          a:Math.random()*0.6+0.25,tw:Math.random()*Math.PI*2,ts:Math.random()*0.02+0.004,col:col});
+      }
+      for(var m=0;m<Math.round(n*0.5);m++){
+        var t=Math.random();
+        var bx=W*(0.15+t*0.8)+(Math.random()-0.5)*W*0.16;
+        var by=H*(0.85-t*0.75)+(Math.random()-0.5)*H*0.14;
+        milky.push({ang:Math.atan2(by-cy,bx-cx),rad:Math.hypot(bx-cx,by-cy),r:(Math.random()*1.0+0.2)*DPR,a:Math.random()*0.25+0.05});
+      }
+    }
+    var rot=0,lastShoot=0;
+    function spawnShooter(){
+      if(reduce)return;
+      shooters.push({x:Math.random()*W*0.8,y:Math.random()*H*0.4,vx:(Math.random()*4+5)*DPR,vy:(Math.random()*2+2)*DPR,life:0,max:Math.random()*30+30});
+    }
+    function draw(ts){
+      ctx.clearRect(0,0,W,H);
+      if(!reduce) rot+=0.00006;
+      for(var m=0;m<milky.length;m++){
+        var p=milky[m], a=p.ang+rot;
+        ctx.globalAlpha=p.a; ctx.fillStyle="#b9aed8";
+        ctx.beginPath();ctx.arc(cx+Math.cos(a)*p.rad,cy+Math.sin(a)*p.rad,p.r,0,6.28);ctx.fill();
+      }
+      for(var i=0;i<stars.length;i++){
+        var s=stars[i], ang=s.ang+rot;
+        var x=cx+Math.cos(ang)*s.rad, y=cy+Math.sin(ang)*s.rad;
+        var tw=reduce?s.a:s.a*(0.6+0.4*Math.sin(s.tw+(ts||0)*s.ts*0.06));
+        ctx.globalAlpha=Math.max(0,tw); ctx.fillStyle="rgba("+s.col+",1)";
+        ctx.beginPath();ctx.arc(x,y,s.r,0,6.28);ctx.fill();
+        if(s.r>1.5*DPR){ ctx.globalAlpha=tw*0.25; ctx.beginPath();ctx.arc(x,y,s.r*2.6,0,6.28);ctx.fill(); }
+      }
+      for(var k=shooters.length-1;k>=0;k--){
+        var sh=shooters[k]; sh.life++; sh.x+=sh.vx; sh.y+=sh.vy;
+        var op=Math.max(0,1-sh.life/sh.max);
+        var g2=ctx.createLinearGradient(sh.x,sh.y,sh.x-sh.vx*4,sh.y-sh.vy*4);
+        g2.addColorStop(0,"rgba(244,238,222,"+op+")"); g2.addColorStop(1,"rgba(244,238,222,0)");
+        ctx.globalAlpha=1;ctx.strokeStyle=g2;ctx.lineWidth=1.4*DPR;ctx.lineCap="round";
+        ctx.beginPath();ctx.moveTo(sh.x,sh.y);ctx.lineTo(sh.x-sh.vx*4,sh.y-sh.vy*4);ctx.stroke();
+        if(sh.life>sh.max) shooters.splice(k,1);
+      }
+      ctx.globalAlpha=1;
+      if(!reduce && ts-lastShoot>Math.random()*4000+3500){ lastShoot=ts; spawnShooter(); }
+      requestAnimationFrame(draw);
+    }
+    size();
+    window.addEventListener("resize",function(){clearTimeout(window.__rs);window.__rs=setTimeout(size,200);});
+    requestAnimationFrame(draw);
+    if(!reduce){
+      window.addEventListener("pointermove",function(e){
+        var mx=(e.clientX/innerWidth-0.5), my=(e.clientY/innerHeight-0.5);
+        cv.style.transform="translate("+(mx*-14)+"px,"+(my*-10)+"px)";
+      });
+    }
+  })();
+
+    setLang("ja");
+})();
+</script>
 </body>
 </html>
